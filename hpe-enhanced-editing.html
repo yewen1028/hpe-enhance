@@ -814,8 +814,8 @@
        and over the one before it (like a deck of cards). Every later section
        gets a high z-index so it scrolls over the whole pinned stack. Sections
        are opaque so whatever is pinned behind stays hidden. */
-    body > section,
-    body > footer {
+    body>section,
+    body>footer {
 
       position: relative;
 
@@ -823,11 +823,21 @@
 
     }
 
-    .hero      { z-index: 0; }
+    .hero {
+      z-index: 0;
+    }
 
-    .keyfacts  { position: sticky; top: 0; z-index: 1; }
+    .keyfacts {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
 
-    .about     { position: sticky; top: 0; z-index: 2; }
+    .about {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
 
 
 
@@ -1090,7 +1100,7 @@
 
       inset: 0;
 
-      background: linear-gradient(to right, var(--navy) 0%, rgba(13,27,42,.92) 28%, rgba(13,27,42,.55) 58%, rgba(13,27,42,0) 100%);
+      background: linear-gradient(to right, var(--navy) 0%, rgba(13, 27, 42, .92) 28%, rgba(13, 27, 42, .55) 58%, rgba(13, 27, 42, 0) 100%);
 
       z-index: 1;
 
@@ -1117,21 +1127,32 @@
     /* orange diagonal sheen removed per request */
 
     /* staggered entrance for the hero copy after reveal */
-    .hero-left > * {
+    .hero-left>* {
       opacity: 0;
       transform: translateY(18px);
     }
 
-    .hero-left.reveal > * {
+    .hero-left.reveal>* {
       opacity: 1;
       transform: translateY(0);
       transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
     }
 
-    .hero-left.reveal > .hero-badge { transition-delay: .05s; }
-    .hero-left.reveal > h1          { transition-delay: .16s; }
-    .hero-left.reveal > p           { transition-delay: .28s; }
-    .hero-left.reveal > .hero-btns  { transition-delay: .40s; }
+    .hero-left.reveal>.hero-badge {
+      transition-delay: .05s;
+    }
+
+    .hero-left.reveal>h1 {
+      transition-delay: .16s;
+    }
+
+    .hero-left.reveal>p {
+      transition-delay: .28s;
+    }
+
+    .hero-left.reveal>.hero-btns {
+      transition-delay: .40s;
+    }
 
     /* button shine micro-interaction */
     .btn-orange,
@@ -1161,10 +1182,12 @@
 
     @media (prefers-reduced-motion: reduce) {
 
-      .hero::after { animation: none; }
+      .hero::after {
+        animation: none;
+      }
 
-      .hero-left > *,
-      .hero-left.reveal > * {
+      .hero-left>*,
+      .hero-left.reveal>* {
         opacity: 1;
         transform: none;
         transition: none;
@@ -1207,9 +1230,7 @@
     .hero-right img,
     .hero-right video {
       transform:
-        translate3d(var(--mx, 0px), calc(var(--py, 0px) + var(--my, 0px)), 0)
-        rotateY(var(--rx, 0deg)) rotateX(var(--ry, 0deg))
-        scale(1.12);
+        translate3d(var(--mx, 0px), calc(var(--py, 0px) + var(--my, 0px)), 0) rotateY(var(--rx, 0deg)) rotateX(var(--ry, 0deg)) scale(1.12);
       will-change: transform;
     }
 
@@ -1599,8 +1620,17 @@
     }
 
     @keyframes introPulse {
-      0%, 100% { transform: scale(.82); opacity: .5; }
-      50%      { transform: scale(1.06); opacity: 1; }
+
+      0%,
+      100% {
+        transform: scale(.82);
+        opacity: .5;
+      }
+
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
     }
 
     .intro-logo {
@@ -1633,7 +1663,7 @@
       letter-spacing: .3px;
     }
 
-    .intro-fallback > span {
+    .intro-fallback>span {
       background: var(--orange);
       color: #fff;
       padding: 5px 12px;
@@ -1653,7 +1683,9 @@
       transition: opacity .5s ease .25s;
     }
 
-    .intro-logo.show ~ .intro-bar { opacity: 1; }
+    .intro-logo.show~.intro-bar {
+      opacity: 1;
+    }
 
     .intro-bar::before {
       content: '';
@@ -1668,8 +1700,13 @@
     }
 
     @keyframes introSweep {
-      0%   { left: -45%; }
-      100% { left: 105%; }
+      0% {
+        left: -45%;
+      }
+
+      100% {
+        left: 105%;
+      }
     }
 
     .intro-tag {
@@ -1683,12 +1720,17 @@
       transition: opacity .6s ease .35s, transform .6s ease .35s;
     }
 
-    .intro-logo.show ~ .intro-tag { opacity: 1; transform: translateY(0); }
+    .intro-logo.show~.intro-tag {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     @media (prefers-reduced-motion: reduce) {
 
       .intro-glow,
-      .intro-bar::before { animation: none; }
+      .intro-bar::before {
+        animation: none;
+      }
     }
 
 
@@ -1769,7 +1811,7 @@
 
       transform: translateY(18px) scale(.92);
 
-      transition: transform .5s cubic-bezier(.34,1.56,.64,1), opacity .5s ease, background .35s ease;
+      transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), opacity .5s ease, background .35s ease;
 
       cursor: default;
 
@@ -1823,7 +1865,7 @@
 
       box-shadow: 0 0 24px rgba(244, 121, 32, .18);
 
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease, border-color .35s ease;
+      transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .35s ease, border-color .35s ease;
 
     }
 
@@ -2085,7 +2127,11 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .sr { opacity: 1; transform: none; transition: none; }
+      .sr {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
     }
 
 
@@ -2215,7 +2261,7 @@
     }
 
     /* diagonal scroll-parallax: JS drifts the content in from the bottom-left */
-    .services > div {
+    .services>div {
 
       transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0);
 
@@ -2589,7 +2635,7 @@
 
       z-index: 1;
 
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1), border-color .3s ease, box-shadow .3s ease, background .3s ease;
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), border-color .3s ease, box-shadow .3s ease, background .3s ease;
 
     }
 
@@ -2674,7 +2720,7 @@
 
       height: 160px;
 
-      background: linear-gradient(to bottom, var(--navy) 0%, rgba(13,27,42,0) 100%);
+      background: linear-gradient(to bottom, var(--navy) 0%, rgba(13, 27, 42, 0) 100%);
 
       opacity: .09;
 
@@ -2686,7 +2732,7 @@
 
 
 
-    .industries > * {
+    .industries>* {
 
       position: relative;
 
@@ -2734,7 +2780,7 @@
 
       box-shadow: var(--shadow);
 
-      transition: transform .55s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+      transition: transform .55s cubic-bezier(.22, 1, .36, 1), box-shadow .4s ease;
 
     }
 
@@ -2756,7 +2802,7 @@
 
       transform: scale(1.03);
 
-      transition: transform .7s cubic-bezier(.22,1,.36,1);
+      transition: transform .7s cubic-bezier(.22, 1, .36, 1);
 
       z-index: -2;
 
@@ -2772,7 +2818,7 @@
 
       inset: 0;
 
-      background: linear-gradient(to top, rgba(13,27,42,.92) 0%, rgba(13,27,42,.55) 46%, rgba(13,27,42,.12) 100%);
+      background: linear-gradient(to top, rgba(13, 27, 42, .92) 0%, rgba(13, 27, 42, .55) 46%, rgba(13, 27, 42, .12) 100%);
 
       transition: background .4s ease;
 
@@ -2786,7 +2832,7 @@
 
       transform: translateY(-8px);
 
-      box-shadow: 0 22px 46px rgba(13,27,42,.30);
+      box-shadow: 0 22px 46px rgba(13, 27, 42, .30);
 
     }
 
@@ -2802,7 +2848,7 @@
 
     .industry-card:hover::after {
 
-      background: linear-gradient(to top, rgba(244,121,32,.86) 0%, rgba(13,27,42,.6) 55%, rgba(13,27,42,.14) 100%);
+      background: linear-gradient(to top, rgba(244, 121, 32, .86) 0%, rgba(13, 27, 42, .6) 55%, rgba(13, 27, 42, .14) 100%);
 
     }
 
@@ -2820,9 +2866,9 @@
 
       border-radius: 12px;
 
-      background: rgba(255,255,255,.16);
+      background: rgba(255, 255, 255, .16);
 
-      border: 1px solid rgba(255,255,255,.24);
+      border: 1px solid rgba(255, 255, 255, .24);
 
       -webkit-backdrop-filter: blur(4px);
 
@@ -2866,7 +2912,7 @@
 
       letter-spacing: .2px;
 
-      text-shadow: 0 2px 10px rgba(0,0,0,.45);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, .45);
 
     }
 
@@ -4310,7 +4356,11 @@
 
       overflow: hidden;
 
-      margin-top: 8px;
+      /* vertical headroom so a hovered logo's lift/scale isn't clipped by
+         overflow:hidden (which we need for the horizontal marquee) */
+      padding: 18px 0;
+
+      margin-top: -10px;
 
       -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
 
@@ -4342,9 +4392,13 @@
 
     @keyframes pb-marquee {
 
-      from { transform: translate3d(-50%, 0, 0); }
+      from {
+        transform: translate3d(-50%, 0, 0);
+      }
 
-      to   { transform: translate3d(0, 0, 0); }
+      to {
+        transform: translate3d(0, 0, 0);
+      }
 
     }
 
@@ -7830,7 +7884,25 @@
 
 <body>
 
-  <noscript><style>.kf-item{opacity:1 !important;transform:none !important;}.hero-left,.hero-right,.hero-left>*{opacity:1 !important;transform:none !important;}#introCurtain{display:none !important;}</style></noscript>
+  <noscript>
+    <style>
+      .kf-item {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .hero-left,
+      .hero-right,
+      .hero-left>* {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      #introCurtain {
+        display: none !important;
+      }
+    </style>
+  </noscript>
 
   <div id="introCurtain">
 
@@ -8037,7 +8109,8 @@
 
     <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-users"></i> IT Staffing</a>
 
-    <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-shield-halved"></i> Authorised Warranty Provider</a>
+    <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-shield-halved"></i> Authorised Warranty
+      Provider</a>
 
     <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-lightbulb"></i> Total Solution &amp; Sourcing</a>
 
@@ -8045,8 +8118,7 @@
 
     <div class="mob-divider"></div>
 
-    <a href="#casestudy"
-      onclick="hamburger.classList.remove('open');mobileMenu.classList.remove('open');"
+    <a href="#casestudy" onclick="hamburger.classList.remove('open');mobileMenu.classList.remove('open');"
       class="mob-link"><i class="fa-solid fa-file-lines"></i> Case Study</a>
 
     <a href="#centers" class="mob-link"><i class="fa-solid fa-map-location-dot"></i> Service Centers</a>
@@ -8093,9 +8165,8 @@
 
     <div class="hero-right">
 
-      <video class="hero-video" autoplay muted loop playsinline preload="metadata"
-        poster="assets/hero-it-support.jpg" data-parallax="0.55"
-        aria-label="Network cables connected in a server rack">
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-it-support.jpg"
+        data-parallax="0.55" aria-label="Network cables connected in a server rack">
         <source src="assets/hero-it.mp4" type="video/mp4" />
         <img src="assets/hero-it-support.jpg" alt="IT technician connecting network cables in a server rack" />
       </video>
@@ -8384,29 +8455,29 @@
 
       <div class="about-media">
 
-      <span class="about-shape about-shape-a"></span>
+        <span class="about-shape about-shape-a"></span>
 
-      <span class="about-shape about-shape-b"></span>
+        <span class="about-shape about-shape-b"></span>
 
-      <span class="about-shape about-shape-c"></span>
+        <span class="about-shape about-shape-c"></span>
 
-      <div class="about-img-wrap">
+        <div class="about-img-wrap">
 
-        <video autoplay muted loop playsinline preload="metadata"
-          poster="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"
-          aria-label="HPE Solutions IT support team at work">
-          <source src="assets/about-it.mp4" type="video/mp4" />
-        </video>
+          <video autoplay muted loop playsinline preload="metadata"
+            poster="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"
+            aria-label="HPE Solutions IT support team at work">
+            <source src="assets/about-it.mp4" type="video/mp4" />
+          </video>
 
-        <div class="about-img-badge">
+          <div class="about-img-badge">
 
-          <span class="big">10+</span>
+            <span class="big">10+</span>
 
-          Years of Trusted<br>IT Excellence
+            Years of Trusted<br>IT Excellence
+
+          </div>
 
         </div>
-
-      </div>
 
       </div>
 
@@ -8522,8 +8593,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="IT Support &amp; Managed Services" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8551,8 +8621,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="Project Deployment" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8580,8 +8649,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/5453822/pexels-photo-5453822.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/5453822/pexels-photo-5453822.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="IT Helpdesk" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8609,8 +8677,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="IT Staffing" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8638,8 +8705,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/1476321/pexels-photo-1476321.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/1476321/pexels-photo-1476321.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="Authorised Warranty Provider" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8667,8 +8733,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="Total Solution &amp; Sourcing" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8696,8 +8761,7 @@
 
         <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <img
-            src="https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=800"
+          <img src="https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=800"
             alt="Value Added Service" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
@@ -8860,29 +8924,68 @@
 
     <div class="industries-grid">
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-building-columns"></i></span><span class="ic-name">Banking</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-building-columns"></i></span><span class="ic-name">Banking</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/2101137/pexels-photo-2101137.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-oil-well"></i></span><span class="ic-name">Oil &amp; Gas</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/2101137/pexels-photo-2101137.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-oil-well"></i></span><span class="ic-name">Oil &amp; Gas</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-tower-broadcast"></i></span><span class="ic-name">Telecommunications</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-tower-broadcast"></i></span><span
+          class="ic-name">Telecommunications</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-cart-shopping"></i></span><span class="ic-name">Retail</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-cart-shopping"></i></span><span class="ic-name">Retail</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/305566/pexels-photo-305566.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-hospital"></i></span><span class="ic-name">Healthcare</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/305566/pexels-photo-305566.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-hospital"></i></span><span class="ic-name">Healthcare</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/208724/pexels-photo-208724.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-landmark"></i></span><span class="ic-name">Government</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/208724/pexels-photo-208724.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-landmark"></i></span><span class="ic-name">Government</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/236698/pexels-photo-236698.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-industry"></i></span><span class="ic-name">Manufacturing</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/236698/pexels-photo-236698.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-industry"></i></span><span class="ic-name">Manufacturing</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-truck"></i></span><span class="ic-name">Logistics</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-truck"></i></span><span class="ic-name">Logistics</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-graduation-cap"></i></span><span class="ic-name">Education</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-graduation-cap"></i></span><span class="ic-name">Education</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/66134/pexels-photo-66134.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-photo-film"></i></span><span class="ic-name">Media &amp; Broadcasting</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/66134/pexels-photo-66134.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-photo-film"></i></span><span class="ic-name">Media &amp;
+          Broadcasting</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-plane"></i></span><span class="ic-name">Airlines &amp; Hospitality</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-plane"></i></span><span class="ic-name">Airlines &amp;
+          Hospitality</span>
+      </div>
 
-      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-car"></i></span><span class="ic-name">Automotive</span></div>
+      <div class="industry-card"
+        style="--ci:url('https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=800')">
+        <span class="ic-icon"><i class="fa-solid fa-car"></i></span><span class="ic-name">Automotive</span>
+      </div>
 
     </div>
 
@@ -9559,7 +9662,7 @@
 
       <div class="section-tag" style="justify-content:center;">Business Partners</div>
 
-      <h2 class="section-title">Our Technology Partners</h2>
+      <h2 class="section-title">Our Business Partners</h2>
 
       <p class="section-sub" style="margin:0 auto;">Authorised support and reseller partner for leading global
 
@@ -9573,75 +9676,181 @@
 
         <!-- set 1 -->
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/amp.png" alt="AMP logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/amp.png" alt="AMP logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/aruba.png" alt="Aruba logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/aruba.png" alt="Aruba logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/avaya.png" alt="AVAYA logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/avaya.png" alt="AVAYA logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cisco.png" alt="Cisco logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cisco.png" alt="Cisco logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cyberoam.png" alt="Cyberoam logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cyberoam.png"
+              alt="Cyberoam logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/dintek.png" alt="DINTEK logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/dintek.png" alt="DINTEK logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/fortinet.png" alt="Fortinet logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/fortinet.png"
+              alt="Fortinet logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/hpe.png" alt="HP Enterprise logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/hpe.png"
+              alt="HP Enterprise logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/huawei.png" alt="Huawei logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/huawei.png" alt="Huawei logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/microsoft.png" alt="Microsoft logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/microsoft.png"
+              alt="Microsoft logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/peplink.png" alt="Peplink logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/peplink.png" alt="Peplink logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/riverbed.png" alt="Riverbed logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/riverbed.png"
+              alt="Riverbed logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/ruckus.png" alt="Ruckus logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/ruckus.png" alt="Ruckus logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sangfor.png" alt="SANGFOR logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sangfor.png" alt="SANGFOR logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sophos.png" alt="Sophos logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sophos.png" alt="Sophos logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span>
+        </div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/tm.png" alt="TM logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/tm.png" alt="TM logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
 
-        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/veeam.png" alt="Veeam logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/veeam.png" alt="Veeam logo"
+              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
 
         <!-- set 2 (duplicate for seamless loop) -->
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/amp.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/amp.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/aruba.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/aruba.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/avaya.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/avaya.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/cisco.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/cisco.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/cyberoam.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/cyberoam.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/dintek.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/dintek.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/fortinet.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/fortinet.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/hpe.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/hpe.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/huawei.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/huawei.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/microsoft.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/microsoft.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/peplink.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/peplink.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/riverbed.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/riverbed.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/ruckus.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/ruckus.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/sangfor.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/sangfor.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/sophos.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/sophos.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span>
+        </div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/tm.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/tm.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
 
-        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/veeam.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
+              src="assets/partner-logos/veeam.png" alt="" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
 
       </div>
 
@@ -9869,7 +10078,8 @@
 
       <div class="footer-brand">
 
-        <span style="font-weight:800; font-size:18px; color:white; margin-bottom:16px; display:block;">hpe solutions</span>
+        <span style="font-weight:800; font-size:18px; color:white; margin-bottom:16px; display:block;">hpe
+          solutions</span>
 
         <p>Malaysia's established IT support service provider with a nationwide support centre network, serving
 
