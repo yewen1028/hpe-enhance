@@ -805,6 +805,8 @@
 
       z-index: 0;
 
+      perspective: 1200px;
+
     }
 
     /* Stacked sticky-reveal parallax. The hero plus the next three sections
@@ -1198,10 +1200,16 @@
     }
 
     /* Parallax the hero product image itself for foreground depth.
-       The slight over-scale hides the edges as the image drifts. */
+       The slight over-scale hides the edges as the image drifts.
+       --mx/--my/--rx/--ry are driven by the pointer (see hero pointer
+       script) for a Spline-style cursor-follow tilt; they default to 0
+       so scroll parallax (--py) still works on its own. */
     .hero-right img,
     .hero-right video {
-      transform: translate3d(0, var(--py, 0px), 0) scale(1.12);
+      transform:
+        translate3d(var(--mx, 0px), calc(var(--py, 0px) + var(--my, 0px)), 0)
+        rotateY(var(--rx, 0deg)) rotateX(var(--ry, 0deg))
+        scale(1.12);
       will-change: transform;
     }
 
@@ -8215,6 +8223,7 @@
       var ctx = canvas.getContext('2d');
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       var W = 0, H = 0, nodes = [], raf = null, running = false;
+      var mouse = { x: null, y: null, R: 190 };   // cursor attractor (null = idle)
 
       function size() {
         var r = canvas.getBoundingClientRect();
@@ -8240,13 +8249,39 @@
 
       function draw() {
         ctx.clearRect(0, 0, W, H);
-        var i, j, a, b, dx, dy, d, max = 130;
+        var i, j, a, b, dx, dy, d, sp, max = 130;
+        var mR = mouse.R, active = mouse.x !== null;
+
+        // ── move nodes; the cursor gently attracts nearby ones, then the
+        //    field elastically relaxes back to its ambient drift ──
         for (i = 0; i < nodes.length; i++) {
           a = nodes[i];
+          if (active) {
+            dx = mouse.x - a.x; dy = mouse.y - a.y; d = Math.sqrt(dx * dx + dy * dy);
+            if (d < mR && d > 0.01) {
+              var f = (1 - d / mR) * 0.09;               // fade with distance
+              a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+            }
+          }
+          a.vx *= 0.985; a.vy *= 0.985;                  // damping keeps it gentle
+          sp = Math.sqrt(a.vx * a.vx + a.vy * a.vy);
+          if (sp < 0.12) { a.vx += (Math.random() - .5) * .06; a.vy += (Math.random() - .5) * .06; }
+          else if (sp > 1.7) { a.vx = a.vx / sp * 1.7; a.vy = a.vy / sp * 1.7; }
           a.x += a.vx; a.y += a.vy;
           if (a.x < 0 || a.x > W) a.vx *= -1;
           if (a.y < 0 || a.y > H) a.vy *= -1;
         }
+
+        // ── soft glow under the cursor ──
+        if (active) {
+          var g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mR * .85);
+          g.addColorStop(0, 'rgba(244,121,32,.16)');
+          g.addColorStop(1, 'rgba(244,121,32,0)');
+          ctx.globalAlpha = 1; ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(mouse.x, mouse.y, mR * .85, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // ── node-to-node links ──
         for (i = 0; i < nodes.length; i++) {
           a = nodes[i];
           for (j = i + 1; j < nodes.length; j++) {
@@ -8260,6 +8295,22 @@
             }
           }
         }
+
+        // ── links reaching from the cursor to nearby nodes ──
+        if (active) {
+          for (i = 0; i < nodes.length; i++) {
+            a = nodes[i];
+            dx = a.x - mouse.x; dy = a.y - mouse.y; d = Math.sqrt(dx * dx + dy * dy);
+            if (d < mR) {
+              ctx.globalAlpha = (1 - d / mR) * .55;
+              ctx.strokeStyle = 'rgb(244,121,32)';
+              ctx.lineWidth = 1;
+              ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(a.x, a.y); ctx.stroke();
+            }
+          }
+        }
+
+        // ── nodes ──
         for (i = 0; i < nodes.length; i++) {
           a = nodes[i];
           ctx.globalAlpha = a.hot ? .95 : .55;
@@ -8285,6 +8336,18 @@
       if (reduce) { draw(); return; }
       start();
 
+      // ── cursor tracking (canvas is pointer-events:none, so listen on the
+      //    hero and translate into canvas space) ──
+      var host = canvas.parentElement || canvas;
+      host.addEventListener('pointermove', function (e) {
+        var r = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - r.left;
+        mouse.y = e.clientY - r.top;
+      }, { passive: true });
+      host.addEventListener('pointerleave', function () {
+        mouse.x = mouse.y = null;
+      }, { passive: true });
+
       var rt;
       window.addEventListener('resize', function () {
         clearTimeout(rt);
@@ -8294,6 +8357,48 @@
       document.addEventListener('visibilitychange', function () {
         if (document.hidden) stop(); else start();
       });
+    })();
+  </script>
+
+  <script>
+    /* Hero pointer-parallax: the background media drifts + tilts toward the
+       cursor for a Spline-style depth effect. Sets --mx/--my (px) and
+       --rx/--ry (deg) on .hero, consumed by the .hero-right media transform
+       (combined there with the scroll-driven --py). Eased, rAF-throttled,
+       passive, and disabled under reduced motion. */
+    (function () {
+      var hero = document.querySelector('.hero');
+      if (!hero) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      var tx = 0, ty = 0, targetX = 0, targetY = 0, ticking = false;
+      var SHIFT = 16, TILT = 2.6;   // max px drift and max degrees of tilt
+
+      function apply() {
+        ticking = false;
+        tx += (targetX - tx) * 0.12;
+        ty += (targetY - ty) * 0.12;
+        hero.style.setProperty('--mx', (tx * SHIFT).toFixed(1) + 'px');
+        hero.style.setProperty('--my', (ty * SHIFT).toFixed(1) + 'px');
+        hero.style.setProperty('--rx', (tx * TILT).toFixed(2) + 'deg');
+        hero.style.setProperty('--ry', (-ty * TILT).toFixed(2) + 'deg');
+        if (Math.abs(targetX - tx) > 0.001 || Math.abs(targetY - ty) > 0.001) {
+          ticking = true; requestAnimationFrame(apply);
+        }
+      }
+      function queue() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
+
+      hero.addEventListener('pointermove', function (e) {
+        var r = hero.getBoundingClientRect();
+        targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;    // -1 … 1
+        targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+        queue();
+      }, { passive: true });
+
+      hero.addEventListener('pointerleave', function () {
+        targetX = 0; targetY = 0; queue();   // ease back to rest
+      }, { passive: true });
     })();
   </script>
 
