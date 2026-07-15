@@ -1975,6 +1975,11 @@
 
       align-items: center;
 
+      /* diagonal scroll-parallax: JS drifts these from bottom-right to 0 */
+      transform: translate3d(var(--ax, 0px), var(--ay, 0px), 0);
+
+      will-change: transform;
+
     }
 
 
@@ -2196,6 +2201,17 @@
     .services {
 
       background: white;
+
+      overflow: hidden;
+
+    }
+
+    /* diagonal scroll-parallax: JS drifts the content in from the bottom-left */
+    .services > div {
+
+      transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0);
+
+      will-change: transform;
 
     }
 
@@ -12334,6 +12350,117 @@
         els.forEach(function (el) { el.classList.add('sr-in'); });
 
       }, 4500);
+
+    })();
+
+
+
+    /* ════════════════════════════════════════════
+
+       ABOUT DIAGONAL PARALLAX — the second pinned section drifts in from
+       the bottom-right (positive X + Y) and settles to 0 as it reaches the
+       top. Applied to the inner grid so the section's sticky pin is intact.
+
+    ════════════════════════════════════════════ */
+
+    (function () {
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var about = document.getElementById('about');
+
+      var grid = about && about.querySelector('.about-grid');
+
+      if (reduce || !grid) return;
+
+      function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+      var ticking = false;
+
+      function update() {
+
+        ticking = false;
+
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+
+        var top = about.getBoundingClientRect().top;
+
+        // p: 0 while the section is a full screen away, 1 once it reaches the top
+
+        var p = clamp((vh - top) / vh);
+
+        var e = 1 - p;   // offset factor: max when far, 0 when settled
+
+        grid.style.setProperty('--ax', (e * 130).toFixed(1) + 'px');
+
+        grid.style.setProperty('--ay', (e * 90).toFixed(1) + 'px');
+
+      }
+
+      function onScroll() {
+
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      window.addEventListener('resize', onScroll, { passive: true });
+
+      update();
+
+    })();
+
+
+
+    /* ════════════════════════════════════════════
+
+       SERVICES DIAGONAL PARALLAX — the third section drifts in from the
+       bottom-left (negative X + positive Y) and settles to 0.
+
+    ════════════════════════════════════════════ */
+
+    (function () {
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var section = document.getElementById('services');
+
+      if (reduce || !section) return;
+
+      function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+      var ticking = false;
+
+      function update() {
+
+        ticking = false;
+
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+
+        var top = section.getBoundingClientRect().top;
+
+        var p = clamp((vh - top) / vh);
+
+        var e = 1 - p;   // offset factor: max when far, 0 when settled
+
+        section.style.setProperty('--sx', (e * -140).toFixed(1) + 'px');
+
+        section.style.setProperty('--sy', (e * 90).toFixed(1) + 'px');
+
+      }
+
+      function onScroll() {
+
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      window.addEventListener('resize', onScroll, { passive: true });
+
+      update();
 
     })();
 
