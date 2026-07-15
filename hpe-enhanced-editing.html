@@ -807,17 +807,25 @@
 
     }
 
-    /* every section below the hero scrolls up and over the pinned hero,
-       giving a reveal-on-scroll parallax. Sections are opaque so the hero
-       stays hidden behind them. */
+    /* Stacked sticky-reveal parallax. The hero plus the next three sections
+       each pin to the top with an increasing z-index, so each one scrolls up
+       and over the one before it (like a deck of cards). Every later section
+       gets a high z-index so it scrolls over the whole pinned stack. Sections
+       are opaque so whatever is pinned behind stays hidden. */
     body > section,
     body > footer {
 
       position: relative;
 
-      z-index: 1;
+      z-index: 10;
 
     }
+
+    .hero      { z-index: 0; }
+
+    .keyfacts  { position: sticky; top: 0; z-index: 1; }
+
+    .about     { position: sticky; top: 0; z-index: 2; }
 
 
 
@@ -4450,6 +4458,19 @@
 
       }
 
+    }
+
+    /* When JS takes over the marquee it must run even under reduced-motion /
+       animations-off (common on low-end laptops), so re-enable the seamless
+       two-set track and let requestAnimationFrame drive the transform. */
+    .pb-track.pb-js {
+      animation: none !important;
+      flex-wrap: nowrap !important;
+      width: max-content !important;
+    }
+
+    .pb-track.pb-js .pb-dup {
+      display: flex !important;
     }
 
 
@@ -12313,6 +12334,86 @@
         els.forEach(function (el) { el.classList.add('sr-in'); });
 
       }, 4500);
+
+    })();
+
+
+
+    /* ════════════════════════════════════════════
+
+       PARTNER MARQUEE — JS-driven. The pure-CSS marquee is disabled by
+       prefers-reduced-motion (which low-end laptops trigger when Windows
+       "Show animations" is off) and can stall when GPU compositing is off.
+       requestAnimationFrame drives the transform on the main thread so it
+       always moves. Pauses on hover and when the tab is hidden.
+
+    ════════════════════════════════════════════ */
+
+    (function () {
+
+      var track = document.querySelector('.pb-track');
+
+      var wrap = document.querySelector('.partners-marquee');
+
+      if (!track || !wrap) return;
+
+      track.classList.add('pb-js');   // CSS override kills the keyframe animation
+
+      var x = 0, half = 0, last = 0, paused = false, raf = null;
+
+      var SPEED = 45;                 // px per second
+
+      function measure() { half = track.scrollWidth / 2; }
+
+      function step(ts) {
+
+        if (!last) last = ts;
+
+        var dt = (ts - last) / 1000; last = ts;
+
+        if (dt > 0.1) dt = 0.1;       // clamp after tab-switch / jank
+
+        if (!paused && half > 0) {
+
+          x -= SPEED * dt;
+
+          if (x <= -half) x += half;  // seamless wrap (two identical sets)
+
+          track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+
+        }
+
+        raf = requestAnimationFrame(step);
+
+      }
+
+      wrap.addEventListener('mouseenter', function () { paused = true; });
+
+      wrap.addEventListener('mouseleave', function () { paused = false; });
+
+      document.addEventListener('visibilitychange', function () {
+
+        if (document.hidden) {
+
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+
+          last = 0;
+
+        } else if (!raf) {
+
+          raf = requestAnimationFrame(step);
+
+        }
+
+      });
+
+      window.addEventListener('resize', measure, { passive: true });
+
+      window.addEventListener('load', measure);
+
+      measure();
+
+      raf = requestAnimationFrame(step);
 
     })();
 
