@@ -807,7 +807,7 @@
 
     .hero-left {
 
-      flex: 1;
+      flex: 1.7;
 
       padding: 96px 5% 96px 7%;
 
@@ -815,7 +815,7 @@
 
       z-index: 2;
 
-      max-width: 580px;
+      max-width: 760px;
 
       opacity: 0;
 
@@ -1009,7 +1009,7 @@
 
     .hero-right {
 
-      flex: 1;
+      flex: 0.75;
 
       position: relative;
 
@@ -1048,6 +1048,10 @@
       object-fit: cover;
 
       object-position: center;
+
+      opacity: .28;
+
+      mix-blend-mode: luminosity;
 
     }
 
@@ -2123,7 +2127,7 @@
 
       display: grid;
 
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
 
       gap: 28px;
 
@@ -7498,6 +7502,14 @@
 
 
 
+      .services-grid {
+
+        grid-template-columns: repeat(2, 1fr);
+
+      }
+
+
+
       .hero {
 
         flex-direction: column;
@@ -7579,6 +7591,14 @@
 
 
       .footer-grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+
+
+      .services-grid {
 
         grid-template-columns: 1fr;
 
@@ -9558,8 +9578,7 @@
 
   <!-- FOOTER -->
 
-  <footer class="px-photo" data-parallax="1"
-    style="--px-img:url('https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(13,27,42,.86),rgba(13,27,42,.93))">
+  <footer>
 
     <div class="footer-grid">
 
