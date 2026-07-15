@@ -4338,14 +4338,6 @@
 
 
 
-    .partners-marquee:hover .pb-track {
-
-      animation-play-state: paused;
-
-    }
-
-
-
     /* -50% → 0 shifts the track rightward; two identical halves make it seamless */
 
     @keyframes pb-marquee {
@@ -5384,98 +5376,6 @@
     .industry-chip:hover {
 
       animation: chip-bounce .35s ease;
-
-    }
-
-
-
-    /* ─── SECTION DOTS (right-edge, slim) ─── */
-
-    #section-dots {
-
-      position: fixed;
-
-      right: 0;
-
-      top: 50%;
-
-      transform: translateY(-50%);
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: flex-end;
-
-      gap: 6px;
-
-      z-index: 180;
-
-      padding: 8px 0;
-
-    }
-
-
-
-    .sdot {
-
-      width: 4px;
-
-      height: 4px;
-
-      border-radius: 2px;
-
-      background: rgba(0, 0, 0, .2);
-
-      cursor: pointer;
-
-      transition: background .25s, width .25s, height .25s, border-radius .25s;
-
-      border: none;
-
-      padding: 0;
-
-      display: block;
-
-    }
-
-
-
-    .sdot.active {
-
-      background: var(--orange);
-
-      width: 4px;
-
-      height: 20px;
-
-      border-radius: 2px;
-
-    }
-
-
-
-    .sdot:hover {
-
-      background: var(--orange);
-
-      width: 4px;
-
-      height: 12px;
-
-      border-radius: 2px;
-
-    }
-
-
-
-    @media (max-width: 960px) {
-
-      #section-dots {
-
-        display: none;
-
-      }
 
     }
 
@@ -8004,12 +7904,6 @@
   <!-- SCROLL PROGRESS -->
 
   <div id="scroll-bar"></div>
-
-
-
-  <!-- SECTION DOTS -->
-
-  <nav id="section-dots" aria-label="Page sections"></nav>
 
 
 
@@ -12012,76 +11906,6 @@
 
     /* ════════════════════════════════════════════
 
-       SECTION DOTS
-
-    ════════════════════════════════════════════ */
-
-    const dotSections = [
-
-      { id: 'about', label: 'About Us' },
-
-      { id: 'services', label: 'Services' },
-
-      { id: 'why', label: 'Why Us' },
-
-      { id: 'process', label: 'Process' },
-
-      { id: 'casestudy', label: 'Case Study' },
-
-      { id: 'centers', label: 'Service Centers' },
-
-      { id: 'bizpartners', label: 'Partners' },
-
-      { id: 'contact', label: 'Contact' },
-
-    ];
-
-    const dotsNav = document.getElementById('section-dots');
-
-    dotSections.forEach(s => {
-
-      const btn = document.createElement('button');
-
-      btn.className = 'sdot';
-
-      btn.title = s.label;
-
-      btn.dataset.target = s.id;
-
-      btn.addEventListener('click', () => {
-
-        const el = document.getElementById(s.id);
-
-        if (el) window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' });
-
-      });
-
-      dotsNav.appendChild(btn);
-
-    });
-
-    function updateDots() {
-
-      dotSections.forEach(s => {
-
-        const el = document.getElementById(s.id);
-
-        if (!el) return;
-
-        const rect = el.getBoundingClientRect();
-
-        const btn = dotsNav.querySelector(`[data-target="${s.id}"]`);
-
-        if (btn) btn.classList.toggle('active', rect.top <= 200 && rect.bottom > 200);
-
-      });
-
-    }
-
-
-
-    /* ════════════════════════════════════════════
-
        SCROLL & NAV
 
     ════════════════════════════════════════════ */
@@ -12097,8 +11921,6 @@
       fabTop.classList.toggle('show', window.scrollY > 400);
 
       updateScrollBar();
-
-      updateDots();
 
     }, { passive: true });
 
@@ -12577,7 +12399,7 @@
        prefers-reduced-motion (which low-end laptops trigger when Windows
        "Show animations" is off) and can stall when GPU compositing is off.
        requestAnimationFrame drives the transform on the main thread so it
-       always moves. Pauses on hover and when the tab is hidden.
+       always moves. Runs continuously; only pauses when the tab is hidden.
 
     ════════════════════════════════════════════ */
 
@@ -12591,7 +12413,7 @@
 
       track.classList.add('pb-js');   // CSS override kills the keyframe animation
 
-      var x = 0, half = 0, last = 0, paused = false, raf = null;
+      var x = 0, half = 0, last = 0, raf = null;
 
       var SPEED = 45;                 // px per second
 
@@ -12605,7 +12427,7 @@
 
         if (dt > 0.1) dt = 0.1;       // clamp after tab-switch / jank
 
-        if (!paused && half > 0) {
+        if (half > 0) {
 
           x -= SPEED * dt;
 
@@ -12618,10 +12440,6 @@
         raf = requestAnimationFrame(step);
 
       }
-
-      wrap.addEventListener('mouseenter', function () { paused = true; });
-
-      wrap.addEventListener('mouseleave', function () { paused = false; });
 
       document.addEventListener('visibilitychange', function () {
 
