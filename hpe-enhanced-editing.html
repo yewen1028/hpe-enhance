@@ -2203,22 +2203,30 @@
       pointer-events: none;
     }
 
-    /* floating brand icon on the photo */
+    /* floating icon on the photo — matches the frosted-glass .ic-icon chips
+       used on the "Trusted Across Sectors" cards, incl. the hover-to-orange. */
     .service-card-img .svc-ico {
       position: absolute;
       z-index: 2;
       left: 16px;
       bottom: 16px;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--orange);
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .16);
+      border: 1px solid rgba(255, 255, 255, .24);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
       color: #fff;
-      font-size: 20px;
-      box-shadow: 0 8px 20px rgba(244, 121, 32, .45);
+      font-size: 17px;
+      transition: background .3s ease, transform .3s ease;
+    }
+
+    .service-card:hover .svc-ico {
+      background: var(--orange);
+      transform: translateY(-2px);
     }
 
     .service-card:hover .service-card-img img {
@@ -4192,69 +4200,179 @@
 
 
 
-    .partners-logos {
+    /* Auto-scrolling logo carousel. The track holds two identical sets so the
+       loop is seamless; it animates left → right and pauses on hover. Edges
+       fade out via a mask. */
 
-      display: flex;
+    .partners-marquee {
 
-      flex-wrap: wrap;
-
-      justify-content: center;
-
-      gap: 16px;
+      overflow: hidden;
 
       margin-top: 8px;
 
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+
+      mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+
     }
 
 
 
-    .partner-badge {
-
-      background: var(--light);
-
-      border: 1px solid var(--border);
-
-      border-radius: 10px;
-
-      padding: 16px 28px;
-
-      font-size: 14px;
-
-      font-weight: 700;
-
-      color: var(--muted);
+    .pb-track {
 
       display: flex;
 
-      align-items: center;
+      width: max-content;
 
-      gap: 10px;
-
-      transition: all .2s;
+      animation: pb-marquee 46s linear infinite;
 
     }
 
 
 
-    .partner-badge:hover {
+    .partners-marquee:hover .pb-track {
 
-      background: var(--orange-l);
+      animation-play-state: paused;
+
+    }
+
+
+
+    /* -50% → 0 shifts the track rightward; two identical halves make it seamless */
+
+    @keyframes pb-marquee {
+
+      from { transform: translateX(-50%); }
+
+      to   { transform: translateX(0); }
+
+    }
+
+
+
+    .partner-bubble {
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 12px;
+
+      width: 100px;
+
+      margin: 0 20px;
+
+      flex-shrink: 0;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .pb-logo {
+
+      width: 84px;
+
+      height: 84px;
+
+      border-radius: 50%;
+
+      display: grid;
+
+      place-items: center;
+
+      background: #fff;
+
+      border: 1px solid var(--border);
+
+      box-shadow: 0 8px 22px rgba(13, 27, 42, .10);
+
+      overflow: hidden;
+
+      transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease, border-color .35s ease;
+
+    }
+
+
+
+    .pb-logo img {
+
+      width: 46px;
+
+      height: 46px;
+
+      object-fit: contain;
+
+    }
+
+
+
+    .pb-logo i {
+
+      font-size: 30px;
 
       color: var(--orange);
+
+    }
+
+
+
+    .partner-bubble:hover .pb-logo {
+
+      transform: translateY(-6px) scale(1.09);
+
+      box-shadow: 0 18px 36px rgba(244, 121, 32, .30);
 
       border-color: var(--orange);
 
-      transform: translateY(-2px);
+    }
+
+
+
+    .pb-name {
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      color: var(--muted);
+
+      transition: color .3s ease;
 
     }
 
 
 
-    .partner-badge i {
-
-      font-size: 18px;
+    .partner-bubble:hover .pb-name {
 
       color: var(--orange);
+
+    }
+
+
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .pb-track {
+
+        animation: none;
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+
+        width: auto;
+
+      }
+
+      .pb-track .pb-dup {
+
+        display: none;
+
+      }
 
     }
 
@@ -7845,7 +7963,7 @@
 
             <a href="#services"><span class="di"><i class="fa-solid fa-users"></i></span> IT Staffing</a>
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-shield-check"></i></span> Authorised Warranty
+            <a href="#services"><span class="di"><i class="fa-solid fa-shield-halved"></i></span> Authorised Warranty
 
               Provider</a>
 
@@ -7904,7 +8022,7 @@
 
     <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-users"></i> IT Staffing</a>
 
-    <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-shield-check"></i> Authorised Warranty Provider</a>
+    <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-shield-halved"></i> Authorised Warranty Provider</a>
 
     <a href="#services" class="mob-link m-sub"><i class="fa-solid fa-lightbulb"></i> Total Solution &amp; Sourcing</a>
 
@@ -8400,13 +8518,13 @@
             alt="Authorised Warranty Provider" loading="lazy"
             onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
 
-          <span class="svc-ico"><i class="fa-solid fa-shield-check"></i></span>
+          <span class="svc-ico"><i class="fa-solid fa-shield-halved"></i></span>
 
         </div>
 
         <div class="service-card-body">
 
-          <h3><i class="fa-solid fa-shield-check"></i> Authorised Warranty Provider</h3>
+          <h3><i class="fa-solid fa-shield-halved"></i> Authorised Warranty Provider</h3>
 
           <p>Appointed Authorised Support Partner (ASP) for PC makers, server makers, and network makers — fulfilling
 
@@ -8990,7 +9108,7 @@
           onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-warranty');},450);">
 
           <div class="cs-home-icon" style="background:linear-gradient(135deg,#1a3a0a,#3a7a1a);"><i
-              class="fa-solid fa-shield-check"></i></div>
+              class="fa-solid fa-shield-halved"></i></div>
 
           <div class="cs-home-info">
 
@@ -9029,7 +9147,7 @@
 
             <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Oil &amp; Gas ·
 
-              Logistics · Retail · Auto</div>
+              Logistics · Retail · Automotive</div>
 
             <h4>Multi-Sector IT Staffing Solutions</h4>
 
@@ -9071,7 +9189,7 @@
 
             <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Telco · Banking ·
 
-              Healthcare · Manufacturing</div>
+              Healthcare · Manufacturing · Logistics · Education</div>
 
             <h4>Multi-Sector IT Sourcing &amp; Infrastructure</h4>
 
@@ -9324,41 +9442,83 @@
 
     </div>
 
-    <div class="partners-logos">
+    <div class="partners-marquee">
 
-      <div class="partner-badge"><i class="fa-solid fa-plug"></i> AMP</div>
+      <div class="pb-track">
 
-      <div class="partner-badge"><i class="fa-solid fa-wifi"></i> Aruba</div>
+        <!-- set 1 -->
 
-      <div class="partner-badge"><i class="fa-solid fa-phone-volume"></i> AVAYA</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/amp.png" alt="AMP logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-network-wired"></i> Cisco</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/aruba.png" alt="Aruba logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-shield-halved"></i> Cyberoam</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/avaya.png" alt="AVAYA logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-ethernet"></i> DINTEK</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cisco.png" alt="Cisco logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-shield-halved"></i> Fortinet</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cyberoam.png" alt="Cyberoam logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-server"></i> HP Enterprise</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/dintek.png" alt="DINTEK logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-tower-cell"></i> Huawei</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/fortinet.png" alt="Fortinet logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span></div>
 
-      <div class="partner-badge"><i class="fa-brands fa-microsoft"></i> Microsoft</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/hpe.png" alt="HP Enterprise logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-diagram-project"></i> Peplink</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/huawei.png" alt="Huawei logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-gauge-high"></i> Riverbed</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/microsoft.png" alt="Microsoft logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-wifi"></i> Ruckus</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/peplink.png" alt="Peplink logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-cloud"></i> SANGFOR</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/riverbed.png" alt="Riverbed logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-shield-halved"></i> Sophos</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/ruckus.png" alt="Ruckus logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-tower-broadcast"></i> TM</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sangfor.png" alt="SANGFOR logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
 
-      <div class="partner-badge"><i class="fa-solid fa-database"></i> Veeam</div>
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sophos.png" alt="Sophos logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span></div>
+
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/tm.png" alt="TM logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
+
+        <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/veeam.png" alt="Veeam logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
+
+        <!-- set 2 (duplicate for seamless loop) -->
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/amp.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/aruba.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/avaya.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/cisco.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/cyberoam.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/dintek.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/fortinet.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/hpe.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/huawei.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/microsoft.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/peplink.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/riverbed.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/ruckus.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/sangfor.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/sophos.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/tm.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
+
+        <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img src="assets/partner-logos/veeam.png" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
+
+      </div>
 
     </div>
 
@@ -10030,9 +10190,9 @@
 
                 <h3>Airline Wireless &amp; Broadband Support</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Hospitality /
+                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Airlines /
 
-                  Airlines</span>
+                  Hospitality</span>
 
               </div>
 
@@ -10288,7 +10448,7 @@
 
         <!-- ── AUTHORISED WARRANTY ── -->
 
-        <div class="cs-category-title"><i class="fa-solid fa-shield-check"></i> Authorised Warranty Support</div>
+        <div class="cs-category-title"><i class="fa-solid fa-shield-halved"></i> Authorised Warranty Support</div>
 
         <div class="cs-cards">
 
@@ -10657,7 +10817,7 @@
 
                 <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Telco ·
 
-                  Banking · Healthcare · Manufacturing</span>
+                  Banking · Healthcare · Manufacturing · Logistics · Education</span>
 
               </div>
 
@@ -10823,7 +10983,7 @@
 
       'media-mgmt': { title: 'Media & Broadcasting Infrastructure', industry: 'Media / Broadcasting', icon: 'fa-photo-film', overview: 'A Malaysia media provider engaged HPE Solutions to maintain their specialised video and voice encoder/decoder network infrastructure — mission-critical equipment where any failure directly impacts broadcast operations nationwide.', challenge: 'Broadcast infrastructure operates around the clock. The client required a support partner with technical capability and nationwide reach to respond within hours to any equipment failure.', solution: ['24×7×4-hour SLA for video and voice encoder/decoder equipment', 'Specialist engineers trained on broadcast network infrastructure', 'Fault diagnosis and resolution for video transmission systems', 'Voice infrastructure maintenance and uptime management', 'On-site dispatch to broadcast facilities nationwide', 'Spare encoder/decoder equipment at strategic locations', 'Documented escalation for critical broadcast failures'], scope: ['Video Encoders', 'Video Decoders', 'Voice Equipment', 'Broadcast Network Devices', 'Nationwide Facilities'], metrics: [{ v: '24×7×4hr', l: 'SLA Response' }, { v: '0', l: 'Broadcast Disruptions' }, { v: 'Nationwide', l: 'Facility Coverage' }], service: 'IT Support & Managed Services' },
 
-      'airline-mgmt': { title: 'Airline Wireless & Broadband Support', industry: 'Hospitality / Airlines', icon: 'fa-plane', overview: 'An airline provider required highly reliable wireless and broadband connectivity maintenance across operational facilities. Any connectivity disruption would impact check-in systems, operations, and passenger services.', challenge: 'Airline operations depend on uninterrupted connectivity. The client required 24-hour support for wireless and broadband infrastructure with fast response to minimise operational disruption.', solution: ['24×7×4-hour maintenance for all wireless and broadband infrastructure', 'Dedicated wireless infrastructure management at airport facilities', 'Broadband connectivity monitoring and fault resolution', 'On-site dispatch for hardware failures and network issues', 'WiFi access point management, replacement, and configuration', 'Network device maintenance for operational and passenger systems'], scope: ['WiFi Infrastructure', 'Broadband Connectivity', 'Wireless Access Points', 'Airport Facilities', 'Operational Systems'], metrics: [{ v: '24×7×4hr', l: 'SLA Response' }, { v: 'Wireless+', l: 'Broadband Covered' }, { v: 'Always On', l: 'Connectivity Target' }], service: 'IT Support & Managed Services' },
+      'airline-mgmt': { title: 'Airline Wireless & Broadband Support', industry: 'Airlines / Hospitality', icon: 'fa-plane', overview: 'An airline provider required highly reliable wireless and broadband connectivity maintenance across operational facilities. Any connectivity disruption would impact check-in systems, operations, and passenger services.', challenge: 'Airline operations depend on uninterrupted connectivity. The client required 24-hour support for wireless and broadband infrastructure with fast response to minimise operational disruption.', solution: ['24×7×4-hour maintenance for all wireless and broadband infrastructure', 'Dedicated wireless infrastructure management at airport facilities', 'Broadband connectivity monitoring and fault resolution', 'On-site dispatch for hardware failures and network issues', 'WiFi access point management, replacement, and configuration', 'Network device maintenance for operational and passenger systems'], scope: ['WiFi Infrastructure', 'Broadband Connectivity', 'Wireless Access Points', 'Airport Facilities', 'Operational Systems'], metrics: [{ v: '24×7×4hr', l: 'SLA Response' }, { v: 'Wireless+', l: 'Broadband Covered' }, { v: 'Always On', l: 'Connectivity Target' }], service: 'IT Support & Managed Services' },
 
       'banking-deploy': { title: 'Large-Scale OS Migration & Asset Management', industry: 'Banking', icon: 'fa-building-columns', overview: 'HPE Solutions managed a large-scale IT asset modernisation for Malaysia major banks — covering hardware inventory, software auditing, SCCM configuration, and full Windows OS migration across Malaysia and Bangkok, encompassing over 25,000 devices.', challenge: 'The banks required comprehensive IT modernisation across two countries simultaneously. Managing asset inventory, OS compatibility, application dependencies, and user communication at this scale required a proven project management methodology.', solution: ['Full hardware and software asset inventory audit across all locations', 'End-user database updates and device assignment reconciliation', 'SCCM setup and configuration for centralised management', 'Windows OS upgrade planning, compatibility testing, and packaging', 'Phased Windows OS migration across desktops, laptops, and servers', 'Network switch inventory and firmware update management', 'Printer fleet inventory and configuration standardisation', 'Cross-border coordination for Malaysia and Bangkok deployments', 'Weekly progress reporting and stakeholder communication', 'User migration support and post-migration issue resolution'], scope: ['Desktops & Laptops', 'Servers', 'Network Switches', 'Printers', 'SCCM Configuration', 'Malaysia', 'Bangkok'], metrics: [{ v: '25,000+', l: 'Devices Migrated' }, { v: '2', l: 'Countries Covered' }, { v: 'SCCM', l: 'Deployed' }, { v: 'On Time', l: 'Delivery' }], service: 'Project Deployment' },
 
@@ -11221,7 +11381,7 @@
 
       warranty: {
 
-        icon: '<i class="fa-solid fa-shield-check"></i>',
+        icon: '<i class="fa-solid fa-shield-halved"></i>',
 
         title: 'Authorised Warranty Provider',
 
@@ -12075,7 +12235,7 @@
 
     ['.service-card', '.cs-home-card', '.center-list-item',
 
-      '.partner-badge', '.about-point', '.why-point', '.step'
+      '.about-point', '.why-point', '.step'
 
     ].forEach(sel => {
 
