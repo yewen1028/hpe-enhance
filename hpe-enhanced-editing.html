@@ -93,6 +93,8 @@
 
       line-height: 1.65;
 
+      overflow-x: clip;
+
     }
 
 
@@ -793,7 +795,7 @@
 
       align-items: center;
 
-      min-height: 540px;
+      min-height: 600px;
 
       overflow: hidden;
 
@@ -807,7 +809,7 @@
 
       flex: 1;
 
-      padding: 80px 5% 80px 7%;
+      padding: 96px 5% 96px 7%;
 
       position: relative;
 
@@ -877,13 +879,15 @@
 
     .hero h1 {
 
-      font-size: clamp(28px, 3.8vw, 50px);
+      font-size: clamp(30px, 4.2vw, 56px);
 
       font-weight: 800;
 
-      line-height: 1.12;
+      line-height: 1.08;
 
-      margin-bottom: 18px;
+      letter-spacing: -.5px;
+
+      margin-bottom: 24px;
 
     }
 
@@ -899,13 +903,15 @@
 
     .hero p {
 
-      font-size: 16px;
+      font-size: 16.5px;
+
+      line-height: 1.75;
 
       color: rgba(255, 255, 255, .78);
 
-      margin-bottom: 34px;
+      margin-bottom: 40px;
 
-      max-width: 460px;
+      max-width: 480px;
 
     }
 
@@ -1011,7 +1017,7 @@
 
       align-self: stretch;
 
-      min-height: 540px;
+      min-height: 600px;
 
       opacity: 0;
 
@@ -1057,6 +1063,139 @@
 
       z-index: 1;
 
+    }
+
+
+
+    /* ─── HERO ATMOSPHERE & POLISH ─── */
+    .hero-net {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    /* keep the product image above the network canvas */
+    .hero-right {
+      z-index: 1;
+    }
+
+    /* slow diagonal sheen for ambient life */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(115deg, transparent 32%, rgba(244, 121, 32, .06) 48%, transparent 64%);
+      background-size: 220% 220%;
+      animation: heroSheen 15s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes heroSheen {
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+
+    /* staggered entrance for the hero copy after reveal */
+    .hero-left > * {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    .hero-left.reveal > * {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .hero-left.reveal > .hero-badge { transition-delay: .05s; }
+    .hero-left.reveal > h1          { transition-delay: .16s; }
+    .hero-left.reveal > p           { transition-delay: .28s; }
+    .hero-left.reveal > .hero-btns  { transition-delay: .40s; }
+
+    /* button shine micro-interaction */
+    .btn-orange,
+    .btn-ghost-white {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-orange::after,
+    .btn-ghost-white::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 55%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .35), transparent);
+      transform: skewX(-18deg);
+      pointer-events: none;
+    }
+
+    .btn-orange:hover::after,
+    .btn-ghost-white:hover::after {
+      left: 130%;
+      transition: left .7s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .hero::after { animation: none; }
+
+      .hero-left > *,
+      .hero-left.reveal > * {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    /* ─── PARALLAX SCROLL ENGINE ─── */
+    /* A section flagged .px-photo gets a photographic layer behind its content.
+       The photo sits in a ::before at z-index:-1 (above the section's solid
+       colour, below the content) and is tinted by --px-tint so the existing
+       theme colour still dominates and text stays readable. JS drifts --py. */
+    .px-photo {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .px-photo::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -18%;
+      bottom: -18%;
+      z-index: -1;
+      background-image: var(--px-tint, none), var(--px-img, none);
+      background-size: cover, cover;
+      background-position: center center, center center;
+      background-repeat: no-repeat, no-repeat;
+      transform: translate3d(0, var(--py, 0px), 0);
+      will-change: transform;
+      pointer-events: none;
+    }
+
+    /* Parallax the hero product image itself for foreground depth.
+       The slight over-scale hides the edges as the image drifts. */
+    .hero-right img {
+      transform: translate3d(0, var(--py, 0px), 0) scale(1.12);
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .px-photo::before,
+      .hero-right img {
+        transform: none !important;
+      }
     }
 
 
@@ -1135,7 +1274,7 @@
 
     section {
 
-      padding: 80px 5%;
+      padding: 104px 5%;
 
     }
 
@@ -1181,6 +1320,11 @@
 
     }
 
+    /* Eyebrows removed site-wide (later rule wins over the .section-tag display above) */
+    .section-tag {
+      display: none;
+    }
+
 
 
     h2.section-title {
@@ -1195,6 +1339,23 @@
 
       line-height: 1.2;
 
+    }
+
+    /* Accent bar in place of the removed eyebrows — anchors each heading */
+    h2.section-title::before {
+      content: '';
+      display: block;
+      width: 46px;
+      height: 4px;
+      margin: 0 0 20px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--orange), #ffb366);
+    }
+
+    /* centred section heads get a centred bar */
+    [style*="text-align:center"] h2.section-title::before {
+      margin-left: auto;
+      margin-right: auto;
     }
 
 
@@ -1384,87 +1545,126 @@
     /* ─── INTRO CURTAIN (landonorris.com-style cinematic load reveal) ─── */
 
     #introCurtain {
-
       position: fixed;
-
       inset: 0;
-
       z-index: 9999;
-
-      background: var(--navy);
-
+      background: radial-gradient(120% 120% at 50% 38%, #16293f 0%, var(--navy) 55%, #0a141f 100%);
       display: flex;
-
+      flex-direction: column;
       align-items: center;
-
       justify-content: center;
-
+      gap: 26px;
       clip-path: inset(0 0 0 0);
-
       transition: clip-path 1s cubic-bezier(.76, 0, .24, 1);
-
     }
-
-
 
     #introCurtain.hide {
-
       clip-path: inset(0 0 100% 0);
-
       pointer-events: none;
-
     }
 
+    /* soft pulsing glow behind the mark */
+    .intro-glow {
+      position: absolute;
+      width: 440px;
+      height: 440px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244, 121, 32, .26) 0%, rgba(244, 121, 32, 0) 68%);
+      animation: introPulse 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
 
+    @keyframes introPulse {
+      0%, 100% { transform: scale(.82); opacity: .5; }
+      50%      { transform: scale(1.06); opacity: 1; }
+    }
 
     .intro-logo {
-
-      display: inline-flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-      font-size: 22px;
-
-      font-weight: 800;
-
-      color: white;
-
-      letter-spacing: .3px;
-
+      position: relative;
       opacity: 0;
-
-      transform: translateY(14px);
-
-      transition: opacity .6s ease, transform .6s ease;
-
+      transform: translateY(16px) scale(.96);
+      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
     }
 
-
+    .intro-logo img {
+      height: 60px;
+      width: auto;
+      display: block;
+      filter: drop-shadow(0 8px 26px rgba(0, 0, 0, .5));
+    }
 
     .intro-logo.show {
-
       opacity: 1;
-
-      transform: translateY(0);
-
+      transform: translateY(0) scale(1);
     }
 
+    /* text fallback if the logo image fails */
+    .intro-fallback {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .3px;
+    }
 
-
-    .intro-logo span {
-
+    .intro-fallback > span {
       background: var(--orange);
-
-      color: white;
-
+      color: #fff;
       padding: 5px 12px;
-
       border-radius: 6px;
+      font-size: 22px;
+    }
 
-      font-size: 19px;
+    /* indeterminate loader sweeping under the mark */
+    .intro-bar {
+      position: relative;
+      width: 188px;
+      height: 3px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, .12);
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity .5s ease .25s;
+    }
 
+    .intro-logo.show ~ .intro-bar { opacity: 1; }
+
+    .intro-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -45%;
+      width: 45%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      animation: introSweep 1.1s cubic-bezier(.5, 0, .3, 1) infinite;
+    }
+
+    @keyframes introSweep {
+      0%   { left: -45%; }
+      100% { left: 105%; }
+    }
+
+    .intro-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .5);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .6s ease .35s, transform .6s ease .35s;
+    }
+
+    .intro-logo.show ~ .intro-tag { opacity: 1; transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .intro-glow,
+      .intro-bar::before { animation: none; }
     }
 
 
@@ -1783,6 +1983,14 @@
 
       object-fit: cover;
 
+      transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+
+    }
+
+    .about-img-wrap:hover img {
+
+      transform: scale(1.06);
+
     }
 
 
@@ -1941,7 +2149,7 @@
 
     .service-card:hover {
 
-      transform: translateY(-6px);
+      transform: translateY(-6px) scale(1.015);
 
       box-shadow: 0 20px 56px rgba(0, 0, 0, .11);
 
@@ -1977,6 +2185,40 @@
 
       object-fit: cover;
 
+      transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+
+    }
+
+    /* legibility tint over the photo */
+    .service-card-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(13, 27, 42, .08) 0%, rgba(13, 27, 42, .58) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* floating brand icon on the photo */
+    .service-card-img .svc-ico {
+      position: absolute;
+      z-index: 2;
+      left: 16px;
+      bottom: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--orange);
+      color: #fff;
+      font-size: 20px;
+      box-shadow: 0 8px 20px rgba(244, 121, 32, .45);
+    }
+
+    .service-card:hover .service-card-img img {
+      transform: scale(1.06);
     }
 
 
@@ -2293,57 +2535,206 @@
 
       background: white;
 
+      position: relative;
+
+      overflow: hidden;
+
+    }
+
+
+
+    /* Transition bridge: fades the dark parallax "why" section above into
+       this white section so the two blend rather than hard-cut. */
+
+    .industries::before {
+
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      right: 0;
+
+      height: 160px;
+
+      background: linear-gradient(to bottom, var(--navy) 0%, rgba(13,27,42,0) 100%);
+
+      opacity: .09;
+
+      pointer-events: none;
+
+      z-index: 0;
+
+    }
+
+
+
+    .industries > * {
+
+      position: relative;
+
+      z-index: 1;
+
     }
 
 
 
     .industries-grid {
 
-      display: flex;
+      display: grid;
 
-      flex-wrap: wrap;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 
-      gap: 12px;
-
-    }
-
-
-
-    .industry-chip {
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 10px;
-
-      background: var(--light);
-
-      border: 1px solid var(--border);
-
-      border-radius: 50px;
-
-      padding: 10px 20px;
-
-      font-size: 13.5px;
-
-      font-weight: 500;
-
-      color: var(--text);
-
-      transition: border-color .2s, background .2s, transform .2s;
+      gap: 18px;
 
     }
 
 
 
-    .industry-chip:hover {
+    /* Image cards — a photo layer (::before) + navy gradient scrim (::after)
+       sit behind the icon/label. Hover lifts the card, zooms the photo and
+       warms the scrim to brand orange. */
 
-      border-color: var(--orange);
+    .industry-card {
 
-      background: var(--orange-l);
+      position: relative;
 
-      color: var(--orange);
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: flex-end;
+
+      min-height: 176px;
+
+      padding: 18px;
+
+      border-radius: var(--radius);
+
+      overflow: hidden;
+
+      isolation: isolate;
+
+      box-shadow: var(--shadow);
+
+      transition: transform .55s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+
+    }
+
+
+
+    .industry-card::before {
+
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      background-image: var(--ci);
+
+      background-size: cover;
+
+      background-position: center;
+
+      transform: scale(1.03);
+
+      transition: transform .7s cubic-bezier(.22,1,.36,1);
+
+      z-index: -2;
+
+    }
+
+
+
+    .industry-card::after {
+
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      background: linear-gradient(to top, rgba(13,27,42,.92) 0%, rgba(13,27,42,.55) 46%, rgba(13,27,42,.12) 100%);
+
+      transition: background .4s ease;
+
+      z-index: -1;
+
+    }
+
+
+
+    .industry-card:hover {
+
+      transform: translateY(-8px);
+
+      box-shadow: 0 22px 46px rgba(13,27,42,.30);
+
+    }
+
+
+
+    .industry-card:hover::before {
+
+      transform: scale(1.11);
+
+    }
+
+
+
+    .industry-card:hover::after {
+
+      background: linear-gradient(to top, rgba(244,121,32,.86) 0%, rgba(13,27,42,.6) 55%, rgba(13,27,42,.14) 100%);
+
+    }
+
+
+
+    .ic-icon {
+
+      width: 44px;
+
+      height: 44px;
+
+      display: grid;
+
+      place-items: center;
+
+      border-radius: 12px;
+
+      background: rgba(255,255,255,.16);
+
+      border: 1px solid rgba(255,255,255,.24);
+
+      -webkit-backdrop-filter: blur(4px);
+
+      backdrop-filter: blur(4px);
+
+      margin-bottom: 12px;
+
+      transition: background .3s ease, transform .3s ease;
+
+    }
+
+
+
+    .ic-icon i {
+
+      color: #fff;
+
+      font-size: 17px;
+
+    }
+
+
+
+    .industry-card:hover .ic-icon {
+
+      background: var(--orange);
 
       transform: translateY(-2px);
 
@@ -2351,15 +2742,17 @@
 
 
 
-    .industry-chip i {
+    .ic-name {
 
-      color: var(--orange);
+      color: #fff;
 
-      font-size: 14px;
+      font-weight: 600;
 
-      width: 16px;
+      font-size: 15px;
 
-      text-align: center;
+      letter-spacing: .2px;
+
+      text-shadow: 0 2px 10px rgba(0,0,0,.45);
 
     }
 
@@ -2629,7 +3022,7 @@
 
       box-shadow: 0 6px 24px rgba(244, 121, 32, .12);
 
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.01);
 
     }
 
@@ -5073,7 +5466,7 @@
 
     .testimonial-card:hover {
 
-      transform: translateY(-5px);
+      transform: translateY(-5px) scale(1.015);
 
     }
 
@@ -5911,7 +6304,7 @@
 
     .cs-full-card:hover {
 
-      transform: translateY(-4px);
+      transform: translateY(-4px) scale(1.015);
 
       box-shadow: 0 12px 36px rgba(0, 0, 0, .1);
 
@@ -7278,11 +7671,21 @@
 
 <body>
 
-  <noscript><style>.kf-item{opacity:1 !important;transform:none !important;}.hero-left,.hero-right{opacity:1 !important;transform:none !important;}#introCurtain{display:none !important;}</style></noscript>
+  <noscript><style>.kf-item{opacity:1 !important;transform:none !important;}.hero-left,.hero-right,.hero-left>*{opacity:1 !important;transform:none !important;}#introCurtain{display:none !important;}</style></noscript>
 
   <div id="introCurtain">
 
-    <div class="intro-logo" id="introLogo"><span>hpe</span>solutions</div>
+    <div class="intro-glow"></div>
+
+    <div class="intro-logo" id="introLogo">
+      <img src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" alt="HPE Solutions Sdn Bhd"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+      <span class="intro-fallback"><span>hpe</span>solutions</span>
+    </div>
+
+    <div class="intro-bar"></div>
+
+    <div class="intro-tag">Enterprise IT · Delivered Nationwide</div>
 
   </div>
 
@@ -7298,7 +7701,7 @@
 
       document.body.style.overflow = 'hidden';
 
-      setTimeout(function () { logo.classList.add('show'); }, 120);
+      setTimeout(function () { logo.classList.add('show'); }, 160);
 
       setTimeout(function () {
 
@@ -7314,9 +7717,9 @@
 
         if (hr) setTimeout(function () { hr.classList.add('reveal'); }, 150);
 
-      }, 900);
+      }, 1650);
 
-      setTimeout(function () { curtain.remove(); }, 2000);
+      setTimeout(function () { curtain.remove(); }, 2750);
 
       // Safety net: guarantee the hero is visible even if something above fails
 
@@ -7507,6 +7910,8 @@
 
   <section class="hero">
 
+    <canvas class="hero-net" id="heroNet" aria-hidden="true"></canvas>
+
     <div class="hero-left">
 
       <div class="hero-badge">
@@ -7536,50 +7941,107 @@
     <div class="hero-right">
 
       <img src="https://hpe.com.my/wp-content/uploads/2021/05/HPE-Main-IT-Service-Provider.png"
-        alt="HPE IT Service Provider"
+        alt="HPE IT Service Provider" data-parallax="0.55"
         onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'" />
 
       <div class="hero-overlay"></div>
 
-      <div class="hero-stats">
-
-        <div class="hero-stat-card">
-
-          <div class="n">10+</div>
-
-          <div class="l">Years Experience</div>
-
-        </div>
-
-        <div class="hero-stat-card">
-
-          <div class="n">18</div>
-
-          <div class="l">Support Centers</div>
-
-        </div>
-
-        <div class="hero-stat-card">
-
-          <div class="n">70+</div>
-
-          <div class="l">IT Professionals</div>
-
-        </div>
-
-        <div class="hero-stat-card">
-
-          <div class="n">50K+</div>
-
-          <div class="l">Nodes Managed</div>
-
-        </div>
-
-      </div>
-
     </div>
 
   </section>
+
+  <script>
+    /* Ambient hero network — nodes drift and link when close, with a few
+       orange "hot" nodes. A living picture of the nationwide managed-node
+       footprint. Paused when the tab is hidden; static under reduced motion. */
+    (function () {
+      var canvas = document.getElementById('heroNet');
+      if (!canvas || !canvas.getContext) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var ctx = canvas.getContext('2d');
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var W = 0, H = 0, nodes = [], raf = null, running = false;
+
+      function size() {
+        var r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        if (W === 0 || H === 0) return;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function build() {
+        var count = Math.max(24, Math.min(58, Math.round(W * H / 22000)));
+        nodes = [];
+        for (var i = 0; i < count; i++) {
+          nodes.push({
+            x: Math.random() * W, y: Math.random() * H,
+            vx: (Math.random() - .5) * .26, vy: (Math.random() - .5) * .26,
+            r: Math.random() * 1.5 + 1,
+            hot: Math.random() < .16
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        var i, j, a, b, dx, dy, d, max = 130;
+        for (i = 0; i < nodes.length; i++) {
+          a = nodes[i];
+          a.x += a.vx; a.y += a.vy;
+          if (a.x < 0 || a.x > W) a.vx *= -1;
+          if (a.y < 0 || a.y > H) a.vy *= -1;
+        }
+        for (i = 0; i < nodes.length; i++) {
+          a = nodes[i];
+          for (j = i + 1; j < nodes.length; j++) {
+            b = nodes[j];
+            dx = a.x - b.x; dy = a.y - b.y; d = Math.sqrt(dx * dx + dy * dy);
+            if (d < max) {
+              ctx.globalAlpha = (1 - d / max) * .26;
+              ctx.strokeStyle = (a.hot || b.hot) ? 'rgb(244,121,32)' : 'rgb(150,180,220)';
+              ctx.lineWidth = 1;
+              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            }
+          }
+        }
+        for (i = 0; i < nodes.length; i++) {
+          a = nodes[i];
+          ctx.globalAlpha = a.hot ? .95 : .55;
+          ctx.fillStyle = a.hot ? 'rgb(244,121,32)' : 'rgb(190,210,235)';
+          ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function loop() {
+        if (!running) return;
+        draw();
+        raf = requestAnimationFrame(loop);
+      }
+
+      function start() { if (!running) { running = true; loop(); } }
+      function stop() { running = false; if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+      size();
+      if (W === 0 || H === 0) { requestAnimationFrame(function () { size(); build(); if (!reduce) start(); else draw(); }); }
+      build();
+
+      if (reduce) { draw(); return; }
+      start();
+
+      var rt;
+      window.addEventListener('resize', function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () { size(); build(); }, 200);
+      }, { passive: true });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stop(); else start();
+      });
+    })();
+  </script>
 
 
 
@@ -7589,7 +8051,8 @@
 
   <!-- KEY FACTS HIGHLIGHTS -->
 
-  <section class="keyfacts" id="keyfacts">
+  <section class="keyfacts px-photo" id="keyfacts" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(13,27,42,.82),rgba(13,27,42,.9))">
 
     <div class="keyfacts-inner">
 
@@ -7663,7 +8126,8 @@
 
   <!-- ABOUT US -->
 
-  <section class="about" id="about">
+  <section class="about px-photo" id="about" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(247,248,251,.88),rgba(247,248,251,.92))">
 
     <div class="about-grid">
 
@@ -7703,7 +8167,7 @@
 
             <div>
 
-              <h4>100% Malaysian Company</h4>
+              <h4>Established Malaysian Company</h4>
 
               <p>Locally incorporated and operated — we understand the Malaysian business landscape, compliance
 
@@ -7793,9 +8257,14 @@
 
       <div class="service-card" data-service="managed" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-server" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="IT Support &amp; Managed Services" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-server"></i></span>
 
         </div>
 
@@ -7817,9 +8286,14 @@
 
       <div class="service-card" data-service="project" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-diagram-project" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Project Deployment" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-diagram-project"></i></span>
 
         </div>
 
@@ -7841,9 +8315,14 @@
 
       <div class="service-card" data-service="helpdesk" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-headset" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/5453822/pexels-photo-5453822.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="IT Helpdesk" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-headset"></i></span>
 
         </div>
 
@@ -7865,9 +8344,14 @@
 
       <div class="service-card" data-service="staffing" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-users" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="IT Staffing" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-users"></i></span>
 
         </div>
 
@@ -7889,9 +8373,14 @@
 
       <div class="service-card" data-service="warranty" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-shield-check" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/1476321/pexels-photo-1476321.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Authorised Warranty Provider" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-shield-check"></i></span>
 
         </div>
 
@@ -7913,9 +8402,14 @@
 
       <div class="service-card" data-service="sourcing" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-lightbulb" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Total Solution &amp; Sourcing" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-lightbulb"></i></span>
 
         </div>
 
@@ -7937,9 +8431,14 @@
 
       <div class="service-card" data-service="vas" style="cursor:pointer;">
 
-        <div class="service-card-img" style="background:var(--orange-l);width:100%;height:200px;display:flex;align-items:center;justify-content:center;">
+        <div class="service-card-img" style="position:relative;width:100%;height:200px;overflow:hidden;">
 
-          <i class="fa-solid fa-gears" style="font-size:56px;color:var(--orange);"></i>
+          <img
+            src="https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Value Added Service" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='var(--orange-l)';" />
+
+          <span class="svc-ico"><i class="fa-solid fa-gears"></i></span>
 
         </div>
 
@@ -7967,7 +8466,8 @@
 
   <!-- WHY US -->
 
-  <section class="why" id="why">
+  <section class="why px-photo" id="why" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(247,248,251,.88),rgba(247,248,251,.92))">
 
     <div class="why-grid">
 
@@ -8047,33 +8547,33 @@
 
         <div class="why-metric">
 
-          <div class="num">99%</div>
+          <div class="num">50K+</div>
 
-          <div class="lbl">SLA Compliance Rate</div>
-
-        </div>
-
-        <div class="why-metric">
-
-          <div class="num">4hr</div>
-
-          <div class="lbl">Avg. Response Time</div>
+          <div class="lbl">Customer Nodes Managed</div>
 
         </div>
 
         <div class="why-metric">
 
-          <div class="num">100+</div>
+          <div class="num">24×7×4hr</div>
 
-          <div class="lbl">Corporate Clients</div>
+          <div class="lbl">Maintenance SLA</div>
 
         </div>
 
         <div class="why-metric">
 
-          <div class="num">24/7</div>
+          <div class="num">18</div>
 
-          <div class="lbl">Support Availability</div>
+          <div class="lbl">Service Centers Nationwide</div>
+
+        </div>
+
+        <div class="why-metric">
+
+          <div class="num">70</div>
+
+          <div class="lbl">Professional Support Staff</div>
 
         </div>
 
@@ -8097,29 +8597,29 @@
 
     <div class="industries-grid">
 
-      <div class="industry-chip"><i class="fa-solid fa-building-columns"></i> Banking &amp; Finance</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-building-columns"></i></span><span class="ic-name">Banking</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-hospital"></i> Healthcare</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/2101137/pexels-photo-2101137.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-oil-well"></i></span><span class="ic-name">Oil &amp; Gas</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-graduation-cap"></i> Education</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-tower-broadcast"></i></span><span class="ic-name">Telecommunications</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-industry"></i> Manufacturing</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-cart-shopping"></i></span><span class="ic-name">Retail</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-cart-shopping"></i> Retail &amp; E-commerce</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/305566/pexels-photo-305566.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-hospital"></i></span><span class="ic-name">Healthcare</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-helmet-safety"></i> Property &amp; Construction</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/208724/pexels-photo-208724.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-landmark"></i></span><span class="ic-name">Government</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-tower-broadcast"></i> Telecommunications</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/236698/pexels-photo-236698.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-industry"></i></span><span class="ic-name">Manufacturing</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-landmark"></i> Government &amp; Public Sector</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-truck"></i></span><span class="ic-name">Logistics</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-truck"></i> Logistics &amp; Transportation</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-graduation-cap"></i></span><span class="ic-name">Education</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-umbrella"></i> Insurance</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/66134/pexels-photo-66134.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-photo-film"></i></span><span class="ic-name">Media &amp; Broadcasting</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-bolt"></i> Energy &amp; Utilities</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-plane"></i></span><span class="ic-name">Airlines &amp; Hospitality</span></div>
 
-      <div class="industry-chip"><i class="fa-solid fa-utensils"></i> Food &amp; Beverage</div>
+      <div class="industry-card" style="--ci:url('https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=800')"><span class="ic-icon"><i class="fa-solid fa-car"></i></span><span class="ic-name">Automotive</span></div>
 
     </div>
 
@@ -8129,7 +8629,8 @@
 
   <!-- PROCESS -->
 
-  <section class="process" id="process">
+  <section class="process px-photo" id="process" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(13,27,42,.82),rgba(13,27,42,.9))">
 
     <div style="text-align:center; margin-bottom: 56px;">
 
@@ -8201,7 +8702,8 @@
 
   <!-- CASE STUDY -->
 
-  <section class="casestudy" id="casestudy">
+  <section class="casestudy px-photo" id="casestudy" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(247,248,251,.88),rgba(247,248,251,.92))">
 
     <div style="text-align:center; margin-bottom:48px;">
 
@@ -8304,7 +8806,7 @@
 
             <h4>Media &amp; Broadcasting Infrastructure</h4>
 
-            <div class="cs-home-metrics"><span>24×7×4hr SLA</span><span>0 Disruptions</span></div>
+            <div class="cs-home-metrics"><span>24×7×4hr SLA</span><span>Video/Voice</span></div>
 
           </div>
 
@@ -8786,96 +9288,6 @@
 
 
 
-  <!-- TESTIMONIALS -->
-
-  <section class="testimonials">
-
-    <div class="section-tag">Client Feedback</div>
-
-    <h2 class="section-title">What Our Clients Say</h2>
-
-    <p class="section-sub">Trusted by corporate and SME clients across Malaysia.</p>
-
-    <div class="testimonial-grid">
-
-      <div class="testimonial-card">
-
-        <div class="stars">★★★★★</div>
-
-        <p>"HPE Solutions has been our IT partner for over 5 years. Their nationwide coverage and fast response times
-
-          have been critical for our branch operations across the country."</p>
-
-        <div class="testimonial-author">
-
-          <div class="author-avatar">AH</div>
-
-          <div>
-
-            <div class="author-name">Ahmad Hafiz</div>
-
-            <div class="author-title">IT Manager, Banking Sector</div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="testimonial-card">
-
-        <div class="stars">★★★★★</div>
-
-        <p>"The team handled our full server migration seamlessly. Zero downtime and the project was delivered ahead of
-
-          schedule. Highly professional and well-coordinated."</p>
-
-        <div class="testimonial-author">
-
-          <div class="author-avatar">LC</div>
-
-          <div>
-
-            <div class="author-name">Lee Chun Wei</div>
-
-            <div class="author-title">CTO, Manufacturing Company</div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="testimonial-card">
-
-        <div class="stars">★★★★★</div>
-
-        <p>"Their warranty support service is exceptional. When our hardware fails, they're on-site within hours. Truly
-
-          dependable — exactly what a growing business needs."</p>
-
-        <div class="testimonial-author">
-
-          <div class="author-avatar">SR</div>
-
-          <div>
-
-            <div class="author-name">Siti Rahimah</div>
-
-            <div class="author-title">Operations Head, Retail Chain</div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
   <!-- BUSINESS PARTNERS -->
 
   <section class="bizpartners" id="bizpartners">
@@ -8894,21 +9306,39 @@
 
     <div class="partners-logos">
 
-      <div class="partner-badge"><i class="fa-solid fa-desktop"></i> HP Inc.</div>
+      <div class="partner-badge"><i class="fa-solid fa-plug"></i> AMP</div>
 
-      <div class="partner-badge"><i class="fa-solid fa-server"></i> Hewlett Packard Enterprise</div>
+      <div class="partner-badge"><i class="fa-solid fa-wifi"></i> Aruba</div>
 
-      <div class="partner-badge"><i class="fa-solid fa-laptop"></i> Dell Technologies</div>
+      <div class="partner-badge"><i class="fa-solid fa-phone-volume"></i> AVAYA</div>
 
       <div class="partner-badge"><i class="fa-solid fa-network-wired"></i> Cisco</div>
 
-      <div class="partner-badge"><i class="fa-solid fa-tablet-screen-button"></i> Lenovo</div>
+      <div class="partner-badge"><i class="fa-solid fa-shield-halved"></i> Cyberoam</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-ethernet"></i> DINTEK</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-shield-halved"></i> Fortinet</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-server"></i> HP Enterprise</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-tower-cell"></i> Huawei</div>
 
       <div class="partner-badge"><i class="fa-brands fa-microsoft"></i> Microsoft</div>
 
-      <div class="partner-badge"><i class="fa-solid fa-display"></i> Acer</div>
+      <div class="partner-badge"><i class="fa-solid fa-diagram-project"></i> Peplink</div>
 
-      <div class="partner-badge"><i class="fa-solid fa-wifi"></i> Huawei</div>
+      <div class="partner-badge"><i class="fa-solid fa-gauge-high"></i> Riverbed</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-wifi"></i> Ruckus</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-cloud"></i> SANGFOR</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-shield-halved"></i> Sophos</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-tower-broadcast"></i> TM</div>
+
+      <div class="partner-badge"><i class="fa-solid fa-database"></i> Veeam</div>
 
     </div>
 
@@ -8927,7 +9357,8 @@
 
   <!-- CONTACT -->
 
-  <section class="contact-section" id="contact">
+  <section class="contact-section px-photo" id="contact" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/325229/pexels-photo-325229.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(247,248,251,.88),rgba(247,248,251,.92))">
 
     <div style="margin-bottom:48px;">
 
@@ -9127,7 +9558,8 @@
 
   <!-- FOOTER -->
 
-  <footer>
+  <footer class="px-photo" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(13,27,42,.86),rgba(13,27,42,.93))">
 
     <div class="footer-grid">
 
@@ -10592,7 +11024,7 @@
 
         desc: 'HPE delivers contractual IT management and support covering corporate networks, systems, and applications using tailored Service Level Agreements that meet each customer\'s unique requirements.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Job Scope — What We Cover',
 
@@ -10624,7 +11056,7 @@
 
           { tier: 'Elite', val: '24×7 (4hr)', desc: 'Non-stop critical systems requiring immediate support year-round.', highlight: true },
 
-          { tier: 'Premium', val: '8×5 (4hr)', desc: 'Office-hours critical support with same-day on-site response.' },
+          { tier: 'Premium', val: '8×5 (2hr)', desc: 'Office-hours critical support with same-day on-site response.' },
 
           { tier: 'Standard', val: '8×5 (NBD)', desc: 'General IT product support during regular business hours.' },
 
@@ -10656,7 +11088,7 @@
 
         desc: 'HPE offers comprehensive project management and deployment for IT initiatives of any scale — covering network devices, servers, desktops, laptops, hardware, software, and applications across banking, retail, manufacturing, and oil & gas sectors.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Deployment Capabilities',
 
@@ -10680,7 +11112,7 @@
 
           { title: 'Cost-Effectiveness', desc: 'Economy of scale advantages versus developing internal deployment resources.' },
 
-          { title: 'Reduced Risk', desc: 'ITIL-based practices with documented processes and comprehensive reporting at every stage.' },
+          { title: 'Reduced Risk', desc: 'Documented processes and comprehensive reporting at every stage.' },
 
           { title: 'Extra Resources', desc: 'Relieves your internal IT team, allowing them to focus on core business operations.' },
 
@@ -10700,7 +11132,7 @@
 
         desc: 'By outsourcing your helpdesk to HPE, we provide top-notch services to your organisation without any compromise on service quality — from managed helpdesk solutions to trained call centre agents.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/5453822/pexels-photo-5453822.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Helpdesk Solutions',
 
@@ -10738,7 +11170,7 @@
 
         desc: 'IT Hardware Support Staffing Management provides IT headcount on long-term or short-term contract terms, matched to your required skillset and years of experience — from junior technicians to senior engineers.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Staffing Models',
 
@@ -10776,7 +11208,7 @@
 
         desc: 'HPE Solutions is an appointed Authorised Support Partner (ASP) handling hardware and software warranty obligations through our 18 nationwide service centres, offering both on-site and walk-in warranty services.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/1476321/pexels-photo-1476321.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Warranty Services Covered',
 
@@ -10818,7 +11250,7 @@
 
         desc: 'HPE provides Total IT Solution or IT Sourcing based on our system integration experience and partnerships with leading technology providers — delivering tested, cost-effective, integrated IT solutions for your business.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Technology Solutions',
 
@@ -10860,7 +11292,7 @@
 
         desc: 'We provide value-added services alongside IT management & support — including IMAC, ad-hoc installation, mini project implementation, and full office relocation services for seamless business continuity.',
 
-        img: '',
+        img: 'https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=1200',
 
         featuresTitle: 'Value Added Capabilities',
 
@@ -11262,6 +11694,53 @@
 
 
 
+    /* ═══════════════════════════════════════════════
+       PARALLAX SCROLL ENGINE
+       Drifts a --py offset on every [data-parallax] element based on its
+       position in the viewport. CSS consumes --py (section ::before photo
+       layers and the hero image). rAF-throttled + passive; disabled for
+       users who prefer reduced motion.
+       ═══════════════════════════════════════════════ */
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      var MAX = 46;               // max px drift for a full-intensity (data-parallax="1") layer
+      var layers = [];
+
+      function collect() {
+        layers = [];
+        var nodes = document.querySelectorAll('[data-parallax]');
+        for (var i = 0; i < nodes.length; i++) {
+          layers.push({ el: nodes[i], k: parseFloat(nodes[i].getAttribute('data-parallax')) || 1 });
+        }
+      }
+
+      var vh = window.innerHeight, ticking = false;
+
+      function apply() {
+        ticking = false;
+        for (var i = 0; i < layers.length; i++) {
+          var L = layers[i], r = L.el.getBoundingClientRect();
+          if (r.bottom < -300 || r.top > vh + 300) continue;      // skip well-offscreen layers
+          var p = (vh - r.top) / (vh + r.height);                 // 0 as it enters bottom → 1 as it leaves top
+          if (p < 0) p = 0; else if (p > 1) p = 1;
+          var py = (0.5 - p) * 2 * MAX * L.k;                      // centre → 0, symmetric drift
+          L.el.style.setProperty('--py', py.toFixed(1) + 'px');
+        }
+      }
+
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () { vh = window.innerHeight; collect(); apply(); }, { passive: true });
+      window.addEventListener('load', function () { collect(); apply(); });
+      collect();
+      apply();
+    })();
+
+
+
     /* ── Services dropdown — JS-controlled with leave delay ── */
 
     const ddParent = document.querySelector('.has-dropdown');
@@ -11558,7 +12037,7 @@
 
           e.target.style.opacity = '1';
 
-          e.target.style.transform = 'translateY(0)';
+          e.target.style.transform = 'translate3d(0, 0, 0)';
 
           fadeObs.unobserve(e.target);
 
@@ -11568,21 +12047,28 @@
 
     }, { threshold: 0.1 });
 
+    // Alternating left/right slide-in gives a visible scroll-driven movement,
+    // layered over the fade-up. Disabled under reduced-motion (plain fade only).
+
+    const slideMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const fadeObsEls = [];
 
-    ['.service-card', '.cs-home-card', '.center-list-item', '.testimonial-card',
+    ['.service-card', '.cs-home-card', '.center-list-item',
 
-      '.partner-badge', '.about-point', '.why-point', '.step', '.industry-chip'
+      '.partner-badge', '.about-point', '.why-point', '.step'
 
     ].forEach(sel => {
 
       document.querySelectorAll(sel).forEach((el, i) => {
 
+        const dx = slideMotion ? (i % 2 ? 28 : -28) : 0;
+
         el.style.opacity = '0';
 
-        el.style.transform = 'translateY(20px)';
+        el.style.transform = `translate3d(${dx}px, 20px, 0)`;
 
-        el.style.transition = `opacity .5s ${(i % 4) * 70}ms, transform .5s ${(i % 4) * 70}ms`;
+        el.style.transition = `opacity .6s ${(i % 4) * 70}ms, transform .6s cubic-bezier(.22, 1, .36, 1) ${(i % 4) * 70}ms`;
 
         fadeObs.observe(el);
 
@@ -11602,11 +12088,80 @@
 
         el.style.opacity = '1';
 
-        el.style.transform = 'translateY(0)';
+        el.style.transform = 'translate3d(0, 0, 0)';
 
       });
 
     }, 5000);
+
+
+
+    /* ════════════════════════════════════════════
+
+       INDUSTRY CARDS — slow scroll-driven reveal
+
+       Each card starts lowered + transparent and eases up into place as it
+       scrolls into the viewport, cascading left-to-right across every row.
+       Given its own observer (separate from the shared fade above) so the
+       timing can be noticeably slower and gentler.
+
+    ════════════════════════════════════════════ */
+
+    const industryCards = document.querySelectorAll('.industry-card');
+
+    if (industryCards.length) {
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const cols = 5; // widest grid layout; only sets the stagger rhythm
+
+      industryCards.forEach((card, i) => {
+
+        card.style.opacity = '0';
+
+        card.style.transform = reduceMotion ? 'none' : 'translate3d(0, 54px, 0)';
+
+        card.style.transition = 'opacity .9s cubic-bezier(.22,1,.36,1), transform 1s cubic-bezier(.22,1,.36,1)';
+
+        card.style.transitionDelay = (reduceMotion ? 0 : (i % cols) * 110) + 'ms';
+
+      });
+
+      const cardObs = new IntersectionObserver(entries => {
+
+        entries.forEach(e => {
+
+          if (e.isIntersecting) {
+
+            e.target.style.opacity = '1';
+
+            e.target.style.transform = 'translate3d(0, 0, 0)';
+
+            cardObs.unobserve(e.target);
+
+          }
+
+        });
+
+      }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+
+      industryCards.forEach(card => cardObs.observe(card));
+
+      // Safety net: never leave a card hidden if the observer never fires.
+
+      setTimeout(() => {
+
+        industryCards.forEach(card => {
+
+          card.style.opacity = '1';
+
+          card.style.transform = 'translate3d(0, 0, 0)';
+
+        });
+
+      }, 6000);
+
+    }
 
 
 
