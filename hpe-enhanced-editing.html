@@ -795,11 +795,27 @@
 
       align-items: center;
 
-      min-height: 600px;
+      min-height: 100vh;
 
       overflow: hidden;
 
+      position: sticky;
+
+      top: 0;
+
+      z-index: 0;
+
+    }
+
+    /* every section below the hero scrolls up and over the pinned hero,
+       giving a reveal-on-scroll parallax. Sections are opaque so the hero
+       stays hidden behind them. */
+    body > section,
+    body > footer {
+
       position: relative;
+
+      z-index: 1;
 
     }
 
@@ -1009,13 +1025,13 @@
 
     .hero-right {
 
-      flex: 0.75;
+      position: absolute;
 
-      position: relative;
+      inset: 0;
+
+      z-index: 0;
 
       overflow: hidden;
-
-      align-self: stretch;
 
       min-height: 600px;
 
@@ -1039,7 +1055,8 @@
 
 
 
-    .hero-right img {
+    .hero-right img,
+    .hero-right video {
 
       width: 100%;
 
@@ -1049,7 +1066,7 @@
 
       object-position: center;
 
-      opacity: .28;
+      opacity: .55;
 
       mix-blend-mode: luminosity;
 
@@ -1063,7 +1080,7 @@
 
       inset: 0;
 
-      background: linear-gradient(to right, var(--navy) 0%, transparent 40%);
+      background: linear-gradient(to right, var(--navy) 0%, rgba(13,27,42,.92) 28%, rgba(13,27,42,.55) 58%, rgba(13,27,42,0) 100%);
 
       z-index: 1;
 
@@ -1087,22 +1104,7 @@
       z-index: 1;
     }
 
-    /* slow diagonal sheen for ambient life */
-    .hero::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      background: linear-gradient(115deg, transparent 32%, rgba(244, 121, 32, .06) 48%, transparent 64%);
-      background-size: 220% 220%;
-      animation: heroSheen 15s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes heroSheen {
-      0%, 100% { background-position: 0% 50%; }
-      50%      { background-position: 100% 50%; }
-    }
+    /* orange diagonal sheen removed per request */
 
     /* staggered entrance for the hero copy after reveal */
     .hero-left > * {
@@ -1189,7 +1191,8 @@
 
     /* Parallax the hero product image itself for foreground depth.
        The slight over-scale hides the edges as the image drifts. */
-    .hero-right img {
+    .hero-right img,
+    .hero-right video {
       transform: translate3d(0, var(--py, 0px), 0) scale(1.12);
       will-change: transform;
     }
@@ -1197,7 +1200,8 @@
     @media (prefers-reduced-motion: reduce) {
 
       .px-photo::before,
-      .hero-right img {
+      .hero-right img,
+      .hero-right video {
         transform: none !important;
       }
     }
@@ -1721,7 +1725,7 @@
 
       gap: 0;
 
-      max-width: 1100px;
+      max-width: 1360px;
 
       margin: 0 auto;
 
@@ -1947,6 +1951,8 @@
 
       background: var(--light);
 
+      overflow: hidden;
+
     }
 
 
@@ -1965,6 +1971,45 @@
 
 
 
+    /* media column: decorative shapes sit behind the rounded video box */
+    .about-media {
+      position: relative;
+    }
+
+    .about-shape {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .about-shape-a {
+      width: 190px;
+      height: 190px;
+      top: -34px;
+      right: -30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, rgba(244, 121, 32, .38), rgba(244, 121, 32, 0) 70%);
+    }
+
+    .about-shape-b {
+      width: 150px;
+      height: 150px;
+      bottom: -30px;
+      left: -28px;
+      border-radius: 24px;
+      border: 3px solid rgba(13, 27, 42, .12);
+      transform: rotate(12deg);
+    }
+
+    .about-shape-c {
+      width: 120px;
+      height: 120px;
+      bottom: 40px;
+      right: -22px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(13, 27, 42, .10), rgba(13, 27, 42, 0) 70%);
+    }
+
     .about-img-wrap {
 
       border-radius: 16px;
@@ -1975,26 +2020,51 @@
 
       position: relative;
 
+      z-index: 1;
+
     }
 
 
 
-    .about-img-wrap img {
+    .about-img-wrap img,
+    .about-img-wrap video {
 
       width: 100%;
 
-      height: 380px;
+      height: 440px;
 
       object-fit: cover;
 
       transition: transform .7s cubic-bezier(.22, 1, .36, 1);
 
+      display: block;
+
     }
 
-    .about-img-wrap:hover img {
+    .about-img-wrap:hover img,
+    .about-img-wrap:hover video {
 
       transform: scale(1.06);
 
+    }
+
+    /* ─── GENERIC SCROLL REVEAL ─── */
+    /* JS adds .sr (hidden start) to components, then .sr-in when they scroll
+       into view. A safety-net timeout force-reveals everything so nothing
+       stays invisible if the observer never fires. */
+    .sr {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .sr.sr-in {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sr { opacity: 1; transform: none; transition: none; }
     }
 
 
@@ -4226,6 +4296,12 @@
 
       animation: pb-marquee 46s linear infinite;
 
+      will-change: transform;
+
+      backface-visibility: hidden;
+
+      transform: translateZ(0);
+
     }
 
 
@@ -4242,9 +4318,9 @@
 
     @keyframes pb-marquee {
 
-      from { transform: translateX(-50%); }
+      from { transform: translate3d(-50%, 0, 0); }
 
-      to   { transform: translateX(0); }
+      to   { transform: translate3d(0, 0, 0); }
 
     }
 
@@ -8078,9 +8154,12 @@
 
     <div class="hero-right">
 
-      <img src="https://images.pexels.com/photos/4508751/pexels-photo-4508751.jpeg?auto=compress&cs=tinysrgb&w=1200"
-        alt="Data center corridor lined with server racks" data-parallax="0.55"
-        onerror="this.src='https://images.pexels.com/photos/442152/pexels-photo-442152.jpeg?auto=compress&cs=tinysrgb&w=1200'" />
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata"
+        poster="assets/hero-it-support.jpg" data-parallax="0.55"
+        aria-label="Network cables connected in a server rack">
+        <source src="assets/hero-it.mp4" type="video/mp4" />
+        <img src="assets/hero-it-support.jpg" alt="IT technician connecting network cables in a server rack" />
+      </video>
 
       <div class="hero-overlay"></div>
 
@@ -8189,8 +8268,7 @@
 
   <!-- KEY FACTS HIGHLIGHTS -->
 
-  <section class="keyfacts px-photo" id="keyfacts" data-parallax="1"
-    style="--px-img:url('https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(13,27,42,.82),rgba(13,27,42,.9))">
+  <section class="keyfacts" id="keyfacts">
 
     <div class="keyfacts-inner">
 
@@ -8264,16 +8342,25 @@
 
   <!-- ABOUT US -->
 
-  <section class="about px-photo" id="about" data-parallax="1"
-    style="--px-img:url('https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(247,248,251,.88),rgba(247,248,251,.92))">
+  <section class="about" id="about">
 
     <div class="about-grid">
 
+      <div class="about-media">
+
+      <span class="about-shape about-shape-a"></span>
+
+      <span class="about-shape about-shape-b"></span>
+
+      <span class="about-shape about-shape-c"></span>
+
       <div class="about-img-wrap">
 
-        <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"
-          alt="HPE Solutions Team"
-          onerror="this.style.display='none'" />
+        <video autoplay muted loop playsinline preload="metadata"
+          poster="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"
+          aria-label="HPE Solutions IT support team at work">
+          <source src="assets/about-it.mp4" type="video/mp4" />
+        </video>
 
         <div class="about-img-badge">
 
@@ -8282,6 +8369,8 @@
           Years of Trusted<br>IT Excellence
 
         </div>
+
+      </div>
 
       </div>
 
@@ -12163,6 +12252,69 @@
     const whyVisual = document.querySelector('.why-visual');
 
     if (whyVisual) metricObs.observe(whyVisual);
+
+
+
+    /* ════════════════════════════════════════════
+
+       GENERIC SCROLL REVEAL — every component fades/slides up
+       the first time it scrolls into view. Staggered per grid.
+
+    ════════════════════════════════════════════ */
+
+    (function () {
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var sel = '.section-tag, .section-title, .section-sub, .about-media, .service-card, .industry-card, .why-point, .step, .center-list-item, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
+
+      var els = Array.prototype.slice.call(document.querySelectorAll(sel));
+
+      if (!els.length || reduce) return;
+
+      // hide + per-group stagger (elements share a parent = same grid/row)
+
+      var prevParent = null, idx = 0;
+
+      els.forEach(function (el) {
+
+        if (el.parentNode !== prevParent) { prevParent = el.parentNode; idx = 0; }
+
+        el.classList.add('sr');
+
+        el.style.transitionDelay = Math.min(idx * 70, 350) + 'ms';
+
+        idx++;
+
+      });
+
+      var srObs = new IntersectionObserver(function (entries) {
+
+        entries.forEach(function (e) {
+
+          if (e.isIntersecting) {
+
+            e.target.classList.add('sr-in');
+
+            srObs.unobserve(e.target);
+
+          }
+
+        });
+
+      }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+
+      els.forEach(function (el) { srObs.observe(el); });
+
+      // safety net: force-reveal everything after 4.5s no matter what
+
+      setTimeout(function () {
+
+        els.forEach(function (el) { el.classList.add('sr-in'); });
+
+      }, 4500);
+
+    })();
 
 
 
