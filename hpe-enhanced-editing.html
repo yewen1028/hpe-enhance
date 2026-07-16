@@ -3190,13 +3190,48 @@
 
     }
 
-    /* Stronger, clearly one-by-one entrance for the process components as the
-       section scrolls in — reuses the shared reveal + its per-item stagger. */
+    /* Header lines still slide in via the shared reveal (.sr). */
     .process .sr { transform: translateY(46px); }
 
-    .process .step.sr { transform: translateY(46px) scale(.94); }
-
     .process .sr-in { transform: none !important; }
+
+    /* ── Steps appear IN SYNC with the comet head ──
+       Each step stays hidden until the progress head reaches its position. The
+       comet, pulses and ring are frozen until the section scrolls in (.run is
+       added), so everything starts at step 1 together — then each point
+       materialises exactly as the head arrives (0 / 1.2 / 2.4 / 3.6 / 4.8s,
+       matching the head's per-step arrival times). */
+    .steps .step {
+
+      opacity: 0;
+
+      transform: translateY(22px);
+
+      transition: opacity .4s ease, transform .4s cubic-bezier(.22, 1, .36, 1);
+
+    }
+
+    .steps.run .step { opacity: 1; transform: none; }
+
+    .steps.run .step:nth-child(1) { transition-delay: 0s; }
+
+    .steps.run .step:nth-child(2) { transition-delay: 1.2s; }
+
+    .steps.run .step:nth-child(3) { transition-delay: 2.4s; }
+
+    .steps.run .step:nth-child(4) { transition-delay: 3.6s; }
+
+    .steps.run .step:nth-child(5) { transition-delay: 4.8s; }
+
+    /* freeze the comet, pulses and ring until the section scrolls in, so they
+       begin at step 1 exactly when the reveal begins */
+    .steps::after,
+    .steps .step-num,
+    .steps .step-num::after { animation-play-state: paused; }
+
+    .steps.run::after,
+    .steps.run .step-num,
+    .steps.run .step-num::after { animation-play-state: running; }
 
 
 
@@ -8538,6 +8573,13 @@
       #introCurtain {
         display: none !important;
       }
+
+      /* process steps are hidden until JS reveals them in sync with the comet;
+         with no JS, show them all */
+      .steps .step {
+        opacity: 1 !important;
+        transform: none !important;
+      }
     </style>
   </noscript>
 
@@ -13077,7 +13119,7 @@
 
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      var sel = '.section-tag, .section-title, .section-sub, .about-media, .service-card, .industry-card, .why-point, .step, .center-list-item, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
+      var sel = '.section-tag, .section-title, .section-sub, .about-media, .service-card, .industry-card, .why-point, .center-list-item, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
 
       var els = Array.prototype.slice.call(document.querySelectorAll(sel));
 
@@ -13124,6 +13166,43 @@
         els.forEach(function (el) { el.classList.add('sr-in'); });
 
       }, 4500);
+
+    })();
+
+
+
+    /* ════════════════════════════════════════════
+
+       PROCESS STEPS — start the comet + reveal each step as the head reaches
+       it. Everything is frozen until the section scrolls in, so it all begins
+       at step 1 together and each point appears in sync with the head arriving.
+
+    ════════════════════════════════════════════ */
+
+    (function () {
+
+      var steps = document.querySelector('.process .steps');
+
+      if (!steps) return;
+
+      function run() { steps.classList.add('run'); }
+
+      var obs = new IntersectionObserver(function (entries) {
+
+        entries.forEach(function (e) {
+
+          if (e.isIntersecting) { run(); obs.disconnect(); }
+
+        });
+
+      }, { threshold: 0.25 });
+
+      obs.observe(steps);
+
+      // last-resort backstop if the observer never fires (kept long so it
+      // doesn't pre-reveal off-screen and break the sync); run() is idempotent
+
+      setTimeout(run, 12000);
 
     })();
 
