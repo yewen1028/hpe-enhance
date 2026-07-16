@@ -1643,14 +1643,24 @@
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: radial-gradient(120% 120% at 50% 38%, #16293f 0%, var(--navy) 55%, #0a141f 100%);
+      background: radial-gradient(125% 125% at 50% 42%, #172b42 0%, var(--navy) 52%, #08111c 100%);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 26px;
       clip-path: inset(0 0 0 0);
       transition: clip-path 1s cubic-bezier(.76, 0, .24, 1);
+    }
+
+    /* fine film grain over the whole frame for premium depth (static, cheap) */
+    #introCurtain::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .32;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
     }
 
     #introCurtain.hide {
@@ -1658,14 +1668,16 @@
       pointer-events: none;
     }
 
-    /* soft pulsing glow behind the mark */
+    /* soft dual-layer glow behind the mark — brand orange only, calm pulse */
     .intro-glow {
       position: absolute;
-      width: 440px;
-      height: 440px;
+      width: 480px;
+      height: 480px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(244, 121, 32, .26) 0%, rgba(244, 121, 32, 0) 68%);
-      animation: introPulse 2.4s ease-in-out infinite;
+      background:
+        radial-gradient(circle, rgba(244, 121, 32, .30) 0%, rgba(244, 121, 32, 0) 42%),
+        radial-gradient(circle, rgba(244, 121, 32, .12) 0%, rgba(244, 121, 32, 0) 70%);
+      animation: introPulse 3.2s ease-in-out infinite;
       pointer-events: none;
     }
 
@@ -1673,41 +1685,47 @@
 
       0%,
       100% {
-        transform: scale(.82);
-        opacity: .5;
+        transform: scale(.86);
+        opacity: .55;
       }
 
       50% {
-        transform: scale(1.06);
+        transform: scale(1.04);
         opacity: 1;
       }
     }
 
+    /* mark focuses into existence: fade + rise + de-blur */
     .intro-logo {
       position: relative;
       opacity: 0;
-      transform: translateY(16px) scale(.96);
-      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
+      transform: translateY(14px) scale(.97);
+      filter: blur(9px);
+      transition:
+        opacity .9s cubic-bezier(.22, 1, .36, 1),
+        transform .9s cubic-bezier(.22, 1, .36, 1),
+        filter .9s cubic-bezier(.22, 1, .36, 1);
     }
 
     .intro-logo img {
-      height: 60px;
+      height: 64px;
       width: auto;
       display: block;
-      filter: drop-shadow(0 8px 26px rgba(0, 0, 0, .5));
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .55));
     }
 
     .intro-logo.show {
       opacity: 1;
       transform: translateY(0) scale(1);
+      filter: blur(0);
     }
 
     /* text fallback if the logo image fails */
     .intro-fallback {
       display: none;
       align-items: center;
-      gap: 8px;
-      font-size: 26px;
+      gap: 9px;
+      font-size: 28px;
       font-weight: 800;
       color: #fff;
       letter-spacing: .3px;
@@ -1716,70 +1734,27 @@
     .intro-fallback>span {
       background: var(--orange);
       color: #fff;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 22px;
-    }
-
-    /* indeterminate loader sweeping under the mark */
-    .intro-bar {
-      position: relative;
-      width: 188px;
-      height: 3px;
-      border-radius: 3px;
-      background: rgba(255, 255, 255, .12);
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity .5s ease .25s;
-    }
-
-    .intro-logo.show~.intro-bar {
-      opacity: 1;
-    }
-
-    .intro-bar::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: -45%;
-      width: 45%;
-      border-radius: 3px;
-      background: linear-gradient(90deg, transparent, var(--orange), transparent);
-      animation: introSweep 1.1s cubic-bezier(.5, 0, .3, 1) infinite;
-    }
-
-    @keyframes introSweep {
-      0% {
-        left: -45%;
-      }
-
-      100% {
-        left: 105%;
-      }
-    }
-
-    .intro-tag {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, .5);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .6s ease .35s, transform .6s ease .35s;
-    }
-
-    .intro-logo.show~.intro-tag {
-      opacity: 1;
-      transform: translateY(0);
+      padding: 6px 13px;
+      border-radius: 7px;
+      font-size: 23px;
     }
 
     @media (prefers-reduced-motion: reduce) {
 
-      .intro-glow,
-      .intro-bar::before {
+      .intro-glow {
         animation: none;
+      }
+
+      /* no blur/scale motion — just a quick fade to the mark */
+      .intro-logo {
+        filter: none;
+        transform: none;
+        transition: opacity .4s ease;
+      }
+
+      .intro-logo.show {
+        filter: none;
+        transform: none;
       }
     }
 
@@ -8619,10 +8594,6 @@
       <span class="intro-fallback"><span>hpe</span>solutions</span>
     </div>
 
-    <div class="intro-bar"></div>
-
-    <div class="intro-tag">Enterprise IT · Delivered Nationwide</div>
-
   </div>
 
   <script>
@@ -13863,13 +13834,18 @@
 
     (function () {
 
+      // Many low-end laptops run with OS "animation effects" off, which reports
+      // as reduced-motion. Rather than disable the backdrop entirely (it just
+      // vanished on those machines), we keep it running but lighter and slower —
+      // which is also gentler on weak hardware.
+
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       var section = document.getElementById('centers');
 
       var canvas = section && section.querySelector('.centers-fx');
 
-      if (reduce || !section || !canvas) return;
+      if (!section || !canvas) return;
 
       var ctx = canvas.getContext('2d');
 
@@ -13881,9 +13857,9 @@
 
       var TRAIL = 'rgba(13, 27, 42, 0.1)';   // navy fade → longer, more visible trails
 
-      var COUNT = 300;                       // modest for low-end laptops
+      var COUNT = reduce ? 140 : 280;        // fewer particles when motion is reduced / low-end
 
-      var SPEED = 0.85;
+      var SPEED = reduce ? 0.5 : 0.85;       // calmer drift under reduced motion
 
 
 
