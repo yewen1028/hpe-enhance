@@ -4145,6 +4145,32 @@
 
 
 
+    /* Flow-field particle canvas — fills the section, sits above the photo
+       ::before (z-index:-1) but behind all content (which is lifted to z-index:1
+       below). Transparent until JS animates it, so reduced-motion falls back to
+       the photo backdrop. */
+    .centers-fx {
+
+      position: absolute;
+
+      inset: 0;
+
+      z-index: 0;
+
+      pointer-events: none;
+
+    }
+
+    .centers > *:not(.centers-fx) {
+
+      position: relative;
+
+      z-index: 1;
+
+    }
+
+
+
     .centers-region-block {
 
       background: white;
@@ -10120,6 +10146,10 @@
   <section class="centers px-photo" id="centers" data-parallax="1"
     style="--px-img:url('https://images.pexels.com/photos/335393/pexels-photo-335393.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(8,13,22,.86),rgba(8,13,22,.93))">
 
+    <!-- Flow-field particle backdrop (ported from the React NeuralBackground
+         component). Sits behind the map + branch list; driven by centersFx JS. -->
+    <canvas class="centers-fx" aria-hidden="true"></canvas>
+
     <div style="text-align:center; margin-bottom:40px;">
 
       <div class="section-tag" style="justify-content:center;">Service Centers</div>
@@ -13818,6 +13848,212 @@
         window._lfMarkers[id] = marker;
 
       });
+
+    })();
+
+  </script>
+
+
+
+  <!-- Flow-field particle backdrop for the Service Centers section.
+       Vanilla-JS port of the React NeuralBackground component: a canvas flow
+       field with mouse repulsion, fading trails, and particle recycling.
+       Runs only while the section is on-screen; skipped under reduced motion. -->
+  <script id="centers-fx">
+
+    (function () {
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var section = document.getElementById('centers');
+
+      var canvas = section && section.querySelector('.centers-fx');
+
+      if (reduce || !section || !canvas) return;
+
+      var ctx = canvas.getContext('2d');
+
+      if (!ctx) return;
+
+
+
+      var COLOR = '#f47920';                 // HPE orange particles
+
+      var TRAIL = 'rgba(13, 27, 42, 0.1)';   // navy fade → longer, more visible trails
+
+      var COUNT = 300;                       // modest for low-end laptops
+
+      var SPEED = 0.85;
+
+
+
+      var width = 0, height = 0, dpr = 1;
+
+      var particles = [];
+
+      var raf = null, running = false;
+
+      var mouse = { x: -1000, y: -1000 };
+
+
+
+      function size() {
+
+        width = section.clientWidth;
+
+        height = section.clientHeight;
+
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.max(1, Math.floor(width * dpr));
+
+        canvas.height = Math.max(1, Math.floor(height * dpr));
+
+        canvas.style.width = width + 'px';
+
+        canvas.style.height = height + 'px';
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      }
+
+
+
+      function Particle() { this.reset(); }
+
+      Particle.prototype.reset = function () {
+
+        this.x = Math.random() * width;
+
+        this.y = Math.random() * height;
+
+        this.vx = 0; this.vy = 0;
+
+        this.age = 0;
+
+        this.life = Math.random() * 200 + 100;
+
+      };
+
+      Particle.prototype.update = function () {
+
+        var angle = (Math.cos(this.x * 0.005) + Math.sin(this.y * 0.005)) * Math.PI;
+
+        this.vx += Math.cos(angle) * 0.2 * SPEED;
+
+        this.vy += Math.sin(angle) * 0.2 * SPEED;
+
+        var dx = mouse.x - this.x, dy = mouse.y - this.y;
+
+        var dist = Math.sqrt(dx * dx + dy * dy), R = 150;
+
+        if (dist < R) { var f = (R - dist) / R; this.vx -= dx * f * 0.05; this.vy -= dy * f * 0.05; }
+
+        this.x += this.vx; this.y += this.vy;
+
+        this.vx *= 0.95; this.vy *= 0.95;
+
+        this.age++;
+
+        if (this.age > this.life) this.reset();
+
+        if (this.x < 0) this.x = width; else if (this.x > width) this.x = 0;
+
+        if (this.y < 0) this.y = height; else if (this.y > height) this.y = 0;
+
+      };
+
+      Particle.prototype.draw = function () {
+
+        var alpha = 1 - Math.abs((this.age / this.life) - 0.5) * 2;
+
+        ctx.globalAlpha = alpha * 0.8;
+
+        ctx.fillRect(this.x, this.y, 1.5, 1.5);
+
+      };
+
+
+
+      function build() {
+
+        size();
+
+        particles = [];
+
+        for (var i = 0; i < COUNT; i++) particles.push(new Particle());
+
+      }
+
+
+
+      function frame() {
+
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = TRAIL;
+
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = COLOR;
+
+        for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
+
+        raf = requestAnimationFrame(frame);
+
+      }
+
+
+
+      function start() { if (running) return; running = true; frame(); }
+
+      function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
+
+
+
+      build();
+
+
+
+      // Only animate while the section is visible — saves CPU off-screen.
+
+      if ('IntersectionObserver' in window) {
+
+        new IntersectionObserver(function (entries) {
+
+          entries.forEach(function (e) { if (e.isIntersecting) start(); else stop(); });
+
+        }, { threshold: 0.01 }).observe(section);
+
+      } else { start(); }
+
+
+
+      // Keep the canvas matched to the section as it (or the viewport) resizes.
+
+      if ('ResizeObserver' in window) {
+
+        new ResizeObserver(function () { build(); }).observe(section);
+
+      } else {
+
+        window.addEventListener('resize', build, { passive: true });
+
+      }
+
+
+
+      // Mouse repulsion — events bubble up from the map/list to the section.
+
+      section.addEventListener('mousemove', function (e) {
+
+        var r = canvas.getBoundingClientRect();
+
+        mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+
+      }, { passive: true });
+
+      section.addEventListener('mouseleave', function () { mouse.x = -1000; mouse.y = -1000; });
 
     })();
 
