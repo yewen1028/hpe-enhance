@@ -1259,6 +1259,10 @@
       .sc-marker.active {
         animation: none !important;
       }
+      /* NOTE: the process step animation is intentionally NOT disabled here.
+         Many low-end laptops ship with OS "animation effects" turned off, which
+         reports as reduced-motion and made the whole process effect vanish. It's
+         a gentle, small-scale loop, so we keep it running everywhere. */
     }
 
 
@@ -3038,9 +3042,60 @@
 
       height: 2px;
 
-      border-top: 2px dashed rgba(244, 121, 32, .4);
+      border-top: 2px dashed rgba(255, 255, 255, .2);
 
       z-index: 0;
+
+    }
+
+
+
+    /* Progress line: fills left→right as the process advances, led by a bright
+       comet head. It rides just over the dim track, behind the step circles, so
+       the head emerges from each circle and streaks to the next — completing at
+       step 5, then fading and refilling from step 1. Forever. Linear timing so
+       the head meets each step exactly as that step's pulse fires. */
+    .steps::after {
+
+      content: '';
+
+      position: absolute;
+
+      top: 30px;
+
+      left: 10%;
+
+      height: 4px;
+
+      margin-top: -2px;
+
+      width: 0;
+
+      border-radius: 4px;
+
+      background:
+        radial-gradient(circle at right center, #fff 0%, #ffdca6 34%, rgba(244, 121, 32, 0) 72%) right center / 26px 26px no-repeat,
+        linear-gradient(90deg, rgba(244, 121, 32, .1), rgba(244, 121, 32, .85));
+
+      box-shadow: 0 0 16px 3px rgba(244, 121, 32, .5);
+
+      z-index: 0;
+
+      pointer-events: none;
+
+      animation: lineFill 6s linear infinite;
+
+    }
+
+    @keyframes lineFill {
+
+      0%   { width: 0;   opacity: 1; }
+
+      80%  { width: 80%; opacity: 1; }
+
+      87%  { width: 80%; opacity: 0; }
+
+      100% { width: 0;   opacity: 0; }
 
     }
 
@@ -3119,6 +3174,29 @@
       line-height: 1.6;
 
     }
+
+
+
+    /* Process parallax layers: the header and the steps drift at gentle,
+       differing rates over the section's drifting photo backdrop (deeper =
+       faster) — consumes --py set by the shared parallax engine. */
+    .proc-head,
+
+    .steps[data-parallax] {
+
+      transform: translate3d(0, var(--py, 0px), 0);
+
+      will-change: transform;
+
+    }
+
+    /* Stronger, clearly one-by-one entrance for the process components as the
+       section scrolls in — reuses the shared reveal + its per-item stagger. */
+    .process .sr { transform: translateY(46px); }
+
+    .process .step.sr { transform: translateY(46px) scale(.94); }
+
+    .process .sr-in { transform: none !important; }
 
 
 
@@ -5788,21 +5866,86 @@
 
 
 
-    /* ─── STEP NUMBER PULSE ON HOVER ─── */
-
+    /* ─── STEP "REACHED" ACTIVATION (synced to the progress head) ─── */
     .step-num {
+
+      position: relative;
 
       transition: transform .2s, box-shadow .2s;
 
+      /* springs, brightens and glows the instant the comet head lands */
+      animation: stepReached 6s ease-in-out infinite;
+
     }
 
+    /* a sonar ring that pings outward from the circle as the head arrives */
+    .step-num::after {
 
+      content: '';
 
+      position: absolute;
+
+      inset: 0;
+
+      border-radius: 50%;
+
+      border: 2px solid var(--orange);
+
+      opacity: 0;
+
+      pointer-events: none;
+
+      animation: nodePing 6s ease-out infinite;
+
+    }
+
+    /* stagger the pulse AND its ring so each step fires as the head lands
+       (0.2× cycle apart: 0 / 1.2 / 2.4 / 3.6 / 4.8s) */
+    .steps .step:nth-child(1) .step-num,
+    .steps .step:nth-child(1) .step-num::after { animation-delay: 0s; }
+
+    .steps .step:nth-child(2) .step-num,
+    .steps .step:nth-child(2) .step-num::after { animation-delay: 1.2s; }
+
+    .steps .step:nth-child(3) .step-num,
+    .steps .step:nth-child(3) .step-num::after { animation-delay: 2.4s; }
+
+    .steps .step:nth-child(4) .step-num,
+    .steps .step:nth-child(4) .step-num::after { animation-delay: 3.6s; }
+
+    .steps .step:nth-child(5) .step-num,
+    .steps .step:nth-child(5) .step-num::after { animation-delay: 4.8s; }
+
+    @keyframes stepReached {
+
+      0%   { transform: scale(1)   translateY(0);    box-shadow: 0 4px 20px rgba(244, 121, 32, .4); }
+
+      3%   { transform: scale(1.3) translateY(-10px); box-shadow: 0 18px 40px rgba(244, 121, 32, .9); }
+
+      9%   { transform: scale(.96) translateY(0);    box-shadow: 0 4px 20px rgba(244, 121, 32, .4); }
+
+      14%  { transform: scale(1)   translateY(0);    box-shadow: 0 4px 20px rgba(244, 121, 32, .4); }
+
+      100% { transform: scale(1)   translateY(0);    box-shadow: 0 4px 20px rgba(244, 121, 32, .4); }
+
+    }
+
+    @keyframes nodePing {
+
+      0%   { transform: scale(1);   opacity: .8; }
+
+      12%  { transform: scale(2.3); opacity: 0; }
+
+      100% { transform: scale(2.3); opacity: 0; }
+
+    }
+
+    /* hover still wins over the auto pulse (!important outranks animations) */
     .step:hover .step-num {
 
-      transform: scale(1.12);
+      transform: scale(1.12) !important;
 
-      box-shadow: 0 6px 24px rgba(244, 121, 32, .5);
+      box-shadow: 0 6px 24px rgba(244, 121, 32, .5) !important;
 
     }
 
@@ -7816,11 +7959,23 @@
 
 
 
-      .steps::before {
+      .steps::before,
+
+      .steps::after {
 
         display: none;
 
       }
+
+      .step-num,
+
+      .step-num::after {
+
+        animation: none;
+
+      }
+
+      .step-num::after { display: none; }
 
     }
 
@@ -9480,7 +9635,7 @@
   <section class="process px-photo" id="process" data-parallax="1"
     style="--px-img:url('https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(13,27,42,.82),rgba(13,27,42,.9))">
 
-    <div style="text-align:center; margin-bottom: 56px;">
+    <div class="proc-head" data-parallax="0.16" style="text-align:center; margin-bottom: 56px;">
 
       <div class="section-tag" style="justify-content:center;">How It Works</div>
 
@@ -9490,7 +9645,7 @@
 
     </div>
 
-    <div class="steps">
+    <div class="steps" data-parallax="0.3">
 
       <div class="step">
 
@@ -9588,7 +9743,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Banking</div>
+            <div class="cs-home-industry">Banking</div>
 
             <h4>Nationwide IT Infrastructure Maintenance</h4>
 
@@ -9607,7 +9762,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Retail</div>
+            <div class="cs-home-industry">Retail</div>
 
             <h4>Retail Outlet 24/7 IT Support</h4>
 
@@ -9626,7 +9781,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Telecommunications
+            <div class="cs-home-industry">Telecommunications
 
             </div>
 
@@ -9647,7 +9802,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Media / Broadcasting
+            <div class="cs-home-industry">Media / Broadcasting
 
             </div>
 
@@ -9668,7 +9823,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Airlines /
+            <div class="cs-home-industry">Airlines /
 
               Hospitality</div>
 
@@ -9704,7 +9859,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Banking</div>
+            <div class="cs-home-industry">Banking</div>
 
             <h4>Large-Scale OS Migration &amp; Asset Management</h4>
 
@@ -9724,7 +9879,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Oil &amp; Gas</div>
+            <div class="cs-home-industry">Oil &amp; Gas</div>
 
             <h4>AD Migration &amp; Security Encryption</h4>
 
@@ -9743,7 +9898,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Government</div>
+            <div class="cs-home-industry">Government</div>
 
             <h4>Asset Management &amp; Preventive Maintenance</h4>
 
@@ -9777,7 +9932,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Technology / Oil
+            <div class="cs-home-industry">Technology / Oil
 
               &amp; Gas</div>
 
@@ -9799,7 +9954,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Telecommunications
+            <div class="cs-home-industry">Telecommunications
 
             </div>
 
@@ -9821,7 +9976,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Government</div>
+            <div class="cs-home-industry">Government</div>
 
             <h4>Government PC Leasing — Warranty Support</h4>
 
@@ -9854,7 +10009,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Oil &amp; Gas ·
+            <div class="cs-home-industry">Oil &amp; Gas ·
 
               Logistics · Retail · Automotive</div>
 
@@ -9876,7 +10031,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Healthcare</div>
+            <div class="cs-home-industry">Healthcare</div>
 
             <h4>Healthcare Digital Transformation</h4>
 
@@ -9896,7 +10051,7 @@
 
           <div class="cs-home-info">
 
-            <div class="cs-home-industry"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Telco · Banking ·
+            <div class="cs-home-industry">Telco · Banking ·
 
               Healthcare · Manufacturing · Logistics · Education</div>
 
@@ -10776,7 +10931,7 @@
 
                 <h3>Nationwide IT Infrastructure Maintenance</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Banking</span>
+                <span class="cs-industry-badge">Banking</span>
 
               </div>
 
@@ -10833,7 +10988,7 @@
 
                 <h3>Retail Outlet 24/7 IT Support</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Retail</span>
+                <span class="cs-industry-badge">Retail</span>
 
               </div>
 
@@ -10892,8 +11047,7 @@
 
                 <h3>Telco Network Equipment Maintenance</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i>
-
+                <span class="cs-industry-badge">
                   Telecommunications</span>
 
               </div>
@@ -10953,7 +11107,7 @@
 
                 <h3>Media &amp; Broadcasting Infrastructure</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Media /
+                <span class="cs-industry-badge">Media /
 
                   Broadcasting</span>
 
@@ -11012,7 +11166,7 @@
 
                 <h3>Airline Wireless &amp; Broadband Support</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Airlines /
+                <span class="cs-industry-badge">Airlines /
 
                   Hospitality</span>
 
@@ -11083,7 +11237,7 @@
 
                 <h3>Large-Scale OS Migration &amp; Asset Management</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Banking</span>
+                <span class="cs-industry-badge">Banking</span>
 
               </div>
 
@@ -11144,7 +11298,7 @@
 
                 <h3>Oil &amp; Gas — AD Migration &amp; Security Encryption</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Oil &amp;
+                <span class="cs-industry-badge">Oil &amp;
 
                   Gas</span>
 
@@ -11213,8 +11367,7 @@
 
                 <h3>Government Asset Management &amp; Preventive Maintenance</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i>
-
+                <span class="cs-industry-badge">
                   Government</span>
 
               </div>
@@ -11286,8 +11439,7 @@
 
                 <h3>Government PC Leasing Warranty Support</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i>
-
+                <span class="cs-industry-badge">
                   Government</span>
 
               </div>
@@ -11361,7 +11513,7 @@
 
                 <h3>Corporate Helpdesk Operations</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Technology /
+                <span class="cs-industry-badge">Technology /
 
                   Oil &amp; Gas</span>
 
@@ -11422,8 +11574,7 @@
 
                 <h3>Disaster Recovery Call Centre</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i>
-
+                <span class="cs-industry-badge">
                   Telecommunications</span>
 
               </div>
@@ -11493,7 +11644,7 @@
 
                 <h3>Multi-Sector IT Staffing Solutions</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Oil &amp; Gas
+                <span class="cs-industry-badge">Oil &amp; Gas
 
                   · Logistics · Retail · Automotive</span>
 
@@ -11578,8 +11729,7 @@
 
                 <h3>Healthcare Digital Transformation</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i>
-
+                <span class="cs-industry-badge">
                   Healthcare</span>
 
               </div>
@@ -11637,7 +11787,7 @@
 
                 <h3>Multi-Sector IT Sourcing &amp; Infrastructure</h3>
 
-                <span class="cs-industry-badge"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Telco ·
+                <span class="cs-industry-badge">Telco ·
 
                   Banking · Healthcare · Manufacturing · Logistics · Education</span>
 
@@ -13196,7 +13346,10 @@
 
     }
 
-    document.querySelectorAll('.btn-orange, .btn-ghost-white, .form-submit, .nav-cta, .service-card[data-service]')
+    // Orange click ripple on every clickable card & button across all sections.
+    // (.center-list-item is intentionally excluded — it already has its own
+    //  orange click effect, and the ripple's overflow:hidden would clip it.)
+    document.querySelectorAll('.btn-orange, .btn-ghost-white, .btn-ghost, .form-submit, .nav-cta, .service-card[data-service], .cs-home-card, .industry-card, .testimonial-card')
 
       .forEach(addRipple);
 
@@ -13991,7 +14144,7 @@
 
       var style = document.createElement('style');
 
-      style.textContent = '.sc-tooltip, .state-tooltip { background: #0d1b2a; color: #fff; border: 1px solid rgba(244,121,32,.5); font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; white-space: nowrap; } .sc-tooltip::before, .state-tooltip::before { border-top-color: rgba(244,121,32,.5) !important; } .sc-tooltip-sel { background: #ff7d1a; color: #fff; border-color: #fff; box-shadow: 0 4px 14px rgba(255,125,26,.6); } .sc-tooltip-sel::before { border-top-color: #fff !important; } .sc-tooltip-hq { background: #fff; color: #0d1b2a; border-color: #ff7d1a; box-shadow: 0 4px 14px rgba(255,125,26,.5); } .sc-tooltip-hq::before { border-top-color: #ff7d1a !important; }';
+      style.textContent = '.sc-tooltip, .state-tooltip { background: #0d1b2a; color: #fff; border: 1px solid rgba(244,121,32,.5); font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; white-space: nowrap; } .sc-tooltip::before, .state-tooltip::before { border-top-color: rgba(244,121,32,.5) !important; } .sc-tooltip-sel { background: #ff7d1a; color: #fff; border-color: #0d1b2a; box-shadow: 0 4px 14px rgba(255,125,26,.6); } .sc-tooltip-sel::before { border-top-color: #0d1b2a !important; } .sc-tooltip-hq { background: #fff; color: #0d1b2a; border-color: #0d1b2a; box-shadow: 0 4px 14px rgba(255,125,26,.5); } .sc-tooltip-hq::before { border-top-color: #0d1b2a !important; }';
 
       document.head.appendChild(style);
 
