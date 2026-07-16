@@ -1471,9 +1471,10 @@
 
       justify-content: center;
 
-      background: var(--orange);
+      /* at rest: white fill + orange outline, orange icon */
+      background: #fff;
 
-      border: 2.5px solid rgba(255, 255, 255, 0.85);
+      border: 2.5px solid var(--orange);
 
       border-radius: 50%;
 
@@ -1481,22 +1482,24 @@
 
       font-size: 12px;
 
-      color: #fff;
+      color: var(--orange);
 
       cursor: pointer;
 
-      transition: transform .2s, box-shadow .2s, background .2s;
+      transition: transform .2s, box-shadow .2s, background .2s, color .2s, border-color .2s;
 
     }
 
 
 
-    /* POINTED (hover): a quick zoom to the darker brand orange. */
+    /* POINTED (hover): fills with orange, white icon; a quick zoom. */
     .sc-marker:hover {
 
       transform: scale(1.3);
 
-      background: var(--orange-d);
+      background: var(--orange);
+
+      color: #fff;
 
       box-shadow: 0 4px 18px rgba(244, 121, 32, .8);
 
@@ -1504,13 +1507,15 @@
 
 
 
-    /* SELECTED (active): larger, full brand orange, with a continuous pulse +
-       soft halo ring — deliberately different from the hover zoom. */
+    /* SELECTED (active): fills with orange, white icon; larger, with a
+       continuous pulse + soft halo ring — different motion from the hover. */
     .sc-marker.active {
 
       transform: scale(1.45);
 
       background: var(--orange);
+
+      color: #fff;
 
       box-shadow: 0 0 0 4px rgba(244, 121, 32, .25), 0 6px 20px rgba(244, 121, 32, .75);
 
@@ -1588,7 +1593,7 @@
 
       border-radius: 50%;
 
-      border: 2px solid rgba(255, 255, 255, .35);
+      border: 2px solid rgba(244, 121, 32, .55);
 
       pointer-events: none;
 
@@ -13839,7 +13844,7 @@
 
             markers[activeId].unbindTooltip();
 
-            markers[activeId].bindTooltip(prevC.name, { permanent: false, direction: 'top', className: 'sc-tooltip' });
+            markers[activeId].bindTooltip(prevC.name, { permanent: false, direction: 'top', className: 'sc-tooltip' + (prevC.hq ? ' sc-tooltip-hq' : '') });
 
           }
 
@@ -13867,7 +13872,7 @@
 
             markers[id].unbindTooltip();
 
-            markers[id].bindTooltip(c2.name, { permanent: true, direction: 'top', className: 'sc-tooltip sc-tooltip-sel' });
+            markers[id].bindTooltip(c2.name, { permanent: true, direction: 'top', className: 'sc-tooltip sc-tooltip-sel' + (c2.hq ? ' sc-tooltip-hq' : '') });
 
             markers[id].openTooltip();
 
@@ -13875,15 +13880,14 @@
 
         }
 
-        // Activate list item
+        // Activate list item — do NOT scroll it into view, so clicking a map
+        // plot never moves the page (keeps the whole map in view).
 
         var item = document.querySelector('.center-list-item[data-id="' + id + '"]');
 
         if (item) {
 
           item.classList.add('item-active');
-
-          item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         }
 
@@ -13897,15 +13901,16 @@
 
         var marker = L.marker([c.lat, c.lng], { icon: buildIcon(c, false) })
 
-          .bindTooltip(c.name, { permanent: false, direction: 'top', className: 'sc-tooltip' })
+          .bindTooltip(c.name, { permanent: false, direction: 'top', className: 'sc-tooltip' + (c.hq ? ' sc-tooltip-hq' : '') })
 
           .addTo(map);
 
         marker.on('click', function () {
 
-          setActive(c.id);
+          // Just highlight + keep the label floating; no setView so the map
+          // stays showing the entire country (no zoom/pan disturbance).
 
-          map.setView([c.lat, c.lng], Math.max(map.getZoom(), 7), { animate: true });
+          setActive(c.id);
 
         });
 
@@ -13959,11 +13964,34 @@
 
 
 
+      // Keep the selected plot's floating label visible through map adjustments.
+      // Panning/zooming (and the state-hover layer's tooltip churn) can close the
+      // permanent tooltip, so re-open it for the active marker whenever the map
+      // settles — the label never stays gone after a pan or zoom.
+      function keepActiveLabel() {
+
+        if (activeId && markers[activeId]) {
+
+          var m = markers[activeId];
+
+          // openTooltip() re-adds the tooltip if it was removed, and no-ops if
+          // it is already open — so this reliably keeps the label present.
+
+          if (m.getTooltip()) m.openTooltip();
+
+        }
+
+      }
+
+      map.on('zoomend moveend dragend zoom move', keepActiveLabel);
+
+
+
       // Tooltip style
 
       var style = document.createElement('style');
 
-      style.textContent = '.sc-tooltip, .state-tooltip { background: #0d1b2a; color: #fff; border: 1px solid rgba(244,121,32,.5); font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; white-space: nowrap; } .sc-tooltip::before, .state-tooltip::before { border-top-color: rgba(244,121,32,.5) !important; } .sc-tooltip-sel { background: #ff7d1a; color: #fff; border-color: #fff; box-shadow: 0 4px 14px rgba(255,125,26,.6); } .sc-tooltip-sel::before { border-top-color: #fff !important; }';
+      style.textContent = '.sc-tooltip, .state-tooltip { background: #0d1b2a; color: #fff; border: 1px solid rgba(244,121,32,.5); font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; white-space: nowrap; } .sc-tooltip::before, .state-tooltip::before { border-top-color: rgba(244,121,32,.5) !important; } .sc-tooltip-sel { background: #ff7d1a; color: #fff; border-color: #fff; box-shadow: 0 4px 14px rgba(255,125,26,.6); } .sc-tooltip-sel::before { border-top-color: #fff !important; } .sc-tooltip-hq { background: #fff; color: #0d1b2a; border-color: #ff7d1a; box-shadow: 0 4px 14px rgba(255,125,26,.5); } .sc-tooltip-hq::before { border-top-color: #ff7d1a !important; }';
 
       document.head.appendChild(style);
 
