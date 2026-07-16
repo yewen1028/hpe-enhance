@@ -20,7 +20,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -7876,6 +7876,331 @@
       }
 
     }
+
+    /* ══════════════════════════════════════════════════════════════════
+       HPE 2026 REDESIGN LAYER — "Modern Enterprise Dark-Tech"
+       Locked single dark theme · one orange accent · Space Grotesk display.
+       This layer re-skins paint (color / bg / border / shadow / type) on top
+       of the original layout, which is left structurally untouched.
+       ══════════════════════════════════════════════════════════════════ */
+
+    :root {
+      /* base + surfaces (cool near-black navy, tonal steps within one theme) */
+      --base:        #070c14;   /* page background            */
+      --navy:        #0a111d;   /* dark section base          */
+      --navy2:       #0e1726;
+      --light:       #0d1626;   /* alt section surface (was #f7f8fb) */
+      --surface:     #111c2e;   /* card / raised              */
+      --surface-2:   #16233a;   /* hover / elevated           */
+      --white:       #070c14;   /* body bg token (single use) */
+
+      /* ink */
+      --text:        #dbe3ee;
+      --muted:       #93a2b8;
+      --heading:     #f3f7fc;
+
+      /* lines */
+      --border:      rgba(255,255,255,.09);
+      --border-2:    rgba(255,255,255,.16);
+
+      /* accent — HPE orange, nudged for legibility on dark */
+      --orange:      #ff7d1a;
+      --orange-d:    #e8670e;
+      --orange-l:    rgba(255,125,26,.13);
+
+      --radius:      14px;
+      --shadow:      0 22px 55px -18px rgba(0,0,0,.72);
+      --ring:        0 0 0 3px rgba(255,125,26,.28);
+    }
+
+    body {
+      background: var(--base);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    ::selection { background: rgba(255,125,26,.30); color: #fff; }
+
+    /* Display type — modern grotesk on headings, Inter stays for body */
+    h1, h2, h3,
+    .hero h1,
+    h2.section-title,
+    .cs-page-header-title,
+    .cs-detail-header-info h1,
+    .intro-fallback {
+      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 { font-weight: 600; letter-spacing: -0.03em; line-height: 1.06; }
+    h2.section-title { font-weight: 600; color: var(--heading); }
+    p.section-sub { color: var(--muted); }
+
+    /* Heading ink fix — every heading that used the overloaded navy token
+       (which is now a *background*) is restored to light for dark surfaces. */
+    .about-point h4,
+    .service-card-body h3,
+    .why-point h4,
+    .cs-home-info h4,
+    .author-name,
+    .contact-hours h4,
+    .contact-form h3,
+    .cs-detail-card h4,
+    .svc-feature-card h4,
+    .svc-benefit-item strong,
+    .svc-modal-cta p,
+    .step h4 { color: var(--heading); }
+
+    /* thin custom scrollbar to match the dark shell */
+    ::-webkit-scrollbar { width: 11px; height: 11px; }
+    ::-webkit-scrollbar-track { background: var(--base); }
+    ::-webkit-scrollbar-thumb { background: #223047; border-radius: 8px; border: 3px solid var(--base); }
+    ::-webkit-scrollbar-thumb:hover { background: #2c3d59; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #060a11;
+      color: rgba(255,255,255,.62);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── NAV — dark glass ── */
+    nav {
+      background: rgba(9,15,25,.72);
+      -webkit-backdrop-filter: saturate(160%) blur(16px);
+      backdrop-filter: saturate(160%) blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(255,255,255,.02);
+    }
+    nav.scrolled {
+      background: rgba(7,12,20,.86);
+      box-shadow: 0 12px 40px -12px rgba(0,0,0,.7);
+    }
+    .nav-links > li > a { color: var(--text); }
+    .nav-links > li > a:hover { background: rgba(255,255,255,.06); color: var(--orange); }
+    .nav-links > li > a.active { color: var(--orange); background: var(--orange-l); }
+    .hamburger span { background: var(--text); }
+    .dropdown-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .dropdown a { color: var(--text); }
+    .mobile-menu {
+      background: rgba(9,15,25,.98);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .mobile-menu a { color: var(--text); }
+
+    /* nav CTA + primary buttons — soft glow, tactile press */
+    .nav-cta { box-shadow: 0 6px 20px -6px rgba(255,125,26,.6); }
+    .btn-orange {
+      box-shadow: 0 8px 24px -8px rgba(255,125,26,.55);
+      letter-spacing: .1px;
+    }
+    .btn-orange:active, .form-submit:active, .nav-cta:active { transform: translateY(0) scale(.985); }
+
+    /* ── HERO ── */
+    .hero { background: var(--navy); }
+    .hero-overlay {
+      background: linear-gradient(105deg,
+        var(--base) 0%, rgba(8,13,22,.94) 30%, rgba(8,13,22,.6) 60%, rgba(8,13,22,.15) 100%);
+    }
+    .hero h1 { font-size: clamp(32px, 4.6vw, 60px); }
+    .hero p { color: rgba(219,227,238,.8); }
+    .hero-badge {
+      background: rgba(255,125,26,.12);
+      border: 1px solid rgba(255,125,26,.32);
+      color: #ffb277;
+      backdrop-filter: blur(4px);
+    }
+    .hero-stat-card {
+      background: rgba(9,15,25,.72);
+      border: 1px solid var(--border-2);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 40px -14px rgba(0,0,0,.8);
+    }
+
+    /* ── shared card recipe (elevation via tinted border + soft depth) ── */
+    .service-card,
+    .cs-home-card,
+    .testimonial-card,
+    .centers-region-block,
+    .contact-hours,
+    .contact-form,
+    .cs-detail-card,
+    .cs-detail-full,
+    .cs-full-card,
+    .svc-modal,
+    .svc-benefit-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, var(--shadow);
+    }
+    .service-card:hover { box-shadow: 0 26px 60px -20px rgba(0,0,0,.85), 0 0 0 1px var(--border-2); }
+    .testimonial-card:hover { box-shadow: 0 22px 55px -20px rgba(0,0,0,.8); }
+
+    /* ── SECTIONS: opaque dark surfaces (theme lock) ── */
+    .services      { background: var(--navy); }
+    .industries    { background: var(--base); }
+    .centers       { background: var(--navy); }
+    .bizpartners   { background: var(--base); }
+    .about, .why, .casestudy, .testimonials, .contact-section { background: var(--light); }
+    .keyfacts, .process, .footer, footer { background: var(--navy); }
+
+    /* parallax photo sections that shipped with a LIGHT tint get a navy tint
+       so no section flips to light mid-page (theme lock). !important beats the
+       inline custom property. */
+    .why, .casestudy, .contact-section {
+      --px-tint: linear-gradient(rgba(8,13,22,.9), rgba(8,13,22,.95)) !important;
+    }
+    .process { --px-tint: linear-gradient(rgba(8,13,22,.86), rgba(8,13,22,.93)) !important; }
+
+    /* subtle top hairline so stacked sticky sections read as distinct planes */
+    .about, .services, .why, .industries, .casestudy,
+    .centers, .testimonials, .bizpartners, .contact-section {
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+
+    /* keyfacts numbers strip */
+    .kf-label { color: rgba(219,227,238,.66); }
+    .kf-divider { background: var(--border); }
+
+    /* about decorative frame accents (were near-black on light) */
+    .about-shape-b { border-color: rgba(255,255,255,.10); }
+    .about-img-wrap { box-shadow: 0 30px 70px -30px rgba(0,0,0,.9); }
+
+    /* service centers list */
+    .center-list-item { background: var(--surface-2); border-color: var(--border); }
+    .center-list-item .cli-name { color: var(--text); }
+    .center-list-item:hover { background: var(--orange-l); border-color: var(--orange); }
+
+    /* case-study drill-down + full pages + service modal shells */
+    .cs-page, .cs-detail { background: var(--base); }
+    .cs-home-info h4 { color: var(--heading); }
+
+    /* case-study cards → full-bleed image cards (like "Trusted Across Sectors"):
+       the photo covers the whole card, a navy scrim keeps copy legible, and the
+       icon + industry + title + metrics sit overlaid at the bottom. */
+    .cs-home-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: stretch;
+      gap: 0;
+      min-height: 210px;
+      padding: 20px;
+      border: none !important;
+      border-radius: var(--radius);
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: transform .5s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+    }
+    .cs-home-card::before {
+      content: ''; position: absolute; inset: 0; z-index: -2;
+      background-image: var(--ct);
+      background-size: cover; background-position: center;
+      transform: scale(1.03);
+      transition: transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .cs-home-card::after {
+      content: ''; position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(to top, rgba(6,10,18,.95) 0%, rgba(6,10,18,.8) 38%, rgba(6,10,18,.34) 76%, rgba(6,10,18,.1) 100%);
+      transition: background .4s ease;
+    }
+    .cs-home-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 58px -18px rgba(0,0,0,.85);
+    }
+    .cs-home-card:hover::before { transform: scale(1.11); }
+    .cs-home-card:hover::after {
+      background: linear-gradient(to top, rgba(244,121,32,.88) 0%, rgba(6,10,18,.6) 55%, rgba(6,10,18,.14) 100%);
+    }
+
+    /* the old thumbnail is now a frosted-glass icon chip like .ic-icon */
+    .cs-home-thumb {
+      width: 42px; height: 42px; flex: none;
+      border-radius: 11px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.26);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      margin-bottom: 14px;
+      transition: background .3s ease, transform .3s ease;
+    }
+    .cs-home-thumb i { color: #fff; font-size: 16px; text-shadow: 0 1px 5px rgba(0,0,0,.6); }
+    .cs-home-card:hover .cs-home-thumb { background: #fff; border-color: #fff; transform: translateY(-2px); }
+    .cs-home-card:hover .cs-home-thumb i { color: var(--orange-d); text-shadow: none; }
+
+    /* copy overlaid on the photo — light with shadow for legibility */
+    .cs-home-info { flex: none; min-width: 0; }
+    .cs-home-industry { color: rgba(255,255,255,.82); }
+    .cs-home-info h4 {
+      color: #fff !important;
+      font-size: 15.5px;
+      line-height: 1.32;
+      text-shadow: 0 2px 12px rgba(0,0,0,.7);
+      margin-bottom: 9px;
+    }
+    .cs-home-metrics span {
+      background: rgba(255,255,255,.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.24);
+      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    }
+    .cs-home-arrow { display: none !important; }
+
+    @media (max-width: 600px) { .cs-home-card { min-height: 196px; } }
+
+    /* partner logo bubbles — keep light chip so real brand logos stay legible */
+    .pb-logo {
+      background: #eef1f6;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 10px 26px -10px rgba(0,0,0,.7);
+    }
+    .pb-name { color: var(--muted); }
+
+    /* ── FORMS (WCAG-AA on dark) ── */
+    .form-group label { color: var(--text); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--surface-2);
+      border: 1.5px solid var(--border-2);
+      color: var(--text);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #7d8ba1; }
+    .form-group select option { background: var(--surface); color: var(--text); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      background: var(--surface-2);
+      border-color: var(--orange);
+      box-shadow: var(--ring);
+    }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); }
+
+    /* ── FAB back-to-top / contact ── */
+    .fab { box-shadow: 0 10px 30px -8px rgba(0,0,0,.7); }
+
+    /* Map: tune Carto dark tiles to sit under the shell */
+    .leaflet-tile-pane { filter: brightness(.82) saturate(.9) contrast(1.02); }
+    #leafletMap { box-shadow: 0 24px 60px -24px rgba(0,0,0,.85); border: 1px solid var(--border); }
+
+    /* Respect reduced motion for the extra press-scale interactions */
+    @media (prefers-reduced-motion: reduce) {
+      .btn-orange:active, .form-submit:active, .nav-cta:active { transform: none; }
+    }
   </style>
 
 </head>
@@ -8149,7 +8474,7 @@
 
       <h1>Enterprise IT Support <span>Delivered Nationwide</span></h1>
 
-      <p>From managed services and project deployment to helpdesk and IT staffing — HPE Solutions keeps your business
+      <p>From managed services and project deployment to helpdesk and IT staffing, HPE Solutions keeps your business
 
         running, 24/7.</p>
 
@@ -9068,8 +9393,7 @@
 
   <!-- CASE STUDY -->
 
-  <section class="casestudy px-photo" id="casestudy" data-parallax="1"
-    style="--px-img:url('https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(247,248,251,.88),rgba(247,248,251,.92))">
+  <section class="casestudy" id="casestudy">
 
     <div style="text-align:center; margin-bottom:48px;">
 
@@ -9100,9 +9424,9 @@
 
       <div class="cs-home-grid">
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-mgmt');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a2e5a,#1464a8);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-building-columns"></i></div>
 
           <div class="cs-home-info">
@@ -9119,9 +9443,9 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('retail-mgmt');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('retail-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/33690927/pexels-photo-33690927.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#7a2e0a,#c0521a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-cart-shopping"></i></div>
 
           <div class="cs-home-info">
@@ -9138,9 +9462,9 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-mgmt');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5550905/pexels-photo-5550905.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a4a5a,#0e7a9a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-tower-broadcast"></i></div>
 
           <div class="cs-home-info">
@@ -9159,9 +9483,9 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('media-mgmt');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('media-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/7865064/pexels-photo-7865064.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#2e0a5a,#6a1aaa);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-photo-film"></i></div>
 
           <div class="cs-home-info">
@@ -9180,9 +9504,9 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('airline-mgmt');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('airline-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/3140204/pexels-photo-3140204.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a3a2e,#0e7a5a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-plane"></i></div>
 
           <div class="cs-home-info">
@@ -9216,9 +9540,9 @@
       <div class="cs-home-grid">
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-deploy');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/3755700/pexels-photo-3755700.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a2e5a,#1464a8);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-building-columns"></i></div>
 
           <div class="cs-home-info">
@@ -9236,9 +9560,9 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('oilgas-deploy');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('oilgas-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/4883682/pexels-photo-4883682.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#3a2a0a,#8a6a1a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-oil-well"></i></div>
 
           <div class="cs-home-info">
@@ -9255,9 +9579,9 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-deploy');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/14608504/pexels-photo-14608504.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#1a3a0a,#3a7a1a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-landmark"></i></div>
 
           <div class="cs-home-info">
@@ -9289,9 +9613,9 @@
       <div class="cs-home-grid">
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('tech-helpdesk');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('tech-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709297/pexels-photo-7709297.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#3a0a0a,#8a1a1a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-oil-well"></i></div>
 
           <div class="cs-home-info">
@@ -9311,9 +9635,9 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-helpdesk');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709091/pexels-photo-7709091.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a0a3a,#1a1a8a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-tower-broadcast"></i></div>
 
           <div class="cs-home-info">
@@ -9333,9 +9657,9 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-warranty');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-warranty');},450);" style="--ct:url('https://images.pexels.com/photos/12741843/pexels-photo-12741843.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#1a3a0a,#3a7a1a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-shield-halved"></i></div>
 
           <div class="cs-home-info">
@@ -9366,9 +9690,9 @@
 
       <div class="cs-home-grid">
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('staffing');},450);">
+        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('staffing');},450);" style="--ct:url('https://images.pexels.com/photos/8872441/pexels-photo-8872441.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#2a0a3a,#6a1a8a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-briefcase"></i></div>
 
           <div class="cs-home-info">
@@ -9388,9 +9712,9 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('healthcare-solution');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('healthcare-solution');},450);" style="--ct:url('https://images.pexels.com/photos/13176452/pexels-photo-13176452.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a3a1a,#1a8a4a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-hospital"></i></div>
 
           <div class="cs-home-info">
@@ -9408,9 +9732,9 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('multisector-solution');},450);">
+          onclick="openCasePage();setTimeout(function(){openCaseDetail('multisector-solution');},450);" style="--ct:url('https://images.pexels.com/photos/6466141/pexels-photo-6466141.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-          <div class="cs-home-icon" style="background:linear-gradient(135deg,#0a2a3a,#1a6a8a);"><i
+          <div class="cs-home-thumb"><i
               class="fa-solid fa-industry"></i></div>
 
           <div class="cs-home-info">
@@ -13330,7 +13654,10 @@
 
           iconAnchor: center.hq ? [16, 32] : [14, 28],
 
-          popupAnchor: [0, -30]
+          popupAnchor: [0, -30],
+
+          // lift hover label above the top of the pin circle, not over its middle
+          tooltipAnchor: center.hq ? [0, -34] : [0, -30]
 
         });
 
