@@ -1234,12 +1234,30 @@
       will-change: transform;
     }
 
+    /* Service-centers depth planes: the map and the branch list each drift on
+       their own --py (set by the parallax engine) at gentle, differing rates,
+       floating over the section's drifting photo backdrop → layered depth. */
+    .centers-map-wrap,
+    .centers-list-wrap {
+      transform: translate3d(0, var(--py, 0px), 0);
+      will-change: transform;
+    }
+
     @media (prefers-reduced-motion: reduce) {
 
       .px-photo::before,
       .hero-right img,
-      .hero-right video {
+      .hero-right video,
+      .centers-map-wrap,
+      .centers-list-wrap {
         transform: none !important;
+      }
+
+      .center-list-item:hover,
+      .center-list-item.item-active,
+      .center-list-item.item-active::after,
+      .sc-marker.active {
+        animation: none !important;
       }
     }
 
@@ -1467,21 +1485,44 @@
 
       cursor: pointer;
 
-      transition: transform .2s, box-shadow .2s;
+      transition: transform .2s, box-shadow .2s, background .2s;
 
     }
 
 
 
-    .sc-marker:hover,
+    /* POINTED (hover): a quick zoom to the darker brand orange. */
+    .sc-marker:hover {
 
-    .sc-marker.active {
+      transform: scale(1.3);
 
-      transform: scale(1.35);
+      background: var(--orange-d);
 
       box-shadow: 0 4px 18px rgba(244, 121, 32, .8);
 
-      background: var(--orange-d);
+    }
+
+
+
+    /* SELECTED (active): larger, full brand orange, with a continuous pulse +
+       soft halo ring — deliberately different from the hover zoom. */
+    .sc-marker.active {
+
+      transform: scale(1.45);
+
+      background: var(--orange);
+
+      box-shadow: 0 0 0 4px rgba(244, 121, 32, .25), 0 6px 20px rgba(244, 121, 32, .75);
+
+      animation: pinSelected 1.5s ease-in-out infinite;
+
+    }
+
+    @keyframes pinSelected {
+
+      0%, 100% { transform: scale(1.45); }
+
+      50%      { transform: scale(1.58); }
 
     }
 
@@ -3980,7 +4021,7 @@
 
       max-width: 1000px;
 
-      margin: 0 auto;
+      margin: 48px auto 0;
 
     }
 
@@ -4054,26 +4095,87 @@
 
       cursor: pointer;
 
+      position: relative;
+
       transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
 
     }
 
 
 
+    /* POINTED (hover): a quick, tight vertical bob — feels like the branch
+       lifts off and floats under the cursor. Static transform is the reduced-
+       motion / hover-out fallback; the animation overrides it while hovering. */
     .center-list-item:hover {
 
       border-color: var(--orange);
 
       background: var(--orange-l);
 
-      transform: translateX(3px);
+      transform: translateX(6px) translateY(-2px);
+
+      box-shadow: 0 9px 22px -8px rgba(244, 121, 32, .55);
+
+      animation: hoverFloat 1.8s ease-in-out infinite;
 
     }
 
+    /* icon pops and tilts, name goes white on the dark item — makes the
+       pointed-at branch feel alive under the cursor */
+    .center-list-item:hover i {
+
+      transform: scale(1.28) rotate(-8deg);
+
+      color: var(--orange-d);
+
+    }
+
+    .center-list-item:hover .cli-name { color: #fff; }
+
+    .center-list-item:hover .cli-state { color: var(--orange); }
+
+    @keyframes hoverFloat {
+
+      0%, 100% { transform: translateX(6px) translateY(-2px); }
+
+      50%      { transform: translateX(6px) translateY(-7px); }
+
+    }
+
+    /* left accent bar grows in on hover (and stays for the active branch) */
+    .center-list-item::before {
+
+      content: '';
+
+      position: absolute;
+
+      left: 0;
+
+      top: 50%;
+
+      width: 3px;
+
+      height: 0;
+
+      background: var(--orange);
+
+      border-radius: 0 3px 3px 0;
+
+      transform: translateY(-50%);
+
+      transition: height .28s cubic-bezier(.22, 1, .36, 1);
+
+      pointer-events: none;
+
+    }
+
+    .center-list-item:hover::before,
+    .center-list-item.item-active::before { height: 60%; }
 
 
-    /* ACTIVE list item state — clicked */
 
+    /* ACTIVE list item state — clicked. Pops in and pulses a soft orange ring
+       (via ::after) so a clicked branch reads clearly, echoing the hover feel. */
     .center-list-item.item-active {
 
       border-color: var(--orange) !important;
@@ -4082,7 +4184,57 @@
 
       box-shadow: 0 4px 16px rgba(244, 121, 32, .22) !important;
 
-      transform: translateX(4px) !important;
+      transform: translateX(4px) scale(1);
+
+      z-index: 1;
+
+      /* SELECTED: pop in on click, then a slow "breathing" float (rise + gentle
+         scale) — deliberately slower and softer than the hover bob, so pointed
+         and selected read as two different motions. */
+      animation: branchPop .42s cubic-bezier(.34, 1.56, .64, 1) both,
+                 activeFloat 2.8s ease-in-out .42s infinite;
+
+    }
+
+    @keyframes activeFloat {
+
+      0%, 100% { transform: translateX(4px) translateY(0) scale(1); }
+
+      50%      { transform: translateX(4px) translateY(-5px) scale(1.025); }
+
+    }
+
+    .center-list-item.item-active::after {
+
+      content: '';
+
+      position: absolute;
+
+      inset: -1.5px;
+
+      border-radius: 9px;
+
+      pointer-events: none;
+
+      animation: branchRing .75s ease-out;
+
+    }
+
+    @keyframes branchPop {
+
+      0%   { transform: translateX(4px) scale(.95); }
+
+      55%  { transform: translateX(4px) scale(1.035); }
+
+      100% { transform: translateX(4px) scale(1); }
+
+    }
+
+    @keyframes branchRing {
+
+      0%   { box-shadow: 0 0 0 0 rgba(244, 121, 32, .5); }
+
+      100% { box-shadow: 0 0 0 9px rgba(244, 121, 32, 0); }
 
     }
 
@@ -4112,7 +4264,7 @@
 
       flex-shrink: 0;
 
-      transition: color .2s;
+      transition: color .2s, transform .28s cubic-bezier(.34, 1.56, .64, 1);
 
     }
 
@@ -8136,8 +8288,8 @@
       transition: background .3s ease, transform .3s ease;
     }
     .cs-home-thumb i { color: #fff; font-size: 16px; text-shadow: 0 1px 5px rgba(0,0,0,.6); }
-    .cs-home-card:hover .cs-home-thumb { background: #fff; border-color: #fff; transform: translateY(-2px); }
-    .cs-home-card:hover .cs-home-thumb i { color: var(--orange-d); text-shadow: none; }
+    .cs-home-card:hover .cs-home-thumb { background: var(--orange); border-color: var(--orange); transform: translateY(-2px); }
+    .cs-home-card:hover .cs-home-thumb i { color: #fff; }
 
     /* copy overlaid on the photo — light with shadow for legibility */
     .cs-home-info { flex: none; min-width: 0; }
@@ -9763,7 +9915,8 @@
 
   <!-- SERVICE CENTERS -->
 
-  <section class="centers" id="centers">
+  <section class="centers px-photo" id="centers" data-parallax="1"
+    style="--px-img:url('https://images.pexels.com/photos/335393/pexels-photo-335393.jpeg?auto=compress&cs=tinysrgb&w=1600'); --px-tint:linear-gradient(rgba(8,13,22,.86),rgba(8,13,22,.93))">
 
     <div style="text-align:center; margin-bottom:40px;">
 
@@ -9783,18 +9936,23 @@
 
 
 
-    <!-- MAP — Leaflet.js + CartoDB Dark tiles (real Malaysia geography) -->
+    <!-- MAP — Leaflet.js + CartoDB Dark tiles (real Malaysia geography).
+         Wrapper drifts as its own parallax plane over the section backdrop. -->
 
-    <div id="leafletMap" data-enhanced-map="true"
-      style="width:100%;height:340px;border-radius:12px;overflow:hidden;position:relative;z-index:1;"></div>
+    <div class="centers-map-wrap" data-parallax="0.16">
+
+      <div id="leafletMap" data-enhanced-map="true"
+        style="width:100%;height:340px;border-radius:12px;overflow:hidden;position:relative;z-index:1;"></div>
+
+    </div>
 
 
 
 
 
-    <!-- SERVICE CENTER LIST -->
+    <!-- SERVICE CENTER LIST — drifts as a nearer parallax plane than the map -->
 
-    <div class="centers-list-wrap">
+    <div class="centers-list-wrap" data-parallax="0.28">
 
       <!-- PENINSULAR -->
 
@@ -13673,7 +13831,17 @@
 
           var prevC = CENTERS.find(function (x) { return x.id === activeId; });
 
-          if (prevC) markers[activeId].setIcon(buildIcon(prevC, false));
+          if (prevC) {
+
+            markers[activeId].setIcon(buildIcon(prevC, false));
+
+            // revert its label back to hover-only
+
+            markers[activeId].unbindTooltip();
+
+            markers[activeId].bindTooltip(prevC.name, { permanent: false, direction: 'top', className: 'sc-tooltip' });
+
+          }
 
           var prevItem = document.querySelector('.center-list-item[data-id="' + activeId + '"]');
 
@@ -13691,7 +13859,19 @@
 
           var c2 = CENTERS.find(function (x) { return x.id === id; });
 
-          if (c2) markers[id].setIcon(buildIcon(c2, true));
+          if (c2) {
+
+            markers[id].setIcon(buildIcon(c2, true));
+
+            // keep the location name floating on top of the selected pin
+
+            markers[id].unbindTooltip();
+
+            markers[id].bindTooltip(c2.name, { permanent: true, direction: 'top', className: 'sc-tooltip sc-tooltip-sel' });
+
+            markers[id].openTooltip();
+
+          }
 
         }
 
@@ -13783,7 +13963,7 @@
 
       var style = document.createElement('style');
 
-      style.textContent = '.sc-tooltip, .state-tooltip { background: #0d1b2a; color: #fff; border: 1px solid rgba(244,121,32,.5); font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; white-space: nowrap; } .sc-tooltip::before, .state-tooltip::before { border-top-color: rgba(244,121,32,.5) !important; }';
+      style.textContent = '.sc-tooltip, .state-tooltip { background: #0d1b2a; color: #fff; border: 1px solid rgba(244,121,32,.5); font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; white-space: nowrap; } .sc-tooltip::before, .state-tooltip::before { border-top-color: rgba(244,121,32,.5) !important; } .sc-tooltip-sel { background: #ff7d1a; color: #fff; border-color: #fff; box-shadow: 0 4px 14px rgba(255,125,26,.6); } .sc-tooltip-sel::before { border-top-color: #fff !important; }';
 
       document.head.appendChild(style);
 
