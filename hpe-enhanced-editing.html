@@ -4108,13 +4108,18 @@
 
       display: grid;
 
-      grid-template-columns: 1.8fr 1fr;
+      /* equal-width panels so every branch card renders at the same size in
+         both regions (was 1.8fr/1fr, which made the Sabah/Sarawak cards
+         roughly half the width of the Peninsular ones) */
+      grid-template-columns: 1fr 1fr;
 
-      gap: 24px;
+      gap: 22px;
 
       max-width: 1000px;
 
       margin: 48px auto 0;
+
+      align-items: stretch;
 
     }
 
@@ -4190,7 +4195,7 @@
 
       grid-template-columns: 1fr 1fr;
 
-      gap: 8px;
+      gap: 10px;
 
     }
 
@@ -4202,15 +4207,21 @@
 
       align-items: center;
 
-      gap: 10px;
+      gap: 11px;
 
       background: var(--light);
 
       border: 1.5px solid var(--border);
 
-      border-radius: 8px;
+      border-radius: 10px;
 
-      padding: 10px 13px;
+      padding: 11px 14px;
+
+      /* uniform card height across both regions so the grid reads as one tidy
+         set of equal tiles */
+      min-height: 58px;
+
+      box-sizing: border-box;
 
       cursor: pointer;
 
@@ -4383,7 +4394,28 @@
 
       flex-shrink: 0;
 
+      /* fixed icon slot so every branch name starts on the same x-axis,
+         regardless of the marker glyph width */
+      width: 16px;
+
+      text-align: center;
+
       transition: color .2s, transform .28s cubic-bezier(.34, 1.56, .64, 1);
+
+    }
+
+    /* keep the map panel's own icons out of the fixed-slot sizing above */
+    .center-list-item .cli-map i { width: auto; text-align: left; }
+
+    .center-list-item .cli-name {
+
+      line-height: 1.3;
+
+    }
+
+    .center-list-item .cli-state {
+
+      line-height: 1.3;
 
     }
 
