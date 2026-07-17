@@ -1210,8 +1210,10 @@
       position: absolute;
       left: 0;
       right: 0;
-      top: -18%;
-      bottom: -18%;
+      /* overhang must exceed the engine's MAX drift or a drifting photo
+         reveals its own edge; 22% gives headroom for MAX = 78 */
+      top: -22%;
+      bottom: -22%;
       z-index: -1;
       background-image: var(--px-tint, none), var(--px-img, none);
       background-size: cover, cover;
@@ -1243,13 +1245,27 @@
       will-change: transform;
     }
 
+    /* Content depth plane — the generalised form of the two rules above.
+       Parallax only reads as depth when two planes travel at different rates;
+       a lone plane just slides. Sections without a photo backdrop (keyfacts,
+       industries, casestudy, bizpartners) were flat for exactly that reason.
+       Putting .px-drift on a section's heading and on its grid with different
+       data-parallax values lets them separate as the section crosses the
+       viewport, which is the same trick the centers map + list already use.
+       Pair it with data-parallax="<k>"; k is a multiplier on the engine's MAX. */
+    .px-drift {
+      transform: translate3d(0, var(--py, 0px), 0);
+      will-change: transform;
+    }
+
     @media (prefers-reduced-motion: reduce) {
 
       .px-photo::before,
       .hero-right img,
       .hero-right video,
       .centers-map-wrap,
-      .centers-list-wrap {
+      .centers-list-wrap,
+      .px-drift {
         transform: none !important;
       }
 
@@ -1396,7 +1412,10 @@
 
     h2.section-title {
 
-      font-size: clamp(24px, 2.8vw, 38px);
+      /* display scale, not body scale: 38px was timid for a section head and
+         left the headings reading like large paragraphs. Hits the 52px ceiling
+         at ~1300px and floors at 30px on phones. */
+      font-size: clamp(30px, 4vw, 52px);
 
       font-weight: 800;
 
@@ -1404,19 +1423,28 @@
 
       margin-bottom: 14px;
 
-      line-height: 1.2;
+      /* display leading — 1.2 is body leading and opened visible gaps between
+         the lines of a two-line heading */
+      line-height: 1.08;
+
+      /* even line lengths instead of a stranded last word. Unsupported
+         browsers just fall back to normal wrapping. */
+      text-wrap: balance;
 
     }
 
-    /* Accent bar in place of the removed eyebrows — anchors each heading */
+    /* Accent bar in place of the removed eyebrows — anchors each heading.
+       Thinner and solid: at the display scale the old 46x4 gradient bar (which
+       faded orange into a lighter tint) competed with the headline instead of
+       anchoring it. A hairline reads as a mark, not as a second element. */
     h2.section-title::before {
       content: '';
       display: block;
-      width: 46px;
-      height: 4px;
-      margin: 0 0 20px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, var(--orange), #ffb366);
+      width: 34px;
+      height: 3px;
+      margin: 0 0 18px;
+      border-radius: 3px;
+      background: var(--orange);
     }
 
     /* centred section heads get a centred bar */
@@ -1429,11 +1457,15 @@
 
     p.section-sub {
 
-      font-size: 15.5px;
+      /* nudged up with the title: 15.5px under a 52px head left too big a step
+         between the two, so the sub read as fine print */
+      font-size: 16.5px;
+
+      line-height: 1.6;
 
       color: var(--muted);
 
-      max-width: 560px;
+      max-width: 580px;
 
       margin-bottom: 48px;
 
@@ -3228,17 +3260,20 @@
 
 
 
+    /* Category header. Same rule as the service-centers panel headers: the
+       label takes the heading ink and the icon carries the accent, so four
+       stacked orange labels don't out-shout the cards they introduce. */
     .cs-home-cat-label {
 
-      font-size: 11.5px;
+      font-size: 12px;
 
       font-weight: 700;
 
       text-transform: uppercase;
 
-      letter-spacing: 1.8px;
+      letter-spacing: 1.4px;
 
-      color: var(--orange);
+      color: var(--heading, var(--navy));
 
       display: flex;
 
@@ -3246,7 +3281,13 @@
 
       gap: 10px;
 
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+
+    }
+
+    .cs-home-cat-label i {
+
+      color: var(--orange);
 
     }
 
@@ -3274,13 +3315,57 @@
 
 
 
+    /* Every category's row fills exactly, so the grid never leaves orphan
+       cells. auto-fill/minmax(300px) produced a 4-column track at desktop
+       against categories of 5, 3, 3 and 3 cards, which stranded one card alone
+       on row 2 of the first category and left the 4th column empty for the
+       other three. A 6-column base divides cleanly by both 3 and 2:
+         5 cards → 2+2+2 then 3+3
+         3 cards → 2+2+2 */
     .cs-home-grid {
 
       display: grid;
 
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
 
       gap: 14px;
+
+    }
+
+    .cs-home-card {
+
+      grid-column: span 2;
+
+    }
+
+    /* the 5-card category: the trailing pair widens to close its row */
+    .cs-grid-5 > .cs-home-card:nth-last-child(-n+2) {
+
+      grid-column: span 3;
+
+    }
+
+    @media (max-width: 1100px) {
+
+      .cs-home-grid {
+
+        grid-template-columns: repeat(2, 1fr);
+
+      }
+
+      .cs-home-card,
+      .cs-grid-5 > .cs-home-card:nth-last-child(-n+2) {
+
+        grid-column: span 1;
+
+      }
+
+      /* an odd number of cards would strand the last one in a 2-col track */
+      .cs-home-grid:has(> .cs-home-card:nth-child(odd):last-child) > .cs-home-card:last-child {
+
+        grid-column: span 2;
+
+      }
 
     }
 
@@ -3459,6 +3544,15 @@
       .cs-home-grid {
 
         grid-template-columns: 1fr;
+
+      }
+
+      /* single column: every span collapses back to the one track */
+      .cs-home-card,
+      .cs-grid-5 > .cs-home-card:nth-last-child(-n+2),
+      .cs-home-grid:has(> .cs-home-card:nth-child(odd):last-child) > .cs-home-card:last-child {
+
+        grid-column: span 1;
 
       }
 
@@ -8559,8 +8653,13 @@
       letter-spacing: -0.02em;
     }
     .hero h1 { font-weight: 600; letter-spacing: -0.03em; line-height: 1.06; }
-    h2.section-title { font-weight: 600; color: var(--heading); }
-    p.section-sub { color: var(--muted); }
+    /* -0.02em was set when these were 38px; at the display scale they need to
+       close up further or the letters drift apart. Type tracks tighter as it
+       gets bigger — same reason the hero sits at -0.03em. */
+    h2.section-title { font-weight: 600; color: var(--heading); letter-spacing: -0.032em; }
+    /* 'pretty' (not 'balance') for body: keeps the measure even but only
+       fixes the last-line widow, which is what long copy wants */
+    p.section-sub { color: var(--muted); text-wrap: pretty; }
 
     /* Heading ink fix — every heading that used the overloaded navy token
        (which is now a *background*) is restored to light for dark surfaces. */
@@ -8764,23 +8863,32 @@
       box-shadow: var(--shadow);
       transition: transform .5s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
     }
+    /* The 14 photos are stock shots with wildly different exposure, so they are
+       normalised here rather than trusted: without this the bright ones (the
+       Government and DR Call Centre frames) blow out to near-white at the top
+       and break the page's dark theme, and the frosted icon chip disappears
+       into them. Grading them to one range makes the grid read as one set. */
     .cs-home-card::before {
       content: ''; position: absolute; inset: 0; z-index: -2;
       background-image: var(--ct);
       background-size: cover; background-position: center;
       transform: scale(1.03);
-      transition: transform .7s cubic-bezier(.22,1,.36,1);
+      filter: saturate(.86) brightness(.78) contrast(1.04);
+      transition: transform .7s cubic-bezier(.22,1,.36,1), filter .4s ease;
     }
+    /* scrim: opaque enough at the bottom to carry the copy, and no longer
+       clearing to .1 at the top where light photos glared */
     .cs-home-card::after {
       content: ''; position: absolute; inset: 0; z-index: -1;
-      background: linear-gradient(to top, rgba(6,10,18,.95) 0%, rgba(6,10,18,.8) 38%, rgba(6,10,18,.34) 76%, rgba(6,10,18,.1) 100%);
+      background: linear-gradient(to top, rgba(6,10,18,.95) 0%, rgba(6,10,18,.8) 38%, rgba(6,10,18,.46) 76%, rgba(6,10,18,.34) 100%);
       transition: background .4s ease;
     }
     .cs-home-card:hover {
       transform: translateY(-8px);
       box-shadow: 0 28px 58px -18px rgba(0,0,0,.85);
     }
-    .cs-home-card:hover::before { transform: scale(1.11); }
+    /* the photo lifts toward its true exposure on hover — the reward for pointing */
+    .cs-home-card:hover::before { transform: scale(1.11); filter: saturate(.95) brightness(.92) contrast(1.02); }
     .cs-home-card:hover::after {
       background: linear-gradient(to top, rgba(244,121,32,.88) 0%, rgba(6,10,18,.6) 55%, rgba(6,10,18,.14) 100%);
     }
@@ -9366,7 +9474,7 @@
 
   <section class="keyfacts" id="keyfacts">
 
-    <div class="keyfacts-inner">
+    <div class="keyfacts-inner px-drift" data-parallax="0.14">
 
       <div class="kf-item">
 
@@ -9911,7 +10019,7 @@
 
     <p class="section-sub">HPE Solutions supports businesses and institutions across a wide range of industries.</p>
 
-    <div class="industries-grid">
+    <div class="industries-grid px-drift" data-parallax="0.18">
 
       <div class="industry-card"
         style="--ci:url('https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=800')">
@@ -10065,9 +10173,9 @@
 
       <h2 class="section-title">Real Results for Real Businesses</h2>
 
-      <p class="section-sub" style="margin:0 auto 20px;">14 real-world IT outcomes delivered for clients across Malaysia
+      <p class="section-sub" style="margin:0 auto 20px;">14 real-world IT outcomes delivered for clients across Malaysia.
 
-        — click any project to read the full case study.</p>
+        Click any project to read the full case study.</p>
 
       <button class="btn-orange" onclick="openCasePage()"
         style="display:inline-flex;align-items:center;gap:8px;font-size:14px;">
@@ -10086,7 +10194,8 @@
 
       <div class="cs-home-cat-label"><i class="fa-solid fa-server"></i> IT Management &amp; Support</div>
 
-      <div class="cs-home-grid">
+      <!-- 5 cards: the trailing pair widens to span 3 so the row closes -->
+      <div class="cs-home-grid cs-grid-5 px-drift" data-parallax="0.16">
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
@@ -10201,7 +10310,7 @@
 
       <div class="cs-home-cat-label"><i class="fa-solid fa-diagram-project"></i> Project Deployment</div>
 
-      <div class="cs-home-grid">
+      <div class="cs-home-grid px-drift" data-parallax="0.16">
 
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/3755700/pexels-photo-3755700.jpeg?auto=compress&cs=tinysrgb&w=600')">
@@ -10274,7 +10383,7 @@
 
       <div class="cs-home-cat-label"><i class="fa-solid fa-headset"></i> IT Helpdesk &amp; Warranty</div>
 
-      <div class="cs-home-grid">
+      <div class="cs-home-grid px-drift" data-parallax="0.16">
 
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('tech-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709297/pexels-photo-7709297.jpeg?auto=compress&cs=tinysrgb&w=600')">
@@ -10330,7 +10439,7 @@
 
             <div class="cs-home-industry">Government</div>
 
-            <h4>Government PC Leasing — Warranty Support</h4>
+            <h4>Government PC Leasing Warranty Support</h4>
 
             <div class="cs-home-metrics"><span>18 Walk-In Centres</span><span>Nationwide</span></div>
 
@@ -10352,7 +10461,7 @@
 
       <div class="cs-home-cat-label"><i class="fa-solid fa-users"></i> IT Staffing &amp; Total Solutions</div>
 
-      <div class="cs-home-grid">
+      <div class="cs-home-grid px-drift" data-parallax="0.16">
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('staffing');},450);" style="--ct:url('https://images.pexels.com/photos/8872441/pexels-photo-8872441.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
@@ -10671,7 +10780,7 @@
 
     </div>
 
-    <div class="partners-marquee">
+    <div class="partners-marquee px-drift" data-parallax="0.16">
 
       <div class="pb-track">
 
@@ -12322,7 +12431,7 @@
 
       'govt-deploy': { title: 'Government Asset Management & Preventive Maintenance', industry: 'Government', icon: 'fa-landmark', overview: 'HPE Solutions implemented a comprehensive IT asset management and preventive maintenance programme for a government body — ensuring full hardware/software visibility, system security, and physical equipment hygiene across all facilities.', challenge: 'The government body required a systematic approach covering hardware inventory, software licensing compliance, security patching, and physical equipment upkeep across multiple facilities.', solution: ['Full hardware asset inventory — all devices catalogued and asset-tagged', 'Software inventory and licensing compliance audit', 'Antivirus software upgrade and signature update deployment', 'OS security patches and critical updates rollout', 'Malware scanning and removal across all endpoints', 'Asset tag replacement and physical labelling standardisation', 'Hardware logging and configuration recording', 'Physical equipment cleaning — desktops, laptops, peripherals', 'Hardware and software configuration documentation'], scope: ['Hardware Inventory', 'Software Licensing', 'Antivirus Upgrades', 'OS Patching', 'Asset Tagging', 'Physical Cleaning', 'All Government Facilities'], metrics: [{ v: 'Full', l: 'Asset Inventory' }, { v: 'AV + Patches', l: 'Deployed' }, { v: '100%', l: 'Devices Tagged' }], service: 'Project Deployment' },
 
-      'govt-warranty': { title: 'Government PC Leasing — Warranty Support', industry: 'Government', icon: 'fa-landmark', overview: 'HPE Solutions, as an Appointed Authorised Support Partner (ASP), provided comprehensive warranty and out-of-warranty hardware support for a government body\'s PC leasing programme — offering on-site field support and walk-in service at 18 nationwide centres.', challenge: 'The government body required a warranty support partner capable of servicing leased PCs across all government locations nationwide, covering both in-warranty repairs and out-of-warranty replacements with fast response.', solution: ['Appointed as Authorised Support Partner (ASP) for the PC leasing programme', 'On-site warranty support — engineer dispatched to government premises', 'Out-of-warranty hardware support and cost-effective repair options', 'Walk-in support at 18 HPE Solutions service centres across Malaysia', 'Fault ticketing and escalation for all warranty claims', 'Remote troubleshooting as first-line support to reduce unnecessary visits', 'Manufacturer escalation for complex warranty claims', 'Genuine spare parts inventory at all 18 service centre locations', 'SLA-governed response times measured and reported monthly'], scope: ['PC Warranty Support', 'Out-of-Warranty Repair', 'On-Site Engineer Visits', 'Walk-In Service Centres', 'Government Facilities Nationwide'], metrics: [{ v: '18', l: 'Walk-In Centres' }, { v: 'On-Site +', l: 'Walk-In Support' }, { v: 'Nationwide', l: 'Coverage' }, { v: 'ASP', l: 'Authorised Partner' }], service: 'Authorised Warranty Provider' },
+      'govt-warranty': { title: 'Government PC Leasing Warranty Support', industry: 'Government', icon: 'fa-landmark', overview: 'HPE Solutions, as an Appointed Authorised Support Partner (ASP), provided comprehensive warranty and out-of-warranty hardware support for a government body\'s PC leasing programme — offering on-site field support and walk-in service at 18 nationwide centres.', challenge: 'The government body required a warranty support partner capable of servicing leased PCs across all government locations nationwide, covering both in-warranty repairs and out-of-warranty replacements with fast response.', solution: ['Appointed as Authorised Support Partner (ASP) for the PC leasing programme', 'On-site warranty support — engineer dispatched to government premises', 'Out-of-warranty hardware support and cost-effective repair options', 'Walk-in support at 18 HPE Solutions service centres across Malaysia', 'Fault ticketing and escalation for all warranty claims', 'Remote troubleshooting as first-line support to reduce unnecessary visits', 'Manufacturer escalation for complex warranty claims', 'Genuine spare parts inventory at all 18 service centre locations', 'SLA-governed response times measured and reported monthly'], scope: ['PC Warranty Support', 'Out-of-Warranty Repair', 'On-Site Engineer Visits', 'Walk-In Service Centres', 'Government Facilities Nationwide'], metrics: [{ v: '18', l: 'Walk-In Centres' }, { v: 'On-Site +', l: 'Walk-In Support' }, { v: 'Nationwide', l: 'Coverage' }, { v: 'ASP', l: 'Authorised Partner' }], service: 'Authorised Warranty Provider' },
 
       'tech-helpdesk': { title: 'Corporate Helpdesk Operations', industry: 'Technology / Oil & Gas', icon: 'fa-oil-well', overview: 'HPE Solutions was engaged to manage and operate in-house corporate helpdesk facilities for technology and oil & gas clients — providing fully staffed, SLA-governed call centre operations without the overhead of building an internal team.', challenge: 'Corporate clients required a professional managed helpdesk but lacked internal resources, infrastructure, and expertise to build and run a call centre independently.', solution: ['Dedicated Team Lead to manage daily helpdesk operations', 'Trained Call Centre Agents deployed to operate the helpdesk', 'Telephony IVR system configured for inbound call routing', 'Abandon call rate measurement and performance tracking', 'Weekly and monthly SLA performance reports to clients', 'Regular agent training to maintain product knowledge', 'Escalation matrix for complex technical issues', 'Ticket management system integration with client ITSM tools', 'Flexible agent headcount scaling based on call volume'], scope: ['Inbound Call Management', 'IVR System', 'Ticket Management', 'SLA Reporting', 'Agent Staffing', 'Team Leadership'], metrics: [{ v: 'Dedicated', l: 'Helpdesk Team' }, { v: 'IVR + SLA', l: 'Reporting' }, { v: 'Weekly', l: 'Performance Reports' }], service: 'IT Helpdesk' },
 
@@ -13143,13 +13252,25 @@
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduce) return;
 
-      var MAX = 46;               // max px drift for a full-intensity (data-parallax="1") layer
+      // Max px drift for a full-intensity (data-parallax="1") layer. 46 was
+      // low enough to be near-invisible over a full scroll-through, so the
+      // engine was paying its cost without reading as depth.
+      // Bound: a .px-photo ::before overhangs its section by 22% top and
+      // bottom, so drift must stay under 0.22 * (shortest photo section). The
+      // shortest is #process at ~557px → 122px of headroom. 78 keeps a margin.
+      var MAX = 78;
       var layers = [];
 
       function collect() {
         layers = [];
         var nodes = document.querySelectorAll('[data-parallax]');
         for (var i = 0; i < nodes.length; i++) {
+          // Seed every layer with its own --py. Custom properties inherit, and
+          // apply() skips off-screen layers — so a nested layer (the centers
+          // map inside #centers, say) would inherit its section's much larger
+          // --py until its own first update, then snap to its real value as it
+          // entered. Owning the property from the start makes that impossible.
+          nodes[i].style.setProperty('--py', '0px');
           layers.push({ el: nodes[i], k: parseFloat(nodes[i].getAttribute('data-parallax')) || 1 });
         }
       }
