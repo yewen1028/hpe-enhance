@@ -4471,6 +4471,211 @@
 
 
 
+    /* ══ EXPAND-MAP EFFECT on branch cards (ported from the React
+       expand-map component). Each branch card tilts in 3D and expands on
+       click to reveal a small procedural street map + its coordinates.
+       Brand orange/navy stand in for the component's emerald so the map
+       still reads as HPE.
+
+       Reveal order (driven by JS): panel opens → .cli-play is added once it
+       is fully visible → roads draw (stroke-dashoffset transition), buildings
+       pop, pin drops, ripple pulses. Keeping the draw off the open transition
+       is what makes it actually visible. ══ */
+
+    /* 3D stage for the cards; start-align so an expanded card doesn't
+       stretch its row sibling. */
+    .centers-list-grid { perspective: 1100px; align-items: start; }
+
+    .center-list-item { transform-style: preserve-3d; flex-wrap: wrap; }
+
+    /* let the name shrink (ellipsis) instead of pushing the chevron to a
+       new line on the narrow Sabah/Sarawak cards */
+    .center-list-item > div { min-width: 0; }
+
+    .center-list-item .cli-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* expand affordance on the right of every card */
+    .cli-chev {
+      margin-left: auto;
+      align-self: center;
+      font-size: 11px !important;
+      color: var(--muted) !important;
+      transition: transform .4s cubic-bezier(.34,1.4,.5,1), color .25s;
+      flex-shrink: 0;
+    }
+
+    .center-list-item:hover .cli-chev { color: var(--orange) !important; }
+
+    .center-list-item.expanded .cli-chev { transform: rotate(180deg); color: var(--orange) !important; }
+
+    /* while expanded the card holds still and tilts in 3D (--tx/--ty are
+       eased every frame by a rAF spring in JS, so no transform transition is
+       needed here — that would double-smooth and feel laggy). */
+    .center-list-item.expanded,
+    .center-list-item.expanded.item-active {
+      animation: none !important;
+      transform: perspective(1100px) rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)) !important;
+      transition: border-color .25s ease, background .25s ease, box-shadow .35s ease;
+      border-color: var(--orange) !important;
+      box-shadow: 0 22px 50px -18px rgba(13,27,42,.66) !important;
+      z-index: 6;
+      will-change: transform;
+    }
+
+    .center-list-item.expanded:hover { animation: none !important; }
+
+    /* the expandable panel wraps onto its own full-width line below the row */
+    .cli-map {
+      flex-basis: 100%;
+      width: 100%;
+      max-height: 0;
+      opacity: 0;
+      margin-top: 0;
+      overflow: hidden;
+      transition: max-height .5s cubic-bezier(.22,1,.36,1), opacity .35s ease, margin-top .5s cubic-bezier(.22,1,.36,1);
+    }
+
+    .center-list-item.expanded .cli-map { max-height: 230px; opacity: 1; margin-top: 12px; }
+
+    .cli-mapcanvas {
+      position: relative;
+      height: 134px;
+      border-radius: 11px;
+      overflow: hidden;
+      background: radial-gradient(120% 120% at 50% 40%, #1b2d45 0%, #0d1b2a 72%);
+      border: 1px solid rgba(255,255,255,.09);
+      opacity: 0;
+      transform: translateY(12px) scale(.98);
+      transition: opacity .45s ease .04s, transform .55s cubic-bezier(.22,1,.36,1) .04s;
+    }
+
+    .center-list-item.expanded .cli-mapcanvas { opacity: 1; transform: none; }
+
+    /* soft depth vignette at the bottom of the map */
+    .cli-mapcanvas::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(13,27,42,.55), transparent 42%);
+    }
+
+    .cli-mapcanvas svg.cli-grid { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* Roads draw by easing stroke-dashoffset → 0. The dash length (120) is
+       larger than any line in the 100×60 viewBox, so every line starts fully
+       hidden; per-line transition-delay (inline) staggers the draw. */
+    .cli-road {
+      fill: none;
+      stroke: rgba(255,255,255,.5);
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      transition: stroke-dashoffset .85s cubic-bezier(.33,.9,.35,1);
+    }
+
+    .center-list-item.cli-play .cli-road { stroke-dashoffset: 0; }
+
+    .cli-bldg {
+      position: absolute;
+      background: rgba(244,121,32,.16);
+      border: 1px solid rgba(244,121,32,.3);
+      border-radius: 2px;
+      opacity: 0;
+      transform: translateY(6px) scale(.72);
+      transition: opacity .45s ease, transform .55s cubic-bezier(.34,1.45,.5,1);
+    }
+
+    .center-list-item.cli-play .cli-bldg { opacity: 1; transform: none; }
+
+    .cli-pin {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      width: 28px;
+      height: 28px;
+      margin: -28px 0 0 -14px;
+      opacity: 0;
+      color: var(--orange);
+      transform: translateY(-16px) scale(.4);
+      transition: opacity .4s ease, transform .6s cubic-bezier(.34,1.56,.64,1);
+      filter: drop-shadow(0 0 10px rgba(244,121,32,.75)) drop-shadow(0 3px 4px rgba(0,0,0,.4));
+    }
+
+    .center-list-item.cli-play .cli-pin { opacity: 1; transform: none; }
+
+    /* ripple pulsing out from the pin's base */
+    .cli-ring {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(244,121,32,.6);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .center-list-item.cli-play .cli-ring { animation: cliRing 2.2s ease-out .55s infinite; }
+
+    @keyframes cliRing {
+      0%   { transform: scale(.4); opacity: .7; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+
+    .cli-coords {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 9px;
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      color: var(--muted);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .4s ease .12s, transform .45s cubic-bezier(.22,1,.36,1) .12s;
+    }
+
+    .center-list-item.expanded .cli-coords { opacity: 1; transform: none; }
+
+    .cli-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+
+    .cli-live::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 0 rgba(244,121,32,.6);
+      animation: cliBlink 1.6s ease-out infinite;
+    }
+
+    @keyframes cliBlink {
+      0%      { box-shadow: 0 0 0 0 rgba(244,121,32,.6); }
+      70%,100%{ box-shadow: 0 0 0 7px rgba(244,121,32,0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .center-list-item.expanded { transform: none !important; }
+      .cli-map, .cli-mapcanvas, .cli-bldg, .cli-pin, .cli-coords, .cli-road { transition: none !important; }
+      .cli-mapcanvas, .cli-bldg, .cli-pin, .cli-coords { opacity: 1 !important; transform: none !important; }
+      .cli-road { stroke-dashoffset: 0 !important; }
+      .cli-ring, .cli-live::before { animation: none !important; }
+    }
+
+
+
     /* ─── TESTIMONIALS ─── */
 
     .testimonials {
@@ -14385,6 +14590,145 @@
         });
 
       });
+
+
+
+      // ── EXPAND-MAP EFFECT ──────────────────────────────────────────────
+      // Port of the React "expand-map" component: each branch card gets a
+      // chevron affordance and, on click, tilts in 3D while expanding to
+      // reveal a small procedural street map + its coordinates. The real
+      // Leaflet map still pans/highlights via the handlers above; this only
+      // adds the in-card reveal.
+      //
+      // Smoothness details:
+      //  • Roads draw with a CSS transition on stroke-dashoffset (dash length
+      //    120 > any line in the 100×60 viewBox, so each line starts hidden).
+      //  • The internal reveal (.cli-play) is started AFTER the panel finishes
+      //    opening, so the draw isn't wasted while the panel is still clipped.
+      //  • The 3D tilt is eased every frame by a small rAF spring (lerp toward
+      //    a mouse-driven target) instead of snapping on each mousemove.
+      (function () {
+
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var TILT = 9;        // max tilt in degrees
+        var OPEN_MS = 480;   // ~ panel open duration before the map animates in
+
+        function fmtCoord(v, pos, neg) {
+          return Math.abs(v).toFixed(4) + '° ' + (v >= 0 ? pos : neg);
+        }
+
+        function buildMap(c) {
+          var wrap = document.createElement('div');
+          wrap.className = 'cli-map';
+          wrap.innerHTML =
+            '<div class="cli-mapcanvas">' +
+              '<svg class="cli-grid" preserveAspectRatio="none" viewBox="0 0 100 60">' +
+                '<line class="cli-road" style="transition-delay:.06s" x1="0" y1="22" x2="100" y2="22" stroke-width="2.4"/>' +
+                '<line class="cli-road" style="transition-delay:.13s" x1="0" y1="40" x2="100" y2="40" stroke-width="2.4"/>' +
+                '<line class="cli-road" style="stroke:rgba(255,255,255,.34);transition-delay:.2s" x1="30" y1="0" x2="30" y2="60" stroke-width="1.8"/>' +
+                '<line class="cli-road" style="stroke:rgba(255,255,255,.34);transition-delay:.27s" x1="70" y1="0" x2="70" y2="60" stroke-width="1.8"/>' +
+                '<line class="cli-road" style="stroke:rgba(255,255,255,.16);transition-delay:.32s" x1="0" y1="11" x2="100" y2="11" stroke-width="1"/>' +
+                '<line class="cli-road" style="stroke:rgba(255,255,255,.16);transition-delay:.36s" x1="0" y1="52" x2="100" y2="52" stroke-width="1"/>' +
+                '<line class="cli-road" style="stroke:rgba(255,255,255,.16);transition-delay:.4s" x1="50" y1="0" x2="50" y2="60" stroke-width="1"/>' +
+                '<line class="cli-road" style="stroke:rgba(255,255,255,.16);transition-delay:.44s" x1="85" y1="0" x2="85" y2="60" stroke-width="1"/>' +
+              '</svg>' +
+              '<span class="cli-bldg" style="top:44%;left:10%;width:14%;height:22%;transition-delay:.42s"></span>' +
+              '<span class="cli-bldg" style="top:15%;left:34%;width:12%;height:16%;transition-delay:.50s"></span>' +
+              '<span class="cli-bldg" style="top:60%;left:74%;width:16%;height:20%;transition-delay:.58s"></span>' +
+              '<span class="cli-bldg" style="top:18%;right:8%;width:10%;height:24%;transition-delay:.46s"></span>' +
+              '<span class="cli-ring"></span>' +
+              '<svg class="cli-pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="transition-delay:.5s">' +
+                '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>' +
+                '<circle cx="12" cy="9" r="2.5" fill="#0d1b2a"/>' +
+              '</svg>' +
+            '</div>' +
+            '<div class="cli-coords">' +
+              '<span>' + fmtCoord(c.lat, 'N', 'S') + ', ' + fmtCoord(c.lng, 'E', 'W') + '</span>' +
+              '<span class="cli-live">Live</span>' +
+            '</div>';
+          return wrap;
+        }
+
+        // ── shared rAF tilt spring ──
+        var tiltCard = null, curX = 0, curY = 0, tgtX = 0, tgtY = 0, raf = null, leaving = false;
+
+        function tiltLoop() {
+          curX += (tgtX - curX) * 0.14;
+          curY += (tgtY - curY) * 0.14;
+          if (tiltCard) {
+            tiltCard.style.setProperty('--tx', curX.toFixed(3) + 'deg');
+            tiltCard.style.setProperty('--ty', curY.toFixed(3) + 'deg');
+          }
+          var settled = Math.abs(tgtX - curX) < 0.02 && Math.abs(tgtY - curY) < 0.02;
+          if (leaving && settled) {
+            if (tiltCard) {
+              tiltCard.style.setProperty('--tx', '0deg');
+              tiltCard.style.setProperty('--ty', '0deg');
+            }
+            tiltCard = null; leaving = false; raf = null; curX = curY = 0;
+            return;
+          }
+          raf = requestAnimationFrame(tiltLoop);
+        }
+
+        function startTilt() { if (!raf) raf = requestAnimationFrame(tiltLoop); }
+
+        // ── open / close ──
+        function expand(card) {
+          card.classList.add('expanded');
+          clearTimeout(card._playT);
+          card._playT = setTimeout(function () {
+            if (card.classList.contains('expanded')) card.classList.add('cli-play');
+          }, reduce ? 0 : OPEN_MS);
+        }
+
+        function collapse(card) {
+          clearTimeout(card._playT);
+          card.classList.remove('expanded');
+          card.classList.remove('cli-play');
+          if (tiltCard === card) { tgtX = tgtY = 0; leaving = true; startTilt(); }
+          else { card.style.setProperty('--tx', '0deg'); card.style.setProperty('--ty', '0deg'); }
+        }
+
+        document.querySelectorAll('.center-list-item[data-id]').forEach(function (card) {
+
+          var c = CENTERS.find(function (x) { return x.id === card.dataset.id; });
+          if (!c) return;
+
+          var chev = document.createElement('i');
+          chev.className = 'fa-solid fa-chevron-down cli-chev';
+          chev.setAttribute('aria-hidden', 'true');
+          card.appendChild(chev);
+
+          card.appendChild(buildMap(c));
+
+          card.addEventListener('click', function () {
+            var willOpen = !card.classList.contains('expanded');
+            document.querySelectorAll('.center-list-item.expanded').forEach(function (other) {
+              if (other !== card) collapse(other);
+            });
+            if (willOpen) expand(card); else collapse(card);
+          });
+
+          if (!reduce) {
+            card.addEventListener('mousemove', function (e) {
+              if (!card.classList.contains('expanded')) return;
+              tiltCard = card; leaving = false;
+              var r = card.getBoundingClientRect();
+              var px = (e.clientX - r.left) / r.width - 0.5;
+              var py = (e.clientY - r.top) / r.height - 0.5;
+              tgtY = px * TILT;    // rotateY from horizontal position
+              tgtX = -py * TILT;   // rotateX from vertical position
+              startTilt();
+            });
+            card.addEventListener('mouseleave', function () {
+              if (tiltCard === card) { tgtX = 0; tgtY = 0; leaving = true; startTilt(); }
+            });
+          }
+
+        });
+
+      })();
 
 
 
