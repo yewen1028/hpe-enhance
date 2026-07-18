@@ -9335,6 +9335,209 @@
     @media (prefers-reduced-motion: reduce) {
       .btn-orange:active, .form-submit:active, .nav-cta:active { transform: none; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN REFINEMENT LAYER (appended: later-cascade wins)
+       Tasteful polish over the established navy/orange system. Only
+       transforms, brand-orange accents and navy-tinted shadows so it
+       reads the same in every section of the single locked theme.
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* --- ABOUT / SERVICES now drift as layered planes via the shared
+       --py engine (see markup data-parallax + .px-drift). The old
+       whole-block --ax/--ay & --sx/--sy slide transforms are retired so
+       the media plane and the text plane separate into real depth. --- */
+    .about-grid { transform: none !important; }
+    .services > div { transform: translate3d(0, var(--py, 0px), 0); }
+
+    /* shapes float as the frontmost plane; keep each shape's own rotation */
+    .about-shape { transform: translate3d(0, var(--py, 0px), 0); }
+    .about-shape-b { transform: translate3d(0, var(--py, 0px), 0) rotate(12deg); }
+
+    /* --- Service cards: crisper resting state, a brand top-accent that
+       wipes in on hover, and a warmer navy-tinted lift. --- */
+    .service-card {
+      position: relative;
+      box-shadow: 0 1px 2px rgba(13, 27, 42, .04), 0 10px 24px -18px rgba(13, 27, 42, .35);
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--orange), #ffb066);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform .5s cubic-bezier(.22, 1, .36, 1);
+      z-index: 3;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover {
+      box-shadow:
+        0 2px 4px rgba(13, 27, 42, .05),
+        0 28px 60px -24px rgba(13, 27, 42, .40),
+        0 0 0 1px rgba(244, 121, 32, .18);
+    }
+
+    /* --- Case-study photo tiles get the same signature as the service cards:
+       an orange top-accent bar that wipes in on hover, plus the orange ring.
+       Their ::before/::after are the photo + scrim, so the bar rides on a
+       dedicated .cs-accent child (z above the scrim, clipped to the radius). --- */
+    .cs-accent {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--orange), #ffb066);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform .5s cubic-bezier(.22, 1, .36, 1);
+      z-index: 4;
+      pointer-events: none;
+    }
+    .cs-home-card:hover .cs-accent { transform: scaleX(1); }
+    .cs-home-card:hover {
+      box-shadow:
+        0 28px 58px -18px rgba(0, 0, 0, .85),
+        0 0 0 1px rgba(244, 121, 32, .35);
+    }
+
+    /* --- About points: quiet cards that warm up and lift on hover, with
+       the icon tile flipping to the brand fill. --- */
+    .about-point {
+      padding: 12px 14px;
+      margin: -12px -14px;
+      border-radius: 12px;
+      transition: background .3s ease, transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease;
+    }
+    .about-point:hover {
+      background: var(--white);
+      transform: translateX(4px);
+      box-shadow: 0 16px 40px -22px rgba(13, 27, 42, .45);
+    }
+    .about-point-icon {
+      transition: background .3s ease, color .3s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
+    }
+    .about-point:hover .about-point-icon {
+      background: var(--orange);
+      color: #fff;
+      transform: rotate(-6deg) scale(1.06);
+    }
+
+    /* --- Media frame: deeper, brand-hued elevation instead of flat black. --- */
+    .about-img-wrap {
+      box-shadow: 0 30px 70px -30px rgba(13, 27, 42, .55), 0 4px 16px -8px rgba(13, 27, 42, .25);
+    }
+    .about-img-badge {
+      box-shadow: 0 14px 30px -12px rgba(244, 121, 32, .6);
+    }
+
+    /* --- Section tag pill: subtle warm gradient + refined ring. --- */
+    .section-tag {
+      background: linear-gradient(180deg, var(--orange-l), #fdeadb);
+      box-shadow: inset 0 0 0 1px rgba(244, 121, 32, .16);
+    }
+
+    /* ═══ SERVICES NAV DROPDOWN — parallax reveal + richer item states ═══ */
+
+    /* Card reveal: a springier parallax drop with a touch of scale + depth. */
+    .dropdown {
+      transform: translateY(-16px) scale(.96);
+      transform-origin: top left;
+      transition: opacity .3s cubic-bezier(.22, 1, .36, 1),
+                  transform .44s cubic-bezier(.16, 1, .3, 1),
+                  visibility .44s;
+    }
+    .has-dropdown.dd-open .dropdown { transform: translateY(0) scale(1); }
+    .dropdown-inner {
+      box-shadow: 0 24px 60px -18px rgba(13, 27, 42, .5), 0 4px 14px -8px rgba(13, 27, 42, .3);
+    }
+
+    /* Items cascade in with a staggered parallax when the card opens. Hover
+       movement rides on an accent bar + chevron + padding nudge (not a
+       transform on the link) so it never fights the entrance animation. */
+    .dropdown a {
+      position: relative;
+      opacity: 0;
+      transform: translateY(9px);
+      transition: background .2s ease, color .2s ease, padding-left .25s cubic-bezier(.22, 1, .36, 1);
+    }
+    .has-dropdown.dd-open .dropdown a { animation: ddItemIn .5s cubic-bezier(.16, 1, .3, 1) both; }
+    .has-dropdown.dd-open .dropdown a:nth-child(1) { animation-delay: .04s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(2) { animation-delay: .09s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(3) { animation-delay: .14s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(4) { animation-delay: .19s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(5) { animation-delay: .24s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(6) { animation-delay: .29s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(7) { animation-delay: .34s; }
+    @keyframes ddItemIn {
+      from { opacity: 0; transform: translateY(9px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* left accent bar wipes in on hover */
+    .dropdown a::before {
+      content: '';
+      position: absolute;
+      left: 4px; top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 3px;
+      background: var(--orange);
+      transform: scaleY(0);
+      transition: transform .28s cubic-bezier(.22, 1, .36, 1);
+    }
+    .dropdown a:hover::before { transform: scaleY(1); }
+
+    /* trailing chevron eases in from the left on hover */
+    .dropdown a::after {
+      content: '\f054';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      font-size: 10px;
+      margin-left: auto;
+      color: var(--orange);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity .25s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+    }
+    .dropdown a:hover::after { opacity: 1; transform: translateX(0); }
+
+    /* replace the old translateX hover with a padding nudge + icon pop */
+    .dropdown a:hover { transform: none; padding-left: 20px; }
+    .dropdown a .di { transition: background .18s ease, color .18s ease, transform .3s cubic-bezier(.22, 1, .36, 1); }
+    .dropdown a:hover .di { transform: scale(1.1) rotate(-6deg); }
+
+    /* ═══ CLICK TRANSITION — on-brand wipe before the service view opens ═══ */
+    #svcTransition {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      pointer-events: none;
+      transform: translateX(-100%);
+      background: linear-gradient(120deg, #0d1b2a 0%, #16283e 58%, #0d1b2a 100%);
+      will-change: transform;
+    }
+    #svcTransition::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; right: -3px;
+      width: 6px;
+      background: var(--orange);
+      box-shadow: 0 0 26px 5px rgba(244, 121, 32, .55);
+    }
+    #svcTransition.wipe-in  { animation: svcWipeIn .4s cubic-bezier(.7, 0, .25, 1) forwards; }
+    #svcTransition.wipe-out { animation: svcWipeOut .42s cubic-bezier(.7, 0, .25, 1) forwards; }
+    @keyframes svcWipeIn  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+    @keyframes svcWipeOut { from { transform: translateX(0); }    to { transform: translateX(100%); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .services > div, .about-shape, .about-shape-b { transform: none !important; }
+      .about-point:hover, .service-card:hover { transform: none; }
+      .cs-home-card:hover .cs-accent { transform: scaleX(1); }
+      .dropdown { transform: none !important; }
+      .dropdown a { opacity: 1 !important; transform: none !important; }
+      .has-dropdown.dd-open .dropdown a { animation: none !important; opacity: 1 !important; transform: none !important; }
+      #svcTransition { display: none !important; }
+    }
   </style>
 
 </head>
@@ -9926,13 +10129,13 @@
 
       <div class="about-media">
 
-        <span class="about-shape about-shape-a"></span>
+        <span class="about-shape about-shape-a" data-parallax="0.5" data-parallax-pin></span>
 
-        <span class="about-shape about-shape-b"></span>
+        <span class="about-shape about-shape-b" data-parallax="-0.32" data-parallax-pin></span>
 
-        <span class="about-shape about-shape-c"></span>
+        <span class="about-shape about-shape-c" data-parallax="0.42" data-parallax-pin></span>
 
-        <div class="about-img-wrap">
+        <div class="about-img-wrap px-drift" data-parallax="0.16" data-parallax-pin>
 
           <video autoplay muted loop playsinline preload="metadata"
             poster="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"
@@ -9952,7 +10155,7 @@
 
       </div>
 
-      <div>
+      <div class="px-drift" data-parallax="0.08" data-parallax-pin>
 
         <div class="section-tag">About HPE Solutions</div>
 
@@ -10044,7 +10247,7 @@
 
   <section class="services" id="services">
 
-    <div style="text-align:center; margin-bottom:52px;">
+    <div style="text-align:center; margin-bottom:52px;" data-parallax="0.18">
 
       <div class="section-tag" style="justify-content:center;">What We Offer</div>
 
@@ -10056,7 +10259,7 @@
 
     </div>
 
-    <div class="services-grid">
+    <div class="services-grid" data-parallax="0.05">
 
 
 
@@ -10573,6 +10776,8 @@
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-building-columns"></i></div>
 
@@ -10592,6 +10797,8 @@
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('retail-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/33690927/pexels-photo-33690927.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-cart-shopping"></i></div>
 
@@ -10610,6 +10817,8 @@
         </div>
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5550905/pexels-photo-5550905.jpeg?auto=compress&cs=tinysrgb&w=600')">
+
+          <span class="cs-accent" aria-hidden="true"></span>
 
           <div class="cs-home-thumb"><i
               class="fa-solid fa-tower-broadcast"></i></div>
@@ -10632,6 +10841,8 @@
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('media-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/7865064/pexels-photo-7865064.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-photo-film"></i></div>
 
@@ -10652,6 +10863,8 @@
         </div>
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('airline-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/3140204/pexels-photo-3140204.jpeg?auto=compress&cs=tinysrgb&w=600')">
+
+          <span class="cs-accent" aria-hidden="true"></span>
 
           <div class="cs-home-thumb"><i
               class="fa-solid fa-plane"></i></div>
@@ -10689,6 +10902,8 @@
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/3755700/pexels-photo-3755700.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-building-columns"></i></div>
 
@@ -10709,6 +10924,8 @@
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('oilgas-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/4883682/pexels-photo-4883682.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-oil-well"></i></div>
 
@@ -10727,6 +10944,8 @@
         </div>
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/14608504/pexels-photo-14608504.jpeg?auto=compress&cs=tinysrgb&w=600')">
+
+          <span class="cs-accent" aria-hidden="true"></span>
 
           <div class="cs-home-thumb"><i
               class="fa-solid fa-landmark"></i></div>
@@ -10762,6 +10981,8 @@
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('tech-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709297/pexels-photo-7709297.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-oil-well"></i></div>
 
@@ -10784,6 +11005,8 @@
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709091/pexels-photo-7709091.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-tower-broadcast"></i></div>
 
@@ -10805,6 +11028,8 @@
 
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-warranty');},450);" style="--ct:url('https://images.pexels.com/photos/12741843/pexels-photo-12741843.jpeg?auto=compress&cs=tinysrgb&w=600')">
+
+          <span class="cs-accent" aria-hidden="true"></span>
 
           <div class="cs-home-thumb"><i
               class="fa-solid fa-shield-halved"></i></div>
@@ -10839,6 +11064,8 @@
 
         <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('staffing');},450);" style="--ct:url('https://images.pexels.com/photos/8872441/pexels-photo-8872441.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-briefcase"></i></div>
 
@@ -10861,6 +11088,8 @@
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('healthcare-solution');},450);" style="--ct:url('https://images.pexels.com/photos/13176452/pexels-photo-13176452.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+          <span class="cs-accent" aria-hidden="true"></span>
+
           <div class="cs-home-thumb"><i
               class="fa-solid fa-hospital"></i></div>
 
@@ -10880,6 +11109,8 @@
 
         <div class="cs-home-card"
           onclick="openCasePage();setTimeout(function(){openCaseDetail('multisector-solution');},450);" style="--ct:url('https://images.pexels.com/photos/6466141/pexels-photo-6466141.jpeg?auto=compress&cs=tinysrgb&w=600')">
+
+          <span class="cs-accent" aria-hidden="true"></span>
 
           <div class="cs-home-thumb"><i
               class="fa-solid fa-industry"></i></div>
@@ -13818,6 +14049,29 @@
 
 
 
+    // On-brand wipe transition played before a service view opens. The veil is
+    // created once and reused; the reflow read restarts the CSS animation.
+    const svcVeil = (function () {
+      let v = document.getElementById('svcTransition');
+      if (!v) { v = document.createElement('div'); v.id = 'svcTransition'; document.body.appendChild(v); }
+      return v;
+    })();
+
+    function runSvcTransition(done) {
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce || !svcVeil) { done(); return; }
+      svcVeil.classList.remove('wipe-out');
+      void svcVeil.offsetWidth;                 // restart the wipe-in animation
+      svcVeil.classList.add('wipe-in');
+      setTimeout(() => {
+        done();                                 // open the view while the screen is covered
+        svcVeil.classList.remove('wipe-in');
+        void svcVeil.offsetWidth;
+        svcVeil.classList.add('wipe-out');      // reveal it with the outgoing wipe
+        setTimeout(() => svcVeil.classList.remove('wipe-out'), 460);
+      }, 400);
+    }
+
     // Also open from dropdown nav links (store last hovered service)
 
     document.querySelectorAll('.has-dropdown .dropdown a').forEach((a, i) => {
@@ -13828,7 +14082,13 @@
 
         e.preventDefault();
 
-        openModal(keys[i]);
+        const key = keys[i];
+
+        const dd = document.querySelector('.has-dropdown');
+
+        if (dd) dd.classList.remove('dd-open');   // close the menu, then transition in
+
+        runSvcTransition(() => openModal(key));
 
       });
 
@@ -14094,6 +14354,29 @@
 
 
 
+    // Resolve a section's true in-flow document position. Several sections
+    // (hero, keyfacts, about) are position:sticky, and while pinned the browser
+    // reports the *stuck* offset for BOTH getBoundingClientRect().top AND
+    // offsetTop — so a naive scroll target collapses to roughly "current
+    // scroll", and the link appears to do nothing. Momentarily neutralising the
+    // sticky lets offsetTop report the real layout position at any scroll. The
+    // read + restore run synchronously, so no intermediate frame is painted.
+    function sectionFlowTop(el) {
+
+      const prev = el.style.position;
+
+      el.style.position = 'static';
+
+      let y = 0, node = el;
+
+      while (node) { y += node.offsetTop; node = node.offsetParent; }
+
+      el.style.position = prev;
+
+      return y;
+
+    }
+
     document.querySelectorAll('a[href^="#"]').forEach(a => {
 
       a.addEventListener('click', e => {
@@ -14108,7 +14391,7 @@
 
           e.preventDefault();
 
-          window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+          window.scrollTo({ top: Math.max(0, sectionFlowTop(target) - 80), behavior: 'smooth' });
 
         }
 
@@ -14364,7 +14647,10 @@
 
       var grid = about && about.querySelector('.about-grid');
 
-      if (reduce || !grid) return;
+      // Retired: #about now drifts as layered planes via the shared --py
+      // engine (.px-drift on the media, shapes and text). Kept the IIFE as a
+      // no-op so the surrounding numbering/comments stay intact.
+      if (reduce || !grid || true) return;
 
       function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
 
@@ -14419,7 +14705,9 @@
 
       var section = document.getElementById('services');
 
-      if (reduce || !section) return;
+      // Retired: #services now drifts as two layered planes (header + grid)
+      // via the shared --py engine. No-op kept to preserve surrounding structure.
+      if (reduce || !section || true) return;
 
       function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
 
