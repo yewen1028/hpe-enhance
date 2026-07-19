@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 
@@ -9539,6 +9539,72 @@
       .has-dropdown.dd-open .dropdown a { animation: none !important; opacity: 1 !important; transform: none !important; }
       #svcTransition { display: none !important; }
     }
+
+    /* ═══ SERVICES MEGA-MENU — two-column service grid + featured case-study panel ═══ */
+    .has-dropdown .dropdown { min-width: 660px; }
+    .dropdown-inner.mega {
+      display: grid;
+      grid-template-columns: 1fr 210px;
+      gap: 12px;
+      padding: 14px;
+      width: 660px;
+      max-width: calc(100vw - 32px);
+    }
+    /* keep the original hover decorations (accent bar + sliding chevron) on the service
+       items; strip them only on the featured panel */
+    .mega .mega-feature::before, .mega .mega-feature::after { content: none !important; }
+
+    .mega .mega-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .mega .mega-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 12px; border-radius: 10px;
+      opacity: 0; transform: translateY(9px);
+    }
+    .mega .mega-item .mi-ico {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
+      display: grid; place-items: center;
+      background: var(--orange-l); color: var(--orange); font-size: 14px;
+      transition: background .18s ease, color .18s ease, transform .3s cubic-bezier(.22, 1, .36, 1);
+    }
+    .mega .mega-item .mi-tx { display: flex; flex-direction: column; line-height: 1.25; }
+    .mega .mega-item .mi-tx strong { font-size: 13.5px; font-weight: 600; color: var(--heading); transition: color .18s ease; }
+    .mega .mega-item .mi-tx em { font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    .mega .mega-item:hover { transform: translateY(0); padding-left: 18px; }
+    .mega .mega-item:hover .mi-ico { background: var(--orange); color: #fff; transform: scale(1.08) rotate(-6deg); }
+    .mega .mega-item:hover .mi-tx strong { color: var(--orange); }
+
+    /* Featured panel → real navigation to the case-study page */
+    .mega .mega-feature {
+      display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
+      padding: 18px 16px 16px; border-radius: 12px; overflow: hidden; position: relative;
+      color: #fff;
+      opacity: 0; transform: translateY(9px);
+      background:
+        linear-gradient(180deg, rgba(13, 27, 42, .48) 0%, rgba(13, 27, 42, .93) 100%),
+        url('https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=500');
+      background-size: cover; background-position: center;
+      transition: none;
+    }
+    .mega .mega-feature .mf-eyebrow { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #ffd0a8; }
+    .mega .mega-feature .mf-title { font-size: 17px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; color: #fff; }
+    .mega .mega-feature .mf-desc { font-size: 11.5px; color: rgba(255, 255, 255, .8); line-height: 1.4; }
+    .mega .mega-feature .mf-cta { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; font-size: 12.5px; font-weight: 700; color: #ffb27a; }
+    .mega .mega-feature .mf-cta i { transition: transform .2s cubic-bezier(.22, 1, .36, 1); }
+    .mega .mega-feature:hover { padding-left: 16px; }
+    .mega .mega-feature:hover .mf-cta i { transform: translateX(4px); }
+
+    /* Narrower desktop widths: collapse to a single column, feature becomes a banner row */
+    @media (max-width: 1120px) {
+      .has-dropdown .dropdown { min-width: 430px; }
+      .dropdown-inner.mega { grid-template-columns: 1fr; width: 430px; }
+      .mega .mega-feature { flex-direction: row; align-items: center; flex-wrap: wrap; padding: 14px 16px; }
+      .mega .mega-feature .mf-title { flex: 1 1 auto; }
+      .mega .mega-feature .mf-cta { margin-top: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mega .mega-item, .mega .mega-feature { opacity: 1 !important; transform: none !important; }
+    }
   </style>
 
 </head>
@@ -9708,29 +9774,53 @@
 
         <div class="dropdown">
 
-          <div class="dropdown-inner">
+          <div class="dropdown-inner mega">
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-server"></i></span> IT Support &amp; Managed
+            <div class="mega-grid">
 
-              Services</a>
+              <a href="#services" data-svc="managed" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-server"></i></span>
+                <span class="mi-tx"><strong>IT Support &amp; Managed Services</strong><em>SLA-backed on-site &amp; remote support</em></span>
+              </a>
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-diagram-project"></i></span> Project
+              <a href="#services" data-svc="project" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-diagram-project"></i></span>
+                <span class="mi-tx"><strong>Project Deployment</strong><em>Migrations, rollouts &amp; deployments</em></span>
+              </a>
 
-              Deployment</a>
+              <a href="#services" data-svc="helpdesk" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-headset"></i></span>
+                <span class="mi-tx"><strong>IT Helpdesk</strong><em>Managed call centres &amp; IVR</em></span>
+              </a>
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-headset"></i></span> IT Helpdesk</a>
+              <a href="#services" data-svc="staffing" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-users"></i></span>
+                <span class="mi-tx"><strong>IT Staffing</strong><em>Dedicated, backfill &amp; project engineers</em></span>
+              </a>
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-users"></i></span> IT Staffing</a>
+              <a href="#services" data-svc="warranty" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-shield-halved"></i></span>
+                <span class="mi-tx"><strong>Authorised Warranty Provider</strong><em>On-site &amp; walk-in repair</em></span>
+              </a>
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-shield-halved"></i></span> Authorised Warranty
+              <a href="#services" data-svc="sourcing" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-lightbulb"></i></span>
+                <span class="mi-tx"><strong>Total Solution &amp; Sourcing</strong><em>Hardware, software &amp; network</em></span>
+              </a>
 
-              Provider</a>
+              <a href="#services" data-svc="vas" class="mega-item mega-item-wide">
+                <span class="mi-ico"><i class="fa-solid fa-gears"></i></span>
+                <span class="mi-tx"><strong>Value Added Service</strong><em>Cabling, WiFi, UPS &amp; structured add-ons</em></span>
+              </a>
 
-            <a href="#services"><span class="di"><i class="fa-solid fa-lightbulb"></i></span> Total Solution &amp;
+            </div>
 
-              Sourcing</a>
-
-            <a href="#services"><span class="di"><i class="fa-solid fa-gears"></i></span> Value Added Service</a>
+            <a href="case-study.html" class="mega-feature">
+              <span class="mf-eyebrow">Proof of work</span>
+              <span class="mf-title">14 client case studies</span>
+              <span class="mf-desc">Banking, telco, government &amp; more, across Malaysia.</span>
+              <span class="mf-cta">Explore case studies <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
 
           </div>
 
@@ -10755,12 +10845,12 @@
 
         Click any project to read the full case study.</p>
 
-      <button class="btn-orange" onclick="openCasePage()"
+      <a class="btn-orange" href="case-study.html"
         style="display:inline-flex;align-items:center;gap:8px;font-size:14px;">
 
         <i class="fa-solid fa-folder-open"></i> View All Case Studies
 
-      </button>
+      </a>
 
     </div>
 
@@ -10775,7 +10865,7 @@
       <!-- 5 cards: the trailing pair widens to span 3 so the row closes -->
       <div class="cs-home-grid cs-grid-5 px-drift" data-parallax="0.16">
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=banking-mgmt'" style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10796,7 +10886,7 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('retail-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/33690927/pexels-photo-33690927.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=retail-mgmt'" style="--ct:url('https://images.pexels.com/photos/33690927/pexels-photo-33690927.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10817,7 +10907,7 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/5550905/pexels-photo-5550905.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=telco-mgmt'" style="--ct:url('https://images.pexels.com/photos/5550905/pexels-photo-5550905.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10840,7 +10930,7 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('media-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/7865064/pexels-photo-7865064.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=media-mgmt'" style="--ct:url('https://images.pexels.com/photos/7865064/pexels-photo-7865064.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10863,7 +10953,7 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('airline-mgmt');},450);" style="--ct:url('https://images.pexels.com/photos/3140204/pexels-photo-3140204.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=airline-mgmt'" style="--ct:url('https://images.pexels.com/photos/3140204/pexels-photo-3140204.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10901,7 +10991,7 @@
       <div class="cs-home-grid px-drift" data-parallax="0.16">
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('banking-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/3755700/pexels-photo-3755700.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=banking-deploy'" style="--ct:url('https://images.pexels.com/photos/3755700/pexels-photo-3755700.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10923,7 +11013,7 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('oilgas-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/4883682/pexels-photo-4883682.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=oilgas-deploy'" style="--ct:url('https://images.pexels.com/photos/4883682/pexels-photo-4883682.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10944,7 +11034,7 @@
 
         </div>
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-deploy');},450);" style="--ct:url('https://images.pexels.com/photos/14608504/pexels-photo-14608504.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=govt-deploy'" style="--ct:url('https://images.pexels.com/photos/14608504/pexels-photo-14608504.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -10980,7 +11070,7 @@
       <div class="cs-home-grid px-drift" data-parallax="0.16">
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('tech-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709297/pexels-photo-7709297.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=tech-helpdesk'" style="--ct:url('https://images.pexels.com/photos/7709297/pexels-photo-7709297.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -11004,7 +11094,7 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('telco-helpdesk');},450);" style="--ct:url('https://images.pexels.com/photos/7709091/pexels-photo-7709091.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=telco-helpdesk'" style="--ct:url('https://images.pexels.com/photos/7709091/pexels-photo-7709091.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -11028,7 +11118,7 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('govt-warranty');},450);" style="--ct:url('https://images.pexels.com/photos/12741843/pexels-photo-12741843.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=govt-warranty'" style="--ct:url('https://images.pexels.com/photos/12741843/pexels-photo-12741843.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -11063,7 +11153,7 @@
 
       <div class="cs-home-grid px-drift" data-parallax="0.16">
 
-        <div class="cs-home-card" onclick="openCasePage();setTimeout(function(){openCaseDetail('staffing');},450);" style="--ct:url('https://images.pexels.com/photos/8872441/pexels-photo-8872441.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-card" onclick="location.href='case-study.html?case=staffing'" style="--ct:url('https://images.pexels.com/photos/8872441/pexels-photo-8872441.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -11087,7 +11177,7 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('healthcare-solution');},450);" style="--ct:url('https://images.pexels.com/photos/13176452/pexels-photo-13176452.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=healthcare-solution'" style="--ct:url('https://images.pexels.com/photos/13176452/pexels-photo-13176452.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -11109,7 +11199,7 @@
         </div>
 
         <div class="cs-home-card"
-          onclick="openCasePage();setTimeout(function(){openCaseDetail('multisector-solution');},450);" style="--ct:url('https://images.pexels.com/photos/6466141/pexels-photo-6466141.jpeg?auto=compress&cs=tinysrgb&w=600')">
+          onclick="location.href='case-study.html?case=multisector-solution'" style="--ct:url('https://images.pexels.com/photos/6466141/pexels-photo-6466141.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
           <span class="cs-accent" aria-hidden="true"></span>
 
@@ -14044,7 +14134,7 @@
 
     document.querySelectorAll('.service-card[data-service]').forEach(card => {
 
-      card.addEventListener('click', () => openModal(card.dataset.service));
+      card.addEventListener('click', () => { location.href = 'services.html?service=' + card.dataset.service; });
 
     });
 
@@ -14075,21 +14165,19 @@
 
     // Also open from dropdown nav links (store last hovered service)
 
-    document.querySelectorAll('.has-dropdown .dropdown a').forEach((a, i) => {
-
-      const keys = ['managed', 'project', 'helpdesk', 'staffing', 'warranty', 'sourcing', 'vas'];
+    document.querySelectorAll('.has-dropdown .dropdown a[data-svc]').forEach((a) => {
 
       a.addEventListener('click', e => {
 
         e.preventDefault();
 
-        const key = keys[i];
+        const key = a.dataset.svc;
 
         const dd = document.querySelector('.has-dropdown');
 
-        if (dd) dd.classList.remove('dd-open');   // close the menu, then transition in
+        if (dd) dd.classList.remove('dd-open');   // close the menu, then wipe into the services page
 
-        runSvcTransition(() => openModal(key));
+        runSvcTransition(() => { location.href = 'services.html?service=' + key; });
 
       });
 
@@ -14107,9 +14195,7 @@
 
         e.preventDefault();
 
-        closeModal(); // close mobile menu first
-
-        setTimeout(() => openModal(keys[i]), 50);
+        location.href = 'services.html?service=' + keys[i];
 
       });
 

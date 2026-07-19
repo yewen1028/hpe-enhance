@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Services — HPE Solutions Sdn Bhd</title>
+  <meta name="description"
+    content="HPE Solutions Sdn Bhd services — IT support & managed services, project deployment, helpdesk, staffing, warranty and total IT sourcing across Malaysia." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --base: #070c14;
+      --orange: #ff7d1a; --orange-d: #e8670e; --orange-l: rgba(255, 125, 26, .13);
+      --navy: #0a111d; --navy-2: #16233a;
+      --text: #dbe3ee; --muted: #93a2b8; --heading: #f3f7fc;
+      --light: #0d1626; --surface: #111c2e; --surface-2: #16233a;
+      --border: rgba(255, 255, 255, .09);
+      --radius: 16px;
+      --shadow: 0 26px 60px -24px rgba(0, 0, 0, .65);
+      --nav-h: 68px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text); background: var(--base); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    ::selection { background: var(--orange); color: #fff; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100; height: var(--nav-h);
+      display: flex; align-items: center;
+      background: rgba(9, 15, 25, .72);
+      backdrop-filter: saturate(160%) blur(14px);
+      -webkit-backdrop-filter: saturate(160%) blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo img { height: 34px; width: auto; }
+    .nav-logo .lg-fallback { display: none; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; color: var(--orange); }
+    .nav-logo .lg-fallback b { background: var(--orange); color: #fff; padding: 4px 9px; border-radius: 6px; font-size: 13px; }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 9px;
+      font-size: 14px; font-weight: 600; color: var(--muted); transition: background .18s, color .18s;
+    }
+    .nav-back:hover { background: var(--surface); color: var(--heading); }
+    .nav-cta {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 9px;
+      font-size: 14px; font-weight: 700; background: var(--orange); color: #fff;
+      box-shadow: 0 6px 16px -6px rgba(244, 121, 32, .6);
+      transition: transform .16s, box-shadow .2s, background .2s;
+    }
+    .nav-cta:hover { background: var(--orange-d); transform: translateY(-2px); box-shadow: 0 10px 22px -8px rgba(244, 121, 32, .7); }
+    .nav-cta:active { transform: translateY(0); }
+
+    /* HERO */
+    .hero { position: relative; background: var(--navy); color: #fff; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; opacity: .34; transform: scale(1.06); }
+    .hero::after {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(13, 27, 42, .55) 0%, rgba(13, 27, 42, .82) 62%, rgba(7, 12, 20, .97) 100%),
+        radial-gradient(1200px 460px at 82% -8%, rgba(244, 121, 32, .28), transparent 62%);
+    }
+    .hero .wrap { position: relative; z-index: 2; }
+
+    .crumb {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .62);
+    }
+    .crumb a { transition: color .16s; }
+    .crumb a:hover { color: var(--orange); }
+    .crumb i { font-size: 9px; opacity: .55; }
+    .crumb .here { color: #fff; }
+
+    .d-hero .wrap { padding: 30px 0 clamp(48px, 7vw, 78px); }
+    .d-tag {
+      display: inline-flex; align-items: center; gap: 9px; margin: 26px 0 18px;
+      padding: 7px 15px 7px 11px; border-radius: 999px;
+      background: rgba(244, 121, 32, .16); border: 1px solid rgba(244, 121, 32, .4);
+      color: #ffd7b4; font-size: 12.5px; font-weight: 700; letter-spacing: .02em;
+    }
+    .d-tag i { color: var(--orange); }
+    .d-title { font-size: clamp(31px, 5vw, 52px); line-height: 1.04; font-weight: 800; letter-spacing: -.02em; max-width: 20ch; }
+    .d-lead { margin-top: 20px; max-width: 68ch; font-size: clamp(15.5px, 1.6vw, 18px); color: rgba(255, 255, 255, .82); line-height: 1.62; }
+    .hero-cta { margin-top: 30px; display: inline-flex; }
+    .btn-quote {
+      display: inline-flex; align-items: center; gap: 9px; padding: 14px 24px; border-radius: 11px;
+      font-weight: 700; font-size: 15px; background: var(--orange); color: #fff;
+      box-shadow: 0 10px 26px -10px rgba(244, 121, 32, .8);
+      transition: transform .16s, box-shadow .2s, background .2s;
+    }
+    .btn-quote:hover { background: var(--orange-d); transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(244, 121, 32, .9); }
+    .btn-quote:active { transform: translateY(0); }
+
+    /* BODY */
+    .d-body { padding: clamp(46px, 6vw, 76px) 0 20px; }
+    .sec { margin-bottom: clamp(38px, 5vw, 56px); }
+    .sec-title { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+    .sec-title .st-ico { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--orange-l); color: var(--orange); font-size: 15px; flex-shrink: 0; }
+    .sec-title h2 { font-size: clamp(19px, 2.4vw, 25px); font-weight: 800; color: var(--heading); letter-spacing: -.01em; }
+
+    /* Feature grid */
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 22px 20px; transition: transform .2s, border-color .2s, box-shadow .2s; }
+    .feat-card:hover { transform: translateY(-4px); border-color: rgba(255, 125, 26, .4); box-shadow: var(--shadow); }
+    .feat-card .fc-ico { width: 44px; height: 44px; border-radius: 11px; background: var(--orange-l); color: var(--orange); display: grid; place-items: center; font-size: 18px; margin-bottom: 14px; }
+    .feat-card h4 { color: var(--heading); font-size: 16px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+    .feat-card p { color: var(--muted); font-size: 14px; line-height: 1.55; }
+
+    /* SLA grid */
+    .sla-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+    .sla-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+    .sla-card.highlight { border-color: rgba(255, 125, 26, .5); background: linear-gradient(180deg, rgba(255, 125, 26, .13), var(--surface)); }
+    .sla-card .tier { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--orange); font-weight: 800; }
+    .sla-card .val { font-size: 24px; font-weight: 800; color: var(--heading); margin: 7px 0 8px; letter-spacing: -.01em; }
+    .sla-card .desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* Benefits */
+    .ben-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 26px; }
+    .ben-item { display: flex; gap: 12px; }
+    .ben-item i { color: var(--orange); margin-top: 3px; font-size: 15px; }
+    .ben-item strong { color: var(--heading); display: block; font-size: 15px; font-weight: 700; }
+    .ben-item span { color: var(--muted); font-size: 13.5px; }
+
+    /* CTA band */
+    .cta-band {
+      margin-top: 8px; background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 100%);
+      border-radius: var(--radius); color: #fff; overflow: hidden;
+      display: grid; grid-template-columns: 1.4fr .9fr; align-items: center; gap: 24px;
+      padding: 34px; position: relative;
+    }
+    .cta-band::before { content: ''; position: absolute; right: -60px; top: -60px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(244, 121, 32, .4), transparent 66%); pointer-events: none; }
+    .cta-band .ct-eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #ffd7b4; }
+    .cta-band h3 { font-size: clamp(20px, 2.6vw, 26px); font-weight: 800; margin-top: 8px; letter-spacing: -.01em; }
+    .cta-band p { color: rgba(255, 255, 255, .74); font-size: 14.5px; margin-top: 8px; max-width: 46ch; }
+    .cta-band .ct-actions { display: flex; justify-content: flex-end; position: relative; z-index: 1; }
+
+    /* Pager */
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 40px 0 8px; }
+    .pager a { display: flex; flex-direction: column; gap: 5px; padding: 20px 22px; border-radius: 13px; border: 1px solid var(--border); background: var(--surface); transition: border-color .18s, transform .18s, box-shadow .2s; }
+    .pager a:hover { border-color: rgba(244, 121, 32, .5); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .pager .pg-k { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .pager .pg-k i { color: var(--orange); }
+    .pager .pg-t { font-size: 15.5px; font-weight: 700; color: var(--heading); line-height: 1.35; }
+    .pager a.next { text-align: right; }
+    .pager a.next .pg-k { justify-content: flex-end; }
+    .pager a.empty { visibility: hidden; }
+
+    /* INDEX */
+    .i-hero .wrap { padding: 44px 0 clamp(44px, 6vw, 66px); }
+    .i-eyebrow { color: var(--orange); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; margin-bottom: 14px; }
+    .i-title { font-size: clamp(34px, 6vw, 60px); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; }
+    .i-sub { margin-top: 18px; max-width: 60ch; font-size: clamp(15.5px, 1.6vw, 18px); color: rgba(255, 255, 255, .8); }
+    .i-stats { display: flex; flex-wrap: wrap; gap: 30px; margin-top: 30px; }
+    .i-stats .st .v { font-size: 28px; font-weight: 800; color: #fff; }
+    .i-stats .st .l { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: rgba(255, 255, 255, .55); }
+
+    .i-body { padding: clamp(46px, 6vw, 72px) 0 30px; background: var(--light); }
+    .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .svc-card {
+      position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius);
+      background: var(--surface); border: 1px solid var(--border); box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .5);
+      transition: transform .22s cubic-bezier(.22, 1, .36, 1), box-shadow .22s, border-color .22s;
+    }
+    .svc-card:hover { transform: translateY(-5px); box-shadow: 0 26px 50px -22px rgba(0, 0, 0, .7); border-color: rgba(244, 121, 32, .4); }
+    .svc-thumb { position: relative; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
+    .svc-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 12, 20, .1), rgba(7, 12, 20, .72)); }
+    .svc-thumb .ico { position: absolute; left: 14px; bottom: 14px; z-index: 1; width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; background: #101c2e; color: var(--orange); font-size: 17px; box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .6); }
+    .svc-info { padding: 20px 22px 22px; display: flex; flex-direction: column; flex: 1; }
+    .svc-info h3 { font-size: 18px; font-weight: 800; color: var(--heading); line-height: 1.3; margin-bottom: 9px; }
+    .svc-info p { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin-bottom: 15px; }
+    .svc-more { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; font-size: 13.5px; font-weight: 700; color: var(--orange); }
+    .svc-more i { transition: transform .2s; }
+    .svc-card:hover .svc-more i { transform: translateX(4px); }
+
+    /* FOOTER */
+    footer { background: #060a11; color: rgba(255, 255, 255, .7); padding: 40px 0; }
+    footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
+    footer .f-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #fff; }
+    footer .f-brand b { background: var(--orange); color: #fff; padding: 4px 9px; border-radius: 6px; font-size: 13px; }
+    footer .f-links { display: flex; flex-wrap: wrap; gap: 22px; font-size: 14px; font-weight: 600; }
+    footer .f-links a:hover { color: var(--orange); }
+    footer .f-copy { width: 100%; font-size: 12.5px; color: rgba(255, 255, 255, .4); border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 18px; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16, 1, .3, 1), transform .7s cubic-bezier(.16, 1, .3, 1); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 860px) {
+      .ben-list { grid-template-columns: 1fr; }
+      .cta-band { grid-template-columns: 1fr; }
+      .cta-band .ct-actions { justify-content: flex-start; }
+    }
+    @media (max-width: 560px) {
+      .nav-back span { display: none; }
+      .pager { grid-template-columns: 1fr; }
+      .pager a.next { text-align: left; }
+      .pager a.next .pg-k { justify-content: flex-start; }
+      .pager a.empty { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .hero-bg { transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="wrap">
+      <a class="nav-logo" href="hpe-enhanced-editing.html" aria-label="HPE Solutions — home">
+        <img src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" alt="HPE Solutions Sdn Bhd"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <span class="lg-fallback"><b>hpe</b> HPE Solutions</span>
+      </a>
+      <div class="nav-right">
+        <a class="nav-back" href="hpe-enhanced-editing.html"><i class="fa-solid fa-arrow-left"></i> <span>Back to Home</span></a>
+        <a class="nav-cta" href="hpe-enhanced-editing.html#contact"><i class="fa-solid fa-paper-plane"></i> Contact Us</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="app"><!-- rendered by JS --></main>
+
+  <footer>
+    <div class="wrap">
+      <a class="f-brand" href="hpe-enhanced-editing.html"><b>hpe</b> HPE Solutions Sdn Bhd</a>
+      <div class="f-links">
+        <a href="services.html">Services</a>
+        <a href="case-study.html">Case Studies</a>
+        <a href="hpe-enhanced-editing.html#centers">Service Centers</a>
+        <a href="hpe-enhanced-editing.html#contact">Contact</a>
+      </div>
+      <div class="f-copy">© <span id="yr"></span> HPE Solutions Sdn Bhd. Nationwide IT support &amp; managed services across Malaysia.</div>
+    </div>
+  </footer>
+
+  <script>
+    /* SERVICES data — mirrors the SERVICES object in the main site. */
+    const SERVICES = {
+
+      managed: {
+
+        icon: '<i class="fa-solid fa-server"></i>',
+
+        title: 'IT Support & Managed Services',
+
+        desc: 'HPE delivers contractual IT management and support covering corporate networks, systems, and applications using tailored Service Level Agreements that meet each customer\'s unique requirements.',
+
+        img: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Job Scope — What We Cover',
+
+        features: [
+
+          { icon: 'fa-ticket', title: 'Fault Ticketing & Escalation', desc: 'Structured fault logging and escalation matrix ensuring every issue is tracked to resolution.' },
+
+          { icon: 'fa-phone-volume', title: 'Phone & Remote Troubleshooting', desc: 'Immediate remote diagnostics and troubleshooting by certified support engineers.' },
+
+          { icon: 'fa-user-gear', title: 'Engineer Site Visits', desc: 'On-site engineer dispatch for hands-on resolution when remote support is insufficient.' },
+
+          { icon: 'fa-microchip', title: 'Faulty Part Replacement', desc: 'Replacement of defective hardware components using qualified spare parts inventory.' },
+
+          { icon: 'fa-rotate', title: 'Software Reinstallation', desc: 'Clean OS and application reinstallation with data preservation where applicable.' },
+
+          { icon: 'fa-shield-virus', title: 'Malware Removal', desc: 'Detection and elimination of viruses, ransomware, and malicious software threats.' },
+
+          { icon: 'fa-key', title: 'Password Resets', desc: 'Secure account recovery and password management for end-users and administrators.' },
+
+          { icon: 'fa-clipboard-list', title: 'Daily Progress Updates', desc: 'Regular reporting on open tickets, SLA status, and resolution timelines.' },
+
+          { icon: 'fa-boxes-stacked', title: 'Inventory & Loaner Tracking', desc: 'Full tracking of loaner equipment and hardware asset inventory throughout the contract.' },
+
+          { icon: 'fa-screwdriver-wrench', title: 'Preventive Maintenance', desc: 'Scheduled hardware cleaning, asset tagging, configuration audits, and software patch deployment.' },
+
+        ],
+
+        sla: [
+
+          { tier: 'Elite', val: '24×7 (4hr)', desc: 'Non-stop critical systems requiring immediate support year-round.', highlight: true },
+
+          { tier: 'Premium', val: '8×5 (2hr)', desc: 'Office-hours critical support with same-day on-site response.' },
+
+          { tier: 'Standard', val: '8×5 (NBD)', desc: 'General IT product support during regular business hours.' },
+
+          { tier: 'Remote', val: '8×5 (3–5BD)', desc: 'Non-critical scheduling and remote installation requests.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'Cost Predictability', desc: 'Fixed monthly fees eliminate surprise IT costs and budget overruns.' },
+
+          { title: 'Scalable Staffing', desc: 'Flexible headcount that scales up or down with your business demands.' },
+
+          { title: 'Risk Mitigation', desc: 'Nationwide support network reduces single-point-of-failure risk.' },
+
+          { title: 'Business Control', desc: 'Client retains full oversight while HPE handles day-to-day IT operations.' },
+
+          { title: 'Continuous Improvement', desc: 'Monthly SLA reviews and reporting drive ongoing service quality enhancement.' },
+
+        ],
+
+      },
+
+      project: {
+
+        icon: '<i class="fa-solid fa-diagram-project"></i>',
+
+        title: 'Project Deployment',
+
+        desc: 'HPE offers comprehensive project management and deployment for IT initiatives of any scale — covering network devices, servers, desktops, laptops, hardware, software, and applications across banking, retail, manufacturing, and oil & gas sectors.',
+
+        img: 'https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Deployment Capabilities',
+
+        features: [
+
+          { icon: 'fa-flag-checkered', title: 'Project Kick-Start', desc: 'Planning, timeline chartering, team assignment, deliverable definition, and meeting scheduling from day one.' },
+
+          { icon: 'fa-warehouse', title: 'Off-Site Preparation', desc: 'Commissioning, software installation, custom imaging, and testing completed off-site — minimising on-site time.' },
+
+          { icon: 'fa-building', title: 'On-Site Installation', desc: 'Full transportation, on-site setup, initialisation, testing, and environment-specific assessment managed end-to-end.' },
+
+          { icon: 'fa-clock', title: 'After-Hours Deployment', desc: 'Large-scale rollouts within compressed timeframes with after-hours scheduling to avoid business disruption.' },
+
+          { icon: 'fa-people-group', title: 'Dedicated Project Teams', desc: 'Major projects receive dedicated project managers, consultants, and engineers.' },
+
+          { icon: 'fa-calendar-check', title: 'Progress Meetings', desc: 'Weekly or bi-weekly progress meetings ensure milestones are tracked and risks addressed proactively.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'Cost-Effectiveness', desc: 'Economy of scale advantages versus developing internal deployment resources.' },
+
+          { title: 'Reduced Risk', desc: 'Documented processes and comprehensive reporting at every stage.' },
+
+          { title: 'Extra Resources', desc: 'Relieves your internal IT team, allowing them to focus on core business operations.' },
+
+          { title: 'Committed Timeline', desc: 'Milestone-driven delivery with signed-off project schedules.' },
+
+          { title: 'Minimum Business Disruption', desc: 'Off-site preparation and after-hours scheduling keep your operations running throughout.' },
+
+        ],
+
+      },
+
+      helpdesk: {
+
+        icon: '<i class="fa-solid fa-headset"></i>',
+
+        title: 'IT Helpdesk',
+
+        desc: 'By outsourcing your helpdesk to HPE, we provide top-notch services to your organisation without any compromise on service quality — from managed helpdesk solutions to trained call centre agents.',
+
+        img: 'https://images.pexels.com/photos/5453822/pexels-photo-5453822.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Helpdesk Solutions',
+
+        features: [
+
+          { icon: 'fa-building-user', title: 'Helpdesk Management', desc: 'On-site or off-site helpdesk management solutions tailored to meet your specific operational requirements.' },
+
+          { icon: 'fa-user-headset', title: 'Helpdesk Resources', desc: 'Dedicated helpdesk agents on long-term or short-term basis to ensure your call centre runs smoothly.' },
+
+          { icon: 'fa-chalkboard-user', title: 'Training Services', desc: 'Customised training courses with regular skill refresh and knowledge updates for your call centre staff.' },
+
+          { icon: 'fa-life-ring', title: 'Disaster Recovery Helpdesk', desc: 'Standby helpdesk capacity to take over call centre functionality during disasters or business continuity events.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'Cost-Effective Operation', desc: 'Established Team Lead and Call Centre Agent structure delivers cost-effective call centre management.' },
+
+          { title: 'Manpower Solved', desc: 'Call centre staffing challenges resolved with performance measured by committed SLA targets.' },
+
+          { title: 'Regular Training', desc: 'Continuous training ensures agents maintain performance standards and up-to-date product knowledge.' },
+
+          { title: 'Monthly Reporting', desc: 'Telephony IVR system measures abandon call rates and provides weekly/monthly performance reports.' },
+
+        ],
+
+      },
+
+      staffing: {
+
+        icon: '<i class="fa-solid fa-users"></i>',
+
+        title: 'IT Staffing',
+
+        desc: 'IT Hardware Support Staffing Management provides IT headcount on long-term or short-term contract terms, matched to your required skillset and years of experience — from junior technicians to senior engineers.',
+
+        img: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Staffing Models',
+
+        features: [
+
+          { icon: 'fa-user-tie', title: 'Dedicated IT Staffing', desc: 'In-house engineers supporting daily operations, available at junior through to senior experience levels.' },
+
+          { icon: 'fa-user-clock', title: 'Backfill IT Staffing', desc: 'Temporary personnel covering absences, resignations, emergency needs, or short-term project surges.' },
+
+          { icon: 'fa-coins', title: 'Prepaid IT Staffing', desc: 'Cost-efficient model for organisations requiring minimal external support or scheduled maintenance work.' },
+
+          { icon: 'fa-file-contract', title: 'Agency Contract Staffing', desc: 'Customised hiring based on client specifications with committed competencies and defined deliverables.' },
+
+          { icon: 'fa-rotate', title: 'Shift & Offsite Standby', desc: 'Year-round staffing arrangements — on-site or remote — operating on rotating shift schedules.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'Cost-Effective Hiring', desc: 'Pool of IT staff with varied skill sets — more cost-effective than direct recruitment and employment.' },
+
+          { title: 'Immediate Availability', desc: 'Eliminates traditional recruitment delays with ready-to-deploy qualified personnel.' },
+
+          { title: 'Right Skill for the Job', desc: 'Precise skill-set matching ensures service quality requirements are always met.' },
+
+        ],
+
+      },
+
+      warranty: {
+
+        icon: '<i class="fa-solid fa-shield-halved"></i>',
+
+        title: 'Authorised Warranty Provider',
+
+        desc: 'HPE Solutions is an appointed Authorised Support Partner (ASP) handling hardware and software warranty obligations through our 18 nationwide service centres, offering both on-site and walk-in warranty services.',
+
+        img: 'https://images.pexels.com/photos/1476321/pexels-photo-1476321.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Warranty Services Covered',
+
+        features: [
+
+          { icon: 'fa-ticket', title: 'Fault Ticketing & Escalation', desc: 'Structured logging and escalation of warranty claims with full status visibility for manufacturers and end-customers.' },
+
+          { icon: 'fa-laptop-medical', title: 'Remote Troubleshooting', desc: 'Initial remote diagnostics to determine whether hardware replacement or software resolution is required.' },
+
+          { icon: 'fa-industry', title: 'Manufacturer Escalation', desc: 'Direct escalation to manufacturers for complex warranty claims requiring factory-level intervention.' },
+
+          { icon: 'fa-truck-fast', title: 'On-Site Engineer Dispatch', desc: 'Certified engineers deployed to customer premises for on-site warranty repair and replacement.' },
+
+          { icon: 'fa-microchip', title: 'Faulty Part Replacement', desc: 'Replacement of defective components using genuine manufacturer-approved spare parts.' },
+
+          { icon: 'fa-map-location-dot', title: 'Nationwide Walk-In Centres', desc: '18 service centres across Malaysia for convenient walk-in warranty claims and device drop-off.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'Cost Savings', desc: 'Leverages pooled resources at strategic locations — eliminating the cost of building your own warranty infrastructure.' },
+
+          { title: 'SLA Compliance', desc: 'Performance measured by Service Level Assurance ensures manufacturer commitments are fulfilled.' },
+
+          { title: 'Nationwide Reach', desc: 'ASP network coverage removes the need for manufacturers to invest in independent regional support.' },
+
+          { title: 'Inventory Management', desc: 'HPE maintains spare parts stock, reducing warehouse investment for manufacturers and partners.' },
+
+        ],
+
+      },
+
+      sourcing: {
+
+        icon: '<i class="fa-solid fa-lightbulb"></i>',
+
+        title: 'Total Solution & Sourcing',
+
+        desc: 'HPE provides Total IT Solution or IT Sourcing based on our system integration experience and partnerships with leading technology providers — delivering tested, cost-effective, integrated IT solutions for your business.',
+
+        img: 'https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Technology Solutions',
+
+        features: [
+
+          { icon: 'fa-network-wired', title: 'Network Solutions', desc: 'Router, switches, load balancers, WAN optimisers, and 3G/4G solutions provisioned and managed.' },
+
+          { icon: 'fa-globe', title: 'SD-WAN Solution', desc: 'Nationwide managed SD-WAN using Riverbed, Silverpeak, Fortinet, Sangfor, and Cisco technology.' },
+
+          { icon: 'fa-wifi', title: 'Wireless Solution', desc: 'Enterprise WiFi solutions for offices, factories, and datacentres including WiFi 6 and Mesh WiFi.' },
+
+          { icon: 'fa-server', title: 'Server & Desktop Sourcing', desc: 'HP, Dell, and Lenovo desktop, laptop, and server supply via direct purchase or tender processes.' },
+
+          { icon: 'fa-shield-halved', title: 'Security Solution', desc: 'Managed security services through Fortinet, Check Point, and Sangfor platforms.' },
+
+          { icon: 'fa-boxes-stacked', title: 'System Integration', desc: 'End-to-end IT solution integration combining hardware, software, and network into one cohesive infrastructure.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'Single Vendor Simplicity', desc: 'One partner for hardware, software, network, and security — reducing procurement complexity.' },
+
+          { title: 'Proven Technology Partners', desc: 'Solutions built on globally recognised platforms: Cisco, HP, Dell, Fortinet, Microsoft, and more.' },
+
+          { title: 'Cost-Effective Procurement', desc: 'Direct partner relationships deliver competitive pricing unavailable through retail channels.' },
+
+          { title: 'Integrated & Tested', desc: 'All solutions are tested for compatibility before deployment, reducing post-installation issues.' },
+
+        ],
+
+      },
+
+      vas: {
+
+        icon: '<i class="fa-solid fa-gears"></i>',
+
+        title: 'Value Added Service',
+
+        desc: 'We provide value-added services alongside IT management & support — including IMAC, ad-hoc installation, mini project implementation, and full office relocation services for seamless business continuity.',
+
+        img: 'https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=1200',
+
+        featuresTitle: 'Value Added Capabilities',
+
+        features: [
+
+          { icon: 'fa-brands fa-microsoft', title: 'Microsoft Environment', desc: 'Active Directory, MS Exchange, MSSQL, and HyperV implementation and support.' },
+
+          { icon: 'fa-database', title: 'Server & Storage', desc: '24/7 datacentre infrastructure support — Wintel servers, storage, backup tape, and VMware environments.' },
+
+          { icon: 'fa-shield-halved', title: 'Network & Security', desc: 'Multi-vendor support: Cisco, Juniper, Riverbed, Fortinet, Sangfor, and Peplink platforms.' },
+
+          { icon: 'fa-plug', title: 'Infrastructure Cabling', desc: 'Structured cabling solutions — Cat5e, Cat6a, Fibre — and wireless including WiFi 6 and Mesh WiFi.' },
+
+          { icon: 'fa-boxes-stacked', title: 'IMAC Services', desc: 'Installations, moves, adds, and configuration changes supplementing your existing IT agreements.' },
+
+          { icon: 'fa-truck-moving', title: 'Relocation Services', desc: 'Full office IT relocation management including dismantling, transport, reinstallation, and testing.' },
+
+        ],
+
+        benefits: [
+
+          { title: 'IMAC On-Demand', desc: 'Handles installations, moves, adds, and changes without disrupting your primary IT support contract.' },
+
+          { title: 'Timely Upgrades', desc: 'System, hardware, and software upgrades delivered as organisational needs evolve.' },
+
+          { title: 'Mini Project Execution', desc: 'Offline preparation and on-site execution model minimises disruption to your operations.' },
+
+          { title: 'Seamless Relocation', desc: 'Office moves handled with full IT continuity — minimal downtime, maximum control.' },
+
+        ],
+
+      },
+
+    };
+
+    var ORDER = Object.keys(SERVICES);
+
+    /* per-service breadcrumb category (short label) */
+    var SHORT = {
+      managed: 'Managed Services', project: 'Project Deployment', helpdesk: 'IT Helpdesk',
+      staffing: 'IT Staffing', warranty: 'Warranty', sourcing: 'Total Solution', vas: 'Value Added'
+    };
+
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function qp(name) { return new URLSearchParams(location.search).get(name); }
+
+    function renderDetail(key) {
+      var s = SERVICES[key];
+      var i = ORDER.indexOf(key);
+      var prev = i > 0 ? ORDER[i - 1] : null;
+      var next = i < ORDER.length - 1 ? ORDER[i + 1] : null;
+
+      var feats = s.features.map(function (f) {
+        return '<div class="feat-card reveal"><div class="fc-ico"><i class="fa-solid ' + f.icon + '"></i></div>' +
+          '<h4>' + esc(f.title) + '</h4><p>' + esc(f.desc) + '</p></div>';
+      }).join('');
+
+      var slaHtml = '';
+      if (s.sla && s.sla.length) {
+        var slas = s.sla.map(function (t) {
+          return '<div class="sla-card' + (t.highlight ? ' highlight' : '') + ' reveal">' +
+            '<div class="tier">' + esc(t.tier) + '</div><div class="val">' + esc(t.val) + '</div>' +
+            '<div class="desc">' + esc(t.desc) + '</div></div>';
+        }).join('');
+        slaHtml =
+          '<div class="sec"><div class="sec-title"><span class="st-ico"><i class="fa-solid fa-gauge-high"></i></span>' +
+          '<h2>Service Level Agreements</h2></div><div class="sla-grid">' + slas + '</div></div>';
+      }
+
+      var bens = s.benefits.map(function (b) {
+        return '<div class="ben-item"><i class="fa-solid fa-circle-check"></i><div><strong>' + esc(b.title) +
+          '</strong><span>' + esc(b.desc) + '</span></div></div>';
+      }).join('');
+
+      function pager(pk, dir) {
+        if (!pk) return '<span class="pager-cell empty" aria-hidden="true"></span>';
+        var ps = SERVICES[pk];
+        var kicker = dir === 'prev'
+          ? '<div class="pg-k"><i class="fa-solid fa-arrow-left"></i> Previous service</div>'
+          : '<div class="pg-k">Next service <i class="fa-solid fa-arrow-right"></i></div>';
+        return '<a class="' + dir + '" href="services.html?service=' + pk + '">' + kicker +
+          '<div class="pg-t">' + esc(ps.title) + '</div></a>';
+      }
+
+      document.getElementById('app').innerHTML =
+        '<section class="hero d-hero">' +
+          '<div class="hero-bg" style="background-image:url(' + s.img + ')"></div>' +
+          '<div class="wrap">' +
+            '<div class="crumb"><a href="hpe-enhanced-editing.html">Home</a><i class="fa-solid fa-chevron-right"></i>' +
+              '<a href="services.html">Services</a><i class="fa-solid fa-chevron-right"></i>' +
+              '<span class="here">' + esc(SHORT[key] || s.title) + '</span></div>' +
+            '<div class="d-tag">' + s.icon + ' Service</div>' +
+            '<h1 class="d-title">' + esc(s.title) + '</h1>' +
+            '<p class="d-lead">' + esc(s.desc) + '</p>' +
+            '<div class="hero-cta"><a class="btn-quote" href="hpe-enhanced-editing.html#contact"><i class="fa-solid fa-paper-plane"></i> Talk to our team</a></div>' +
+          '</div>' +
+        '</section>' +
+
+        '<section class="d-body"><div class="wrap">' +
+          '<div class="sec"><div class="sec-title"><span class="st-ico"><i class="fa-solid fa-list-check"></i></span>' +
+            '<h2>' + esc(s.featuresTitle) + '</h2></div><div class="feat-grid">' + feats + '</div></div>' +
+          slaHtml +
+          '<div class="sec"><div class="sec-title"><span class="st-ico"><i class="fa-solid fa-star"></i></span>' +
+            '<h2>Key Benefits</h2></div><div class="ben-list">' + bens + '</div></div>' +
+
+          '<div class="cta-band reveal">' +
+            '<div><div class="ct-eyebrow">Get started</div>' +
+              '<h3>Interested in ' + esc(s.title) + '?</h3>' +
+              '<p>Speak to our team about a tailored engagement. No commitment required, fast nationwide mobilisation.</p></div>' +
+            '<div class="ct-actions"><a class="btn-quote" href="hpe-enhanced-editing.html#contact"><i class="fa-solid fa-paper-plane"></i> Get a Quote</a></div>' +
+          '</div>' +
+
+          '<div class="pager">' + pager(prev, 'prev') + pager(next, 'next') + '</div>' +
+        '</div></section>';
+
+      document.title = s.title + ' — HPE Solutions';
+      var md = document.querySelector('meta[name="description"]');
+      if (md) md.setAttribute('content', s.desc);
+    }
+
+    function renderIndex() {
+      var cards = ORDER.map(function (key) {
+        var s = SERVICES[key];
+        return '<a class="svc-card reveal" href="services.html?service=' + key + '">' +
+          '<div class="svc-thumb" style="background-image:url(' + s.img + ')"><span class="ico">' + s.icon + '</span></div>' +
+          '<div class="svc-info"><h3>' + esc(s.title) + '</h3><p>' + esc(s.desc) + '</p>' +
+          '<span class="svc-more">View service <i class="fa-solid fa-arrow-right"></i></span></div></a>';
+      }).join('');
+
+      document.getElementById('app').innerHTML =
+        '<section class="hero i-hero">' +
+          '<div class="hero-bg" style="background-image:url(https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=1600)"></div>' +
+          '<div class="wrap">' +
+            '<div class="i-eyebrow">What we do</div>' +
+            '<h1 class="i-title">IT services,<br>delivered nationwide.</h1>' +
+            '<p class="i-sub">From SLA-backed managed support to large-scale deployments, helpdesk, staffing, warranty and total IT sourcing — one accountable partner across Malaysia.</p>' +
+            '<div class="i-stats">' +
+              '<div class="st"><div class="v">7</div><div class="l">Service lines</div></div>' +
+              '<div class="st"><div class="v">18</div><div class="l">Service centres</div></div>' +
+              '<div class="st"><div class="v">24×7</div><div class="l">SLA options</div></div>' +
+            '</div>' +
+          '</div>' +
+        '</section>' +
+        '<section class="i-body"><div class="wrap"><div class="svc-grid">' + cards + '</div></div></section>';
+
+      document.title = 'Services — HPE Solutions Sdn Bhd';
+    }
+
+    (function () {
+      var key = qp('service');
+      if (key && SERVICES[key]) renderDetail(key); else renderIndex();
+
+      document.getElementById('yr').textContent = new Date().getFullYear();
+      window.scrollTo(0, 0);
+
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('in'); }); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
+      els.forEach(function (el) { io.observe(el); });
+      setTimeout(function () { els.forEach(function (el) { el.classList.add('in'); }); }, 2600);
+    })();
+  </script>
+</body>
+
+</html>
