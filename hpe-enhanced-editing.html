@@ -1428,7 +1428,7 @@
 
       font-weight: 800;
 
-      color: var(--navy);
+      color: var(--orange);
 
       margin-bottom: 14px;
 
@@ -2998,7 +2998,7 @@
 
     .process .section-title {
 
-      color: white;
+      color: var(--orange);
 
     }
 
@@ -9021,25 +9021,26 @@
     /* -0.02em was set when these were 38px; at the display scale they need to
        close up further or the letters drift apart. Type tracks tighter as it
        gets bigger — same reason the hero sits at -0.03em. */
-    h2.section-title { font-weight: 600; color: var(--heading); letter-spacing: -0.032em; }
+    h2.section-title { font-weight: 600; color: var(--orange); letter-spacing: -0.032em; }
     /* 'pretty' (not 'balance') for body: keeps the measure even but only
        fixes the last-line widow, which is what long copy wants */
     p.section-sub { color: var(--muted); text-wrap: pretty; }
 
     /* Heading ink fix — every heading that used the overloaded navy token
        (which is now a *background*) is restored to light for dark surfaces. */
+    .author-name,
+    .svc-benefit-item strong,
+    .svc-modal-cta p { color: var(--heading); }
+
+    /* Card titles (incl. About-us detail headings) — brand orange per request */
     .about-point h4,
     .service-card-body h3,
     .why-point h4,
-    .cs-home-info h4,
-    .author-name,
     .contact-hours h4,
     .contact-form h3,
     .cs-detail-card h4,
     .svc-feature-card h4,
-    .svc-benefit-item strong,
-    .svc-modal-cta p,
-    .step h4 { color: var(--heading); }
+    .step h4 { color: var(--orange); }
 
     /* thin custom scrollbar to match the dark shell */
     ::-webkit-scrollbar { width: 11px; height: 11px; }
@@ -15701,6 +15702,13 @@
 
       function setActive(id) {
 
+        // Re-selecting the already-active branch is a no-op. Each card fires
+        // setActive twice per click (inline onclick + the list click listener);
+        // without this guard the second call strips and re-adds item-active on
+        // the same card, restarting its float animation on every click.
+
+        if (id && id === activeId) return;
+
         // Deactivate previous marker via setIcon (survives map re-render)
 
         if (activeId && markers[activeId]) {
@@ -15718,10 +15726,6 @@
             markers[activeId].bindTooltip(prevC.name, { permanent: false, direction: 'top', className: 'sc-tooltip' + (prevC.hq ? ' sc-tooltip-hq' : '') });
 
           }
-
-          var prevItem = document.querySelector('.center-list-item[data-id="' + activeId + '"]');
-
-          if (prevItem) prevItem.classList.remove('item-active');
 
         }
 
@@ -15757,6 +15761,22 @@
         var item = document.querySelector('.center-list-item[data-id="' + id + '"]');
 
         if (item) {
+
+          // Clear the active card only within this branch's own region block
+          // (Peninsular vs Sabah/Sarawak), so a selected — and animating —
+          // card in the *other* list keeps running instead of resetting.
+
+          var block = item.closest('.centers-region-block');
+
+          if (block) {
+
+            block.querySelectorAll('.center-list-item.item-active').forEach(function (other) {
+
+              if (other !== item) other.classList.remove('item-active');
+
+            });
+
+          }
 
           item.classList.add('item-active');
 
