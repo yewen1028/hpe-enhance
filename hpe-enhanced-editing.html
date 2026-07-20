@@ -9379,6 +9379,16 @@
         0 28px 60px -24px rgba(13, 27, 42, .40),
         0 0 0 1px rgba(244, 121, 32, .18);
     }
+    /* Unified orange click/press feedback for every service card. Placed after
+       the :hover rule so it wins the cascade (a press also matches :hover), and
+       the accent bar stays wiped-in while pressed. */
+    .service-card:active {
+      transform: scale(.98) translateY(-2px);
+      box-shadow:
+        0 0 0 2px var(--orange),
+        0 20px 44px -22px rgba(244, 121, 32, .55);
+    }
+    .service-card:active::before { transform: scaleX(1); }
 
     /* --- Case-study photo tiles get the same signature as the service cards:
        an orange top-accent bar that wipes in on hover, plus the orange ring.
@@ -9544,21 +9554,24 @@
     .has-dropdown .dropdown { min-width: 660px; }
     .dropdown-inner.mega {
       display: grid;
-      grid-template-columns: 1fr 210px;
+      grid-template-columns: 1fr;
       gap: 12px;
       padding: 14px;
-      width: 660px;
+      width: 460px;
       max-width: calc(100vw - 32px);
     }
     /* keep the original hover decorations (accent bar + sliding chevron) on the service
        items; strip them only on the featured panel */
     .mega .mega-feature::before, .mega .mega-feature::after { content: none !important; }
 
-    .mega .mega-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    /* minmax(0,1fr) pins the two tracks to exactly half the card so hover/press
+       states can never grow an item and re-flow the grid (no box jitter) */
+    .mega .mega-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; }
     .mega .mega-item {
       display: flex; align-items: center; gap: 12px;
       padding: 11px 12px; border-radius: 10px;
       opacity: 0; transform: translateY(9px);
+      transition: background .18s ease;
     }
     .mega .mega-item .mi-ico {
       width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
@@ -9569,7 +9582,12 @@
     .mega .mega-item .mi-tx { display: flex; flex-direction: column; line-height: 1.25; }
     .mega .mega-item .mi-tx strong { font-size: 13.5px; font-weight: 600; color: var(--heading); transition: color .18s ease; }
     .mega .mega-item .mi-tx em { font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
-    .mega .mega-item:hover { transform: translateY(0); padding-left: 18px; }
+    /* keep padding-left fixed at its base 12px (overrides the generic
+       `.dropdown a:hover` 20px nudge) so the item box never resizes; the hover
+       cue is an orange tint + the existing accent bar/chevron, and clicking
+       deepens the orange like the site's other :active feedback */
+    .mega .mega-item:hover { padding-left: 12px; background: rgba(244, 121, 32, .12); }
+    .mega .mega-item:active { background: rgba(244, 121, 32, .26); }
     .mega .mega-item:hover .mi-ico { background: var(--orange); color: #fff; transform: scale(1.08) rotate(-6deg); }
     .mega .mega-item:hover .mi-tx strong { color: var(--orange); }
 
@@ -9814,13 +9832,6 @@
               </a>
 
             </div>
-
-            <a href="case-study.html" class="mega-feature">
-              <span class="mf-eyebrow">Proof of work</span>
-              <span class="mf-title">14 client case studies</span>
-              <span class="mf-desc">Banking, telco, government &amp; more, across Malaysia.</span>
-              <span class="mf-cta">Explore case studies <i class="fa-solid fa-arrow-right"></i></span>
-            </a>
 
           </div>
 
