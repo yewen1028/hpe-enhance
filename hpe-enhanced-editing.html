@@ -9390,6 +9390,36 @@
     }
     .service-card:active::before { transform: scaleX(1); }
 
+    /* ── 2026 CRAFT PASS ──────────────────────────────────────────────────
+       Small, system-respecting refinements layered on last.
+       ─────────────────────────────────────────────────────────────────── */
+
+    /* Service cards: the grid stretches every card to a shared height, but the
+       copy inside is uneven, so each "Learn More" chip floated at a different
+       Y. Make the card a column and let the chip settle to the floor — the
+       row of chips now reads as one clean baseline. */
+    .service-card { display: flex; flex-direction: column; }
+    .service-card-body { flex: 1 1 auto; display: flex; flex-direction: column; }
+    .service-card-body p { margin-bottom: 20px; }
+    .service-link { margin-top: auto; align-self: flex-start; }
+
+    /* Film grain — a fixed, imperceptible tooth over the whole shell. Dark
+       enterprise UIs go plasticky when every surface is a flat fill; ~3% of
+       monochrome noise gives the panels a printed grain without reading as
+       texture. pointer-events:none so it never intercepts the map or FABs. */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      pointer-events: none;
+      opacity: .035;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+    @media (prefers-reduced-motion: reduce) { body::after { opacity: .028; } }
+
     /* --- Case-study photo tiles get the same signature as the service cards:
        an orange top-accent bar that wipes in on hover, plus the orange ring.
        Their ::before/::after are the photo + scrim, so the bar rides on a
@@ -11785,178 +11815,178 @@
         <!-- set 1 -->
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/amp.png" alt="AMP logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/aruba.png" alt="Aruba logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/avaya.png" alt="AVAYA logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cisco.png" alt="Cisco logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/cyberoam.png"
-              alt="Cyberoam logo" loading="lazy"
+              alt="Cyberoam logo" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/dintek.png" alt="DINTEK logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/fortinet.png"
-              alt="Fortinet logo" loading="lazy"
+              alt="Fortinet logo" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/hpe.png"
-              alt="HP Enterprise logo" loading="lazy"
+              alt="HP Enterprise logo" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/huawei.png" alt="Huawei logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/microsoft.png"
-              alt="Microsoft logo" loading="lazy"
+              alt="Microsoft logo" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/peplink.png" alt="Peplink logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/riverbed.png"
-              alt="Riverbed logo" loading="lazy"
+              alt="Riverbed logo" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/ruckus.png" alt="Ruckus logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sangfor.png" alt="SANGFOR logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/sophos.png" alt="Sophos logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span>
         </div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/tm.png" alt="TM logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
 
         <div class="partner-bubble"><span class="pb-logo"><img src="assets/partner-logos/veeam.png" alt="Veeam logo"
-              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
+              loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
 
         <!-- set 2 (duplicate for seamless loop) -->
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/amp.png" alt="" loading="lazy"
+              src="assets/partner-logos/amp.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-plug" style="display:none;"></i></span><span class="pb-name">AMP</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/aruba.png" alt="" loading="lazy"
+              src="assets/partner-logos/aruba.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Aruba</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/avaya.png" alt="" loading="lazy"
+              src="assets/partner-logos/avaya.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-phone-volume" style="display:none;"></i></span><span class="pb-name">AVAYA</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/cisco.png" alt="" loading="lazy"
+              src="assets/partner-logos/cisco.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-network-wired" style="display:none;"></i></span><span class="pb-name">Cisco</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/cyberoam.png" alt="" loading="lazy"
+              src="assets/partner-logos/cyberoam.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Cyberoam</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/dintek.png" alt="" loading="lazy"
+              src="assets/partner-logos/dintek.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-ethernet" style="display:none;"></i></span><span class="pb-name">DINTEK</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/fortinet.png" alt="" loading="lazy"
+              src="assets/partner-logos/fortinet.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Fortinet</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/hpe.png" alt="" loading="lazy"
+              src="assets/partner-logos/hpe.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-server" style="display:none;"></i></span><span class="pb-name">HP Enterprise</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/huawei.png" alt="" loading="lazy"
+              src="assets/partner-logos/huawei.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-tower-cell" style="display:none;"></i></span><span class="pb-name">Huawei</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/microsoft.png" alt="" loading="lazy"
+              src="assets/partner-logos/microsoft.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-brands fa-microsoft" style="display:none;"></i></span><span class="pb-name">Microsoft</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/peplink.png" alt="" loading="lazy"
+              src="assets/partner-logos/peplink.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-diagram-project" style="display:none;"></i></span><span class="pb-name">Peplink</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/riverbed.png" alt="" loading="lazy"
+              src="assets/partner-logos/riverbed.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-gauge-high" style="display:none;"></i></span><span class="pb-name">Riverbed</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/ruckus.png" alt="" loading="lazy"
+              src="assets/partner-logos/ruckus.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-wifi" style="display:none;"></i></span><span class="pb-name">Ruckus</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/sangfor.png" alt="" loading="lazy"
+              src="assets/partner-logos/sangfor.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-cloud" style="display:none;"></i></span><span class="pb-name">SANGFOR</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/sophos.png" alt="" loading="lazy"
+              src="assets/partner-logos/sophos.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-shield-halved" style="display:none;"></i></span><span class="pb-name">Sophos</span>
         </div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/tm.png" alt="" loading="lazy"
+              src="assets/partner-logos/tm.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-tower-broadcast" style="display:none;"></i></span><span class="pb-name">TM</span></div>
 
         <div class="partner-bubble pb-dup" aria-hidden="true"><span class="pb-logo"><img
-              src="assets/partner-logos/veeam.png" alt="" loading="lazy"
+              src="assets/partner-logos/veeam.png" alt="" loading="eager"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block';" /><i
               class="fa-solid fa-database" style="display:none;"></i></span><span class="pb-name">Veeam</span></div>
 
@@ -15108,25 +15138,65 @@
 
     ════════════════════════════════════════════ */
 
-    const sectObs = new IntersectionObserver(entries => {
+    /* Position-based scroll-spy. The old IntersectionObserver only ever *set*
+       an active link when a section entered a narrow band and never cleared it,
+       and with the sticky hero/keyfacts/about sections it stayed permanently
+       "intersecting" — so a jump to the top left the last section's link stuck.
+       This computes the active link from scroll position each frame using the
+       sticky-aware sectionFlowTop(), and handles the top and bottom edges
+       explicitly (no link above the first section; last link pinned at page end). */
+    (function () {
 
-      entries.forEach(e => {
+      const links = [...document.querySelectorAll('.nav-links > li > a[href^="#"]')]
+        .map(a => {
+          const el = document.getElementById(a.getAttribute('href').slice(1));
+          return el ? { a: a, el: el, top: 0 } : null;
+        })
+        .filter(Boolean);
 
-        if (e.isIntersecting) {
+      if (!links.length) return;
 
-          document.querySelectorAll('.nav-links > li > a').forEach(a => {
+      const navH = parseInt(getComputedStyle(document.documentElement)
+        .getPropertyValue('--nav-h')) || 76;
 
-            a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id);
+      function measure() {
+        links.forEach(l => { l.top = sectionFlowTop(l.el); });
+        links.sort((a, b) => a.top - b.top);
+      }
 
-          });
+      let ticking = false;
 
+      function update() {
+        ticking = false;
+        const y = window.scrollY;
+        const docH = document.documentElement.scrollHeight;
+        const atBottom = window.innerHeight + y >= docH - 2;
+        // reference line sits just below the fixed navbar
+        const ref = y + navH + 40;
+
+        let current = null;
+        if (atBottom) {
+          current = links[links.length - 1];      // pin last section at page end
+        } else {
+          for (const l of links) {
+            if (l.top - 4 <= ref) current = l; else break;
+          }
         }
 
-      });
+        links.forEach(l => l.a.classList.toggle('active', l === current));
+      }
 
-    }, { rootMargin: '-35% 0px -60% 0px' });
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
 
-    document.querySelectorAll('section[id]').forEach(s => sectObs.observe(s));
+      measure();
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => { measure(); update(); }, { passive: true });
+      window.addEventListener('load', () => { measure(); update(); });
+      // catch late layout shifts from lazy images / web-font swaps
+      [600, 1600, 3600].forEach(t => setTimeout(() => { measure(); update(); }, t));
+
+    })();
 
 
 
