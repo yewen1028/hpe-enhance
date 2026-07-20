@@ -357,26 +357,947 @@
     .pager a { background: var(--surface); border-color: var(--border); }
     .pg-t { color: var(--heading); }
     footer { background: #060a11; }
+  
+    /* ═══════════════════════════════════════════════════════════════
+       SHARED SITE NAV — ported verbatim from hpe-enhanced-editing.html so
+       the header/top navigation is identical to the main page. The main
+       page is dark-themed; these sub-pages are light-themed, so the dark
+       design tokens the nav relies on are re-scoped to the nav + mobile
+       menu only (via inheritance) — the rest of the page is untouched.
+       ═══════════════════════════════════════════════════════════════ */
+    nav, .mobile-menu, .dropdown {
+      --base:#070c14; --navy:#0a111d; --navy2:#0e1726; --light:#0d1626;
+      --surface:#111c2e; --surface-2:#16233a;
+      --text:#dbe3ee; --muted:#93a2b8; --heading:#f3f7fc;
+      --border:rgba(255,255,255,.09); --border-2:rgba(255,255,255,.16);
+      --orange:#ff7d1a; --orange-d:#e8670e; --orange-l:rgba(255,125,26,.13);
+      --shadow:0 22px 55px -18px rgba(0,0,0,.72); --radius:14px; --ring:0 0 0 3px rgba(255,125,26,.28);
+    }
+
+    /* --- base nav (from lines 182-782) --- */
+    nav {
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 200;
+
+      background: #f0f1f3;
+
+      border-bottom: 1px solid #dde0e6;
+
+      box-shadow: 0 2px 16px rgba(0, 0, 0, .06);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      padding: 0 5%;
+
+      height: var(--nav-h);
+
+      transition: background .3s, box-shadow .3s;
+
+    }
+
+
+
+    nav.scrolled {
+
+      background: #e8eaed;
+
+      box-shadow: 0 4px 28px rgba(0, 0, 0, .12);
+
+    }
+
+
+
+    .nav-logo img {
+
+      height: 52px;
+
+      width: auto;
+
+    }
+
+
+
+    .nav-links {
+
+      display: flex;
+
+      gap: 0;
+
+      list-style: none;
+
+      align-items: center;
+
+    }
+
+
+
+    .nav-links>li {
+
+      position: relative;
+
+    }
+
+
+
+    .nav-links>li>a {
+
+      text-decoration: none;
+
+      font-size: 14px;
+
+      font-weight: 500;
+
+      color: var(--text);
+
+      padding: 8px 15px;
+
+      border-radius: 6px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 5px;
+
+      transition: background .2s, color .2s;
+
+      position: relative;
+
+    }
+
+
+
+    .nav-links>li>a:hover {
+
+      background: rgba(0, 0, 0, .06);
+
+      color: var(--orange);
+
+    }
+
+
+
+    .nav-links>li>a.active {
+
+      color: var(--orange);
+
+      background: var(--orange-l);
+
+    }
+
+
+
+    /* Animated underline on active link */
+
+    .nav-links>li>a::after {
+
+      content: '';
+
+      position: absolute;
+
+      bottom: 2px;
+
+      left: 15px;
+
+      right: 15px;
+
+      height: 2px;
+
+      background: var(--orange);
+
+      border-radius: 2px;
+
+      transform: scaleX(0);
+
+      transform-origin: center;
+
+      transition: transform .25s ease;
+
+    }
+
+
+
+    .nav-links>li>a:hover::after,
+
+    .nav-links>li>a.active::after {
+
+      transform: scaleX(1);
+
+    }
+
+
+
+    /* Don't show underline on CTA button */
+
+    .nav-links>li>a.nav-cta::after {
+
+      display: none;
+
+    }
+
+
+
+    /* Chevron rotates on hover */
+
+    .nav-links>li>a i.chevron {
+
+      font-size: 10px;
+
+      opacity: .6;
+
+      transition: transform .25s, opacity .25s;
+
+    }
+
+
+
+    .has-dropdown.dd-open>a i.chevron {
+
+      transform: rotate(180deg);
+
+      opacity: 1;
+
+      color: var(--orange);
+
+    }
+
+
+
+    /* Dropdown — zero gap + animated */
+
+    .dropdown {
+
+      display: block;
+
+      visibility: hidden;
+
+      position: absolute;
+
+      top: 100%;
+
+      left: 0;
+
+      /* padding-top bridges the visual gap without leaving a hover dead-zone */
+
+      padding-top: 6px;
+
+      background: transparent;
+
+      z-index: 300;
+
+      opacity: 0;
+
+      transform: translateY(-6px);
+
+      transition: opacity .22s ease, transform .22s ease, visibility .22s;
+
+      pointer-events: none;
+
+      min-width: 268px;
+
+    }
+
+
+
+    /* The visible card sits inside a wrapper */
+
+    .dropdown-inner {
+
+      background: white;
+
+      border-radius: 12px;
+
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .14);
+
+      padding: 8px;
+
+      border: 1px solid var(--border);
+
+    }
+
+
+
+    .has-dropdown.dd-open .dropdown {
+
+      opacity: 1;
+
+      transform: translateY(0);
+
+      visibility: visible;
+
+      pointer-events: auto;
+
+    }
+
+
+
+    .dropdown a {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+
+      padding: 10px 14px;
+
+      border-radius: 8px;
+
+      font-size: 13.5px;
+
+      font-weight: 500;
+
+      color: var(--text);
+
+      text-decoration: none;
+
+      transition: background .15s, color .15s, transform .15s;
+
+    }
+
+
+
+    .dropdown a:hover {
+
+      background: var(--orange-l);
+
+      color: var(--orange);
+
+      transform: translateX(3px);
+
+    }
+
+
+
+    .dropdown a .di {
+
+      width: 30px;
+
+      height: 30px;
+
+      border-radius: 6px;
+
+      background: var(--orange-l);
+
+      color: var(--orange);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 13px;
+
+      flex-shrink: 0;
+
+      transition: background .15s;
+
+    }
+
+
+
+    .dropdown a:hover .di {
+
+      background: var(--orange);
+
+      color: white;
+
+    }
+
+
+
+    .nav-cta {
+
+      background: var(--orange);
+
+      color: white !important;
+
+      padding: 10px 22px !important;
+
+      border-radius: 6px !important;
+
+      font-weight: 600 !important;
+
+      margin-left: 8px;
+
+      transition: background .2s, transform .15s, box-shadow .2s !important;
+
+      box-shadow: 0 3px 10px rgba(244, 121, 32, .35);
+
+    }
+
+
+
+    .nav-cta:hover {
+
+      background: var(--orange-d) !important;
+
+      color: white !important;
+
+      transform: translateY(-2px) !important;
+
+      box-shadow: 0 6px 18px rgba(244, 121, 32, .45) !important;
+
+    }
+
+
+
+    .nav-cta:active {
+
+      transform: translateY(0) !important;
+
+    }
+
+
+
+    /* Hamburger */
+
+    .hamburger {
+
+      display: none;
+
+      flex-direction: column;
+
+      gap: 5px;
+
+      cursor: pointer;
+
+      background: none;
+
+      border: none;
+
+      padding: 4px;
+
+    }
+
+
+
+    .hamburger span {
+
+      width: 25px;
+
+      height: 2px;
+
+      background: var(--navy);
+
+      border-radius: 2px;
+
+      transition: .3s;
+
+      display: block;
+
+    }
+
+
+
+    .hamburger.open span:nth-child(1) {
+
+      transform: translateY(7px) rotate(45deg);
+
+    }
+
+
+
+    .hamburger.open span:nth-child(2) {
+
+      opacity: 0;
+
+    }
+
+
+
+    .hamburger.open span:nth-child(3) {
+
+      transform: translateY(-7px) rotate(-45deg);
+
+    }
+
+
+
+    /* Mobile Menu */
+
+    .mobile-menu {
+
+      display: none;
+
+      flex-direction: column;
+
+      position: fixed;
+
+      top: var(--nav-h);
+
+      left: 0;
+
+      right: 0;
+
+      background: white;
+
+      z-index: 150;
+
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .12);
+
+      padding: 12px 16px 24px;
+
+      max-height: calc(100vh - var(--nav-h));
+
+      overflow-y: auto;
+
+    }
+
+
+
+    .mobile-menu.open {
+
+      display: flex;
+
+    }
+
+
+
+    .mobile-menu a {
+
+      padding: 11px 14px;
+
+      font-size: 14.5px;
+
+      font-weight: 500;
+
+      color: var(--text);
+
+      text-decoration: none;
+
+      border-radius: 8px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      transition: background .2s, color .2s;
+
+    }
+
+
+
+    .mobile-menu a:hover {
+
+      background: var(--orange-l);
+
+      color: var(--orange);
+
+    }
+
+
+
+    .mobile-menu a i {
+
+      width: 18px;
+
+      text-align: center;
+
+      color: var(--orange);
+
+    }
+
+
+
+    .mobile-menu .m-sub {
+
+      padding-left: 28px;
+
+      font-size: 13.5px;
+
+      color: var(--muted);
+
+    }
+
+
+
+    .mobile-menu .m-section {
+
+      font-size: 10.5px;
+
+      font-weight: 700;
+
+      letter-spacing: 1.5px;
+
+      text-transform: uppercase;
+
+      color: var(--muted);
+
+      padding: 14px 14px 4px;
+
+    }
+
+
+
+    .mobile-menu .m-cta {
+
+      background: var(--orange);
+
+      color: white !important;
+
+      text-align: center;
+
+      justify-content: center;
+
+      margin-top: 10px;
+
+      border-radius: 8px;
+
+    }
+
+
+
+    .mobile-menu .m-cta i {
+
+      color: white;
+
+    }
+
+
+
+    .mob-divider {
+
+      height: 1px;
+
+      background: var(--border);
+
+      margin: 8px 0;
+
+    }
+
+    /* --- responsive: collapse to hamburger --- */
+    @media (max-width: 960px) { .nav-links { display:none !important; } .hamburger { display:flex; } }
+
+    /* --- dark nav overrides (from lines 9059-9095) --- */
+    nav {
+      background: rgba(9,15,25,.72);
+      -webkit-backdrop-filter: saturate(160%) blur(16px);
+      backdrop-filter: saturate(160%) blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(255,255,255,.02);
+    }
+    nav.scrolled {
+      background: rgba(7,12,20,.86);
+      box-shadow: 0 12px 40px -12px rgba(0,0,0,.7);
+    }
+    .nav-links > li > a { color: var(--text); }
+    .nav-links > li > a:hover { background: rgba(255,255,255,.06); color: var(--orange); }
+    .nav-links > li > a.active { color: var(--orange); background: var(--orange-l); }
+    .hamburger span { background: var(--text); }
+    .dropdown-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .dropdown a { color: var(--text); }
+    .mobile-menu {
+      background: rgba(9,15,25,.98);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .mobile-menu a { color: var(--text); }
+
+    /* nav CTA + primary buttons — soft glow, tactile press */
+    .nav-cta { box-shadow: 0 6px 20px -6px rgba(255,125,26,.6); }
+    .btn-orange {
+      box-shadow: 0 8px 24px -8px rgba(255,125,26,.55);
+      letter-spacing: .1px;
+    }
+    .btn-orange:active, .form-submit:active, .nav-cta:active { transform: translateY(0) scale(.985); }
+
+    /* --- dropdown / mega refinements (from lines 9451-9625) --- */
+    /* ═══ SERVICES NAV DROPDOWN — parallax reveal + richer item states ═══ */
+
+    /* Card reveal: a springier parallax drop with a touch of scale + depth. */
+    .dropdown {
+      transform: translateY(-16px) scale(.96);
+      transform-origin: top left;
+      transition: opacity .3s cubic-bezier(.22, 1, .36, 1),
+                  transform .44s cubic-bezier(.16, 1, .3, 1),
+                  visibility .44s;
+    }
+    .has-dropdown.dd-open .dropdown { transform: translateY(0) scale(1); }
+    .dropdown-inner {
+      box-shadow: 0 24px 60px -18px rgba(13, 27, 42, .5), 0 4px 14px -8px rgba(13, 27, 42, .3);
+    }
+
+    /* Items cascade in with a staggered parallax when the card opens. Hover
+       movement rides on an accent bar + chevron + padding nudge (not a
+       transform on the link) so it never fights the entrance animation. */
+    .dropdown a {
+      position: relative;
+      opacity: 0;
+      transform: translateY(9px);
+      transition: background .2s ease, color .2s ease, padding-left .25s cubic-bezier(.22, 1, .36, 1);
+    }
+    .has-dropdown.dd-open .dropdown a { animation: ddItemIn .5s cubic-bezier(.16, 1, .3, 1) both; }
+    .has-dropdown.dd-open .dropdown a:nth-child(1) { animation-delay: .04s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(2) { animation-delay: .09s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(3) { animation-delay: .14s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(4) { animation-delay: .19s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(5) { animation-delay: .24s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(6) { animation-delay: .29s; }
+    .has-dropdown.dd-open .dropdown a:nth-child(7) { animation-delay: .34s; }
+    @keyframes ddItemIn {
+      from { opacity: 0; transform: translateY(9px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* left accent bar wipes in on hover */
+    .dropdown a::before {
+      content: '';
+      position: absolute;
+      left: 4px; top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 3px;
+      background: var(--orange);
+      transform: scaleY(0);
+      transition: transform .28s cubic-bezier(.22, 1, .36, 1);
+    }
+    .dropdown a:hover::before { transform: scaleY(1); }
+
+    /* trailing chevron eases in from the left on hover */
+    .dropdown a::after {
+      content: '\f054';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      font-size: 10px;
+      margin-left: auto;
+      color: var(--orange);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity .25s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+    }
+    .dropdown a:hover::after { opacity: 1; transform: translateX(0); }
+
+    /* replace the old translateX hover with a padding nudge + icon pop */
+    .dropdown a:hover { transform: none; padding-left: 20px; }
+    .dropdown a .di { transition: background .18s ease, color .18s ease, transform .3s cubic-bezier(.22, 1, .36, 1); }
+    .dropdown a:hover .di { transform: scale(1.1) rotate(-6deg); }
+
+    /* ═══ CLICK TRANSITION — on-brand wipe before the service view opens ═══ */
+    #svcTransition {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      pointer-events: none;
+      transform: translateX(-100%);
+      background: linear-gradient(120deg, #0d1b2a 0%, #16283e 58%, #0d1b2a 100%);
+      will-change: transform;
+    }
+    #svcTransition::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; right: -3px;
+      width: 6px;
+      background: var(--orange);
+      box-shadow: 0 0 26px 5px rgba(244, 121, 32, .55);
+    }
+    #svcTransition.wipe-in  { animation: svcWipeIn .4s cubic-bezier(.7, 0, .25, 1) forwards; }
+    #svcTransition.wipe-out { animation: svcWipeOut .42s cubic-bezier(.7, 0, .25, 1) forwards; }
+    @keyframes svcWipeIn  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+    @keyframes svcWipeOut { from { transform: translateX(0); }    to { transform: translateX(100%); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .services > div, .about-shape, .about-shape-b { transform: none !important; }
+      .about-point:hover, .service-card:hover { transform: none; }
+      .cs-home-card:hover .cs-accent { transform: scaleX(1); }
+      .dropdown { transform: none !important; }
+      .dropdown a { opacity: 1 !important; transform: none !important; }
+      .has-dropdown.dd-open .dropdown a { animation: none !important; opacity: 1 !important; transform: none !important; }
+      #svcTransition { display: none !important; }
+    }
+
+    /* ═══ SERVICES MEGA-MENU — two-column service grid + featured case-study panel ═══ */
+    .has-dropdown .dropdown { min-width: 660px; }
+    .dropdown-inner.mega {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 14px;
+      width: 460px;
+      max-width: calc(100vw - 32px);
+    }
+    /* keep the original hover decorations (accent bar + sliding chevron) on the service
+       items; strip them only on the featured panel */
+    .mega .mega-feature::before, .mega .mega-feature::after { content: none !important; }
+
+    /* minmax(0,1fr) pins the two tracks to exactly half the card so hover/press
+       states can never grow an item and re-flow the grid (no box jitter) */
+    .mega .mega-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; }
+    .mega .mega-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 12px; border-radius: 10px;
+      opacity: 0; transform: translateY(9px);
+      transition: background .18s ease;
+    }
+    .mega .mega-item .mi-ico {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
+      display: grid; place-items: center;
+      background: var(--orange-l); color: var(--orange); font-size: 14px;
+      transition: background .18s ease, color .18s ease, transform .3s cubic-bezier(.22, 1, .36, 1);
+    }
+    .mega .mega-item .mi-tx { display: flex; flex-direction: column; line-height: 1.25; }
+    .mega .mega-item .mi-tx strong { font-size: 13.5px; font-weight: 600; color: var(--heading); transition: color .18s ease; }
+    .mega .mega-item .mi-tx em { font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    /* keep padding-left fixed at its base 12px (overrides the generic
+       `.dropdown a:hover` 20px nudge) so the item box never resizes; the hover
+       cue is an orange tint + the existing accent bar/chevron, and clicking
+       deepens the orange like the site's other :active feedback */
+    .mega .mega-item:hover { padding-left: 12px; background: rgba(244, 121, 32, .12); }
+    .mega .mega-item:active { background: rgba(244, 121, 32, .26); }
+    .mega .mega-item:hover .mi-ico { background: var(--orange); color: #fff; transform: scale(1.08) rotate(-6deg); }
+    .mega .mega-item:hover .mi-tx strong { color: var(--orange); }
+
+    /* Featured panel → real navigation to the case-study page */
+    .mega .mega-feature {
+      display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
+      padding: 18px 16px 16px; border-radius: 12px; overflow: hidden; position: relative;
+      color: #fff;
+      opacity: 0; transform: translateY(9px);
+      background:
+        linear-gradient(180deg, rgba(13, 27, 42, .48) 0%, rgba(13, 27, 42, .93) 100%),
+        url('https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=500');
+      background-size: cover; background-position: center;
+      transition: none;
+    }
+    .mega .mega-feature .mf-eyebrow { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #ffd0a8; }
+    .mega .mega-feature .mf-title { font-size: 17px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; color: #fff; }
+    .mega .mega-feature .mf-desc { font-size: 11.5px; color: rgba(255, 255, 255, .8); line-height: 1.4; }
+    .mega .mega-feature .mf-cta { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; font-size: 12.5px; font-weight: 700; color: #ffb27a; }
+    .mega .mega-feature .mf-cta i { transition: transform .2s cubic-bezier(.22, 1, .36, 1); }
+    .mega .mega-feature:hover { padding-left: 16px; }
+    .mega .mega-feature:hover .mf-cta i { transform: translateX(4px); }
+
+    /* Narrower desktop widths: collapse to a single column, feature becomes a banner row */
+    @media (max-width: 1120px) {
+      .has-dropdown .dropdown { min-width: 430px; }
+      .dropdown-inner.mega { grid-template-columns: 1fr; width: 430px; }
+      .mega .mega-feature { flex-direction: row; align-items: center; flex-wrap: wrap; padding: 14px 16px; }
+      .mega .mega-feature .mf-title { flex: 1 1 auto; }
+      .mega .mega-feature .mf-cta { margin-top: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mega .mega-item, .mega .mega-feature { opacity: 1 !important; transform: none !important; }
+    }
+
+  
+    /* Orange scroll-progress bar (shared with main page) — sits above the header */
+    #scroll-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--orange), #f9a34a);
+      z-index: 9999;
+      transition: width .1s linear;
+      box-shadow: 0 0 6px rgba(244, 121, 32, .6);
+    }
+
   </style>
 </head>
 
 <body>
 
-  <nav>
-    <div class="wrap">
-      <a class="nav-logo" href="hpe-enhanced-editing.html" aria-label="HPE Solutions — home">
-        <img src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" alt="HPE Solutions Sdn Bhd"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <span class="lg-fallback"><b>hpe</b> HPE Solutions</span>
-      </a>
-      <div class="nav-right">
-        <a class="nav-back" href="hpe-enhanced-editing.html"><i class="fa-solid fa-arrow-left"></i> <span>Back to
-            Home</span></a>
-        <a class="nav-cta" href="hpe-enhanced-editing.html#contact"><i class="fa-solid fa-paper-plane"></i> Contact
-          Us</a>
-      </div>
-    </div>
+  <!-- Scroll progress bar -->
+  <div id="scroll-bar"></div>
+
+  <!-- NAVBAR (shared with main page) -->
+  <nav id="navbar">
+    <a href="hpe-enhanced-editing.html" class="nav-logo">
+      <img src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" alt="HPE Solutions Sdn Bhd"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <span style="display:none; align-items:center; gap:8px; font-weight:800; font-size:17px; color:var(--orange);">
+        <span style="background:var(--orange);color:white;padding:4px 10px;border-radius:6px;font-size:14px;">hpe</span>
+        hpe solutions
+      </span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="hpe-enhanced-editing.html#about"><i class="fa-solid fa-circle-info fa-sm" style="color:var(--orange);margin-right:2px;"></i> About Us</a></li>
+      <li class="has-dropdown">
+        <a href="hpe-enhanced-editing.html#services">Services <i class="fa-solid fa-chevron-down chevron"></i></a>
+        <div class="dropdown">
+          <div class="dropdown-inner mega">
+            <div class="mega-grid">
+              <a href="services.html?service=managed" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-server"></i></span>
+                <span class="mi-tx"><strong>IT Support &amp; Managed Services</strong><em>SLA-backed on-site &amp; remote support</em></span>
+              </a>
+              <a href="services.html?service=project" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-diagram-project"></i></span>
+                <span class="mi-tx"><strong>Project Deployment</strong><em>Migrations, rollouts &amp; deployments</em></span>
+              </a>
+              <a href="services.html?service=helpdesk" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-headset"></i></span>
+                <span class="mi-tx"><strong>IT Helpdesk</strong><em>Managed call centres &amp; IVR</em></span>
+              </a>
+              <a href="services.html?service=staffing" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-users"></i></span>
+                <span class="mi-tx"><strong>IT Staffing</strong><em>Dedicated, backfill &amp; project engineers</em></span>
+              </a>
+              <a href="services.html?service=warranty" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-shield-halved"></i></span>
+                <span class="mi-tx"><strong>Authorised Warranty Provider</strong><em>On-site &amp; walk-in repair</em></span>
+              </a>
+              <a href="services.html?service=sourcing" class="mega-item">
+                <span class="mi-ico"><i class="fa-solid fa-lightbulb"></i></span>
+                <span class="mi-tx"><strong>Total Solution &amp; Sourcing</strong><em>Hardware, software &amp; network</em></span>
+              </a>
+              <a href="services.html?service=vas" class="mega-item mega-item-wide">
+                <span class="mi-ico"><i class="fa-solid fa-gears"></i></span>
+                <span class="mi-tx"><strong>Value Added Service</strong><em>Cabling, WiFi, UPS &amp; structured add-ons</em></span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li><a href="hpe-enhanced-editing.html#casestudy"><i class="fa-solid fa-file-lines fa-sm" style="color:var(--orange);margin-right:2px;"></i> Case Study</a></li>
+      <li><a href="hpe-enhanced-editing.html#centers"><i class="fa-solid fa-map-location-dot fa-sm" style="color:var(--orange);margin-right:2px;"></i> Service Centers</a></li>
+      <li><a href="hpe-enhanced-editing.html#bizpartners"><i class="fa-solid fa-handshake fa-sm" style="color:var(--orange);margin-right:2px;"></i> Business Partners</a></li>
+      <li><a href="hpe-enhanced-editing.html#contact" class="nav-cta"><i class="fa-solid fa-paper-plane"></i> Contact Us</a></li>
+    </ul>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- MOBILE MENU (shared with main page) -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="hpe-enhanced-editing.html#about" class="mob-link"><i class="fa-solid fa-circle-info"></i> About Us</a>
+    <div class="mob-divider"></div>
+    <div class="m-section">Services</div>
+    <a href="services.html?service=managed" class="mob-link m-sub"><i class="fa-solid fa-server"></i> IT Support &amp; Managed Services</a>
+    <a href="services.html?service=project" class="mob-link m-sub"><i class="fa-solid fa-diagram-project"></i> Project Deployment</a>
+    <a href="services.html?service=helpdesk" class="mob-link m-sub"><i class="fa-solid fa-headset"></i> IT Helpdesk</a>
+    <a href="services.html?service=staffing" class="mob-link m-sub"><i class="fa-solid fa-users"></i> IT Staffing</a>
+    <a href="services.html?service=warranty" class="mob-link m-sub"><i class="fa-solid fa-shield-halved"></i> Authorised Warranty Provider</a>
+    <a href="services.html?service=sourcing" class="mob-link m-sub"><i class="fa-solid fa-lightbulb"></i> Total Solution &amp; Sourcing</a>
+    <a href="services.html?service=vas" class="mob-link m-sub"><i class="fa-solid fa-gears"></i> Value Added Service</a>
+    <div class="mob-divider"></div>
+    <a href="hpe-enhanced-editing.html#casestudy" class="mob-link"><i class="fa-solid fa-file-lines"></i> Case Study</a>
+    <a href="hpe-enhanced-editing.html#centers" class="mob-link"><i class="fa-solid fa-map-location-dot"></i> Service Centers</a>
+    <a href="hpe-enhanced-editing.html#bizpartners" class="mob-link"><i class="fa-solid fa-handshake"></i> Business Partners</a>
+    <a href="hpe-enhanced-editing.html#contact" class="mob-link m-cta"><i class="fa-solid fa-paper-plane"></i> Contact Us</a>
+  </div>
+
 
   <main id="app"><!-- rendered by JS --></main>
 
@@ -585,6 +1506,61 @@
       setTimeout(function () { els.forEach(function (el) { el.classList.add('in'); }); }, 2600);
     })();
   </script>
+  <!-- Shared nav behaviour (scroll state, Services dropdown, mobile menu) -->
+  <script>
+    (function () {
+      var navbar = document.getElementById('navbar');
+      var scrollBar = document.getElementById('scroll-bar');
+      function updateScrollBar() {
+        if (!scrollBar) return;
+        var pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+        scrollBar.style.width = Math.min(pct, 100) + '%';
+      }
+      window.addEventListener('scroll', function () {
+        if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 10);
+        updateScrollBar();
+      }, { passive: true });
+      updateScrollBar();
+
+      // Services dropdown — hover on desktop, tap on touch, close on outside click
+      var ddParent = document.querySelector('.has-dropdown');
+      if (ddParent) {
+        var ddTimer = null;
+        var openDD = function () { clearTimeout(ddTimer); ddParent.classList.add('dd-open'); };
+        var closeDD = function () { ddTimer = setTimeout(function () { ddParent.classList.remove('dd-open'); }, 180); };
+        ddParent.addEventListener('mouseenter', openDD);
+        ddParent.addEventListener('mouseleave', closeDD);
+        var dd = ddParent.querySelector('.dropdown');
+        if (dd) { dd.addEventListener('mouseenter', openDD); dd.addEventListener('mouseleave', closeDD); }
+        var topLink = ddParent.querySelector(':scope > a');
+        if (topLink) {
+          topLink.addEventListener('click', function (e) {
+            if (window.matchMedia('(hover: none)').matches) { e.preventDefault(); ddParent.classList.toggle('dd-open'); }
+          });
+        }
+        document.addEventListener('click', function (e) {
+          if (!ddParent.contains(e.target)) ddParent.classList.remove('dd-open');
+        });
+      }
+
+      // Hamburger + mobile menu
+      var hamburger = document.getElementById('hamburger');
+      var mobileMenu = document.getElementById('mobileMenu');
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', function () {
+          hamburger.classList.toggle('open');
+          mobileMenu.classList.toggle('open');
+        });
+        mobileMenu.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
+          });
+        });
+      }
+    })();
+  </script>
+
 </body>
 
 </html>
