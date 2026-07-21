@@ -1737,9 +1737,45 @@
       }
     }
 
+    /* Aurora field — drifting diagonal light bands behind the splash content.
+       Ported from the Aceternity "Aurora Background" (21st.dev) and recolored to
+       the HPE navy/orange palette, kept low-opacity + blurred so the mark and
+       loader stay readable. */
+    .intro-aurora {
+      position: absolute;
+      inset: -40% -20%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(14px);
+      --aurora: repeating-linear-gradient(100deg,
+          #f47920 8%, #ff9d4d 14%, #ffbe85 20%, #f47920 26%, #d9631a 32%);
+      --stripes: repeating-linear-gradient(100deg,
+          transparent 0%, transparent 6%,
+          rgba(13, 27, 42, .55) 9%, rgba(13, 27, 42, .55) 11%,
+          transparent 15%);
+      background-image: var(--stripes), var(--aurora);
+      background-size: 300% 200%, 220% 180%;
+      background-position: 50% 50%, 50% 50%;
+      mix-blend-mode: screen;
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 72%);
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 72%);
+      animation: introAurora 55s linear infinite, introAuroraIn 1.4s ease .2s both;
+    }
+
+    @keyframes introAurora {
+      from { background-position: 50% 50%, 50% 50%; }
+      to { background-position: 350% 50%, 350% 50%; }
+    }
+
+    @keyframes introAuroraIn {
+      from { opacity: 0; }
+      to { opacity: .5; }
+    }
+
     /* mark focuses into existence: fade + rise + de-blur */
     .intro-logo {
       position: relative;
+      z-index: 2;
       opacity: 0;
       transform: translateY(14px) scale(.97);
       filter: blur(9px);
@@ -1787,6 +1823,12 @@
         animation: none;
       }
 
+      /* keep the aurora static (still visible) but stop the drift */
+      .intro-aurora {
+        animation: none;
+        opacity: .4;
+      }
+
       /* no blur/scale motion — just a quick fade to the mark */
       .intro-logo {
         filter: none;
@@ -1802,6 +1844,8 @@
 
     /* ── Splash SVG loader (ported from the loader-12 styled-components component) ── */
     .sev-loader {
+      position: relative;
+      z-index: 2;
       margin-top: 26px;
       opacity: 0;
       transform: translateY(10px);
@@ -9775,6 +9819,8 @@
   </noscript>
 
   <div id="introCurtain">
+
+    <div class="intro-aurora" aria-hidden="true"></div>
 
     <div class="intro-glow"></div>
 
