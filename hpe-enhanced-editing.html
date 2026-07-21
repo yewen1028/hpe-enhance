@@ -1832,6 +1832,23 @@
       filter: blur(0);
     }
 
+    /* Stack the animation icon and the logo in one centred grid cell so they
+       cross-fade in place: the icon plays first and, as it fades out, the HPE
+       logo fades in over the exact same spot — no vertical jump between them. */
+    .intro-mark {
+      position: relative;
+      z-index: 2;
+      display: grid;
+    }
+
+    .intro-mark > .intro-logo,
+    .intro-mark > .sev-loader {
+      grid-area: 1 / 1;
+      justify-self: center;
+      align-self: center;
+      margin: 0;
+    }
+
     /* text fallback if the logo image fails */
     .intro-fallback {
       display: none;
@@ -1886,7 +1903,7 @@
       transition: opacity .7s ease .2s, transform .7s ease .2s;
     }
 
-    .intro-logo.show + .sev-loader {
+    .sev-loader.show {
       opacity: 1;
       transform: translateY(0);
     }
@@ -10080,13 +10097,15 @@
 
     <div class="intro-glow"></div>
 
+    <div class="intro-mark">
+
     <div class="intro-logo" id="introLogo">
       <img src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" alt="HPE Solutions Sdn Bhd"
         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
       <span class="intro-fallback"><span>hpe</span>solutions</span>
     </div>
 
-    <div class="sev-loader" aria-hidden="true">
+    <div class="sev-loader" id="introLoader" aria-hidden="true">
       <div class="container_SevMini">
         <div class="SevMini">
           <svg width="74" height="90" viewBox="0 0 74 90" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -10146,6 +10165,9 @@
       </div>
     </div>
 
+    </div>
+    <!-- /intro-mark -->
+
   </div>
 
   <script>
@@ -10154,13 +10176,24 @@
 
       var logo = document.getElementById('introLogo');
 
+      var loader = document.getElementById('introLoader');
+
       var curtain = document.getElementById('introCurtain');
 
       if (!curtain) return;
 
       document.body.style.overflow = 'hidden';
 
-      setTimeout(function () { logo.classList.add('show'); }, 160);
+      // Flow: animation icon → HPE logo → main page.
+      // 1) the animation icon fades in and plays on its own,
+      // 2) it then fades out as the HPE logo fades in over the same spot,
+      // 3) once the logo has settled the curtain lifts into the main page.
+
+      if (loader) setTimeout(function () { loader.classList.add('show'); }, 200);
+
+      if (loader) setTimeout(function () { loader.classList.remove('show'); }, 1600);
+
+      setTimeout(function () { logo.classList.add('show'); }, 1850);
 
       setTimeout(function () {
 
@@ -10176,9 +10209,9 @@
 
         if (hr) setTimeout(function () { hr.classList.add('reveal'); }, 150);
 
-      }, 2700);
+      }, 3500);
 
-      setTimeout(function () { curtain.remove(); }, 2750);
+      setTimeout(function () { curtain.remove(); }, 3550);
 
       // Safety net: guarantee the hero is visible even if something above fails
 
@@ -10192,7 +10225,7 @@
 
         if (hr) hr.classList.add('reveal');
 
-      }, 3500);
+      }, 4300);
 
     })();
 
