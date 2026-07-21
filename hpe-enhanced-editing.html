@@ -1400,7 +1400,7 @@
 
     section {
 
-      padding: 104px 5%;
+      padding: 132px 6%;
 
     }
 
@@ -1464,7 +1464,7 @@
 
       color: var(--orange);
 
-      margin-bottom: 14px;
+      margin-bottom: 18px;
 
       /* display leading — 1.2 is body leading and opened visible gaps between
          the lines of a two-line heading */
@@ -1510,7 +1510,7 @@
 
       max-width: 580px;
 
-      margin-bottom: 48px;
+      margin-bottom: 64px;
 
     }
 
@@ -2503,7 +2503,7 @@
 
       grid-template-columns: repeat(4, 1fr);
 
-      gap: 28px;
+      gap: 32px;
 
     }
 
@@ -2974,7 +2974,7 @@
 
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 
-      gap: 18px;
+      gap: 24px;
 
     }
 
@@ -3442,15 +3442,69 @@
 
       letter-spacing: 1.4px;
 
-      color: var(--heading, var(--navy));
+      color: #fff;
 
       display: flex;
 
       align-items: center;
 
+      justify-content: center;
+
+      text-align: center;
+
       gap: 10px;
 
-      margin-bottom: 16px;
+      margin-bottom: 0;
+
+      padding: 14px 18px;
+
+      border: 1px solid var(--navy);
+
+      border-radius: 10px;
+
+      background: var(--navy);
+
+      cursor: pointer;
+
+      user-select: none;
+
+      transition: background .2s ease, border-color .2s ease;
+
+    }
+
+    .cs-home-cat-label:hover,
+
+    .cs-home-cat-label:focus-visible {
+
+      border-color: var(--orange);
+
+      background: var(--navy2);
+
+      outline: none;
+
+    }
+
+    .cs-home-category.open > .cs-home-cat-label {
+
+      border-color: var(--orange);
+
+      background: var(--navy2);
+
+    }
+
+    .cs-cat-chevron {
+
+      font-size: 12px;
+
+      color: rgba(255, 255, 255, .7);
+
+      transition: transform .3s ease;
+
+    }
+
+    .cs-home-category.open .cs-cat-chevron {
+
+      transform: rotate(180deg);
 
     }
 
@@ -3472,13 +3526,34 @@
 
     .cs-home-cat-label::after {
 
-      content: '';
+      content: none;
 
-      flex: 1;
+    }
 
-      height: 1px;
+    /* Categories are collapsed dropdowns; the grid reveals when its category
+       carries .open (toggled by toggleCsCat). Two-class specificity beats the
+       base .cs-home-grid{display:grid} rule, and the .open rule follows it. */
+    .cs-home-category > .cs-home-grid {
 
-      background: var(--border);
+      display: none;
+
+      margin-top: 16px;
+
+    }
+
+    .cs-home-category.open > .cs-home-grid {
+
+      display: grid;
+
+      animation: csCatReveal .35s ease both;
+
+    }
+
+    @keyframes csCatReveal {
+
+      from { opacity: 0; }
+
+      to { opacity: 1; }
 
     }
 
@@ -3734,6 +3809,60 @@
     .centers {
 
       background: #f2f3f5;
+
+    }
+
+
+
+    /* The two service-centre maps sit side by side on one row. Each takes an
+       equal share; they stack vertically below 900px. */
+    .centers-maps-row {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 24px;
+
+      align-items: flex-start;
+
+      max-width: 1180px;
+
+      margin: 0 auto 30px;
+
+    }
+
+    .centers-maps-row > .netmap-wrap,
+
+    .centers-maps-row > .centers-map-wrap {
+
+      flex: 1 1 340px;
+
+      min-width: 0;
+
+      max-width: none;
+
+      margin: 0;
+
+    }
+
+    @media (max-width: 900px) {
+
+      .centers-maps-row {
+
+        flex-direction: column;
+
+      }
+
+      .centers-maps-row > .netmap-wrap,
+
+      .centers-maps-row > .centers-map-wrap {
+
+        width: 100%;
+
+        flex-basis: auto;
+
+      }
 
     }
 
@@ -9076,7 +9205,7 @@
 
       section {
 
-        padding: 56px 5%;
+        padding: 76px 6%;
 
       }
 
@@ -9924,6 +10053,11 @@
         opacity: 1 !important;
         transform: none !important;
       }
+
+      /* case-study categories are JS dropdowns; show all cards with no JS */
+      .cs-home-category > .cs-home-grid {
+        display: grid !important;
+      }
     </style>
   </noscript>
 
@@ -10241,13 +10375,13 @@
 
         <i class="fa-solid fa-circle-check"></i>
 
-        Malaysia's Trusted IT Partner Since 2011
+        IT Support &amp; Managed Services Since 2011
 
       </div>
 
-      <h1>Enterprise IT Support <span>Delivered Nationwide</span></h1>
+      <h1>IT Support Across <span>All of Malaysia</span></h1>
 
-      <p>Managed services, deployment, helpdesk, and staffing — keeping you running 24/7.</p>
+      <p>Managed services, hardware deployment, helpdesk, and on-site engineers — with 24/7 response from 18 service centres.</p>
 
       <div class="hero-btns">
 
@@ -10584,9 +10718,9 @@
 
         <div class="section-tag">About HPE Solutions</div>
 
-        <h2 class="section-title">Malaysia's Established IT Support Service Provider</h2>
+        <h2 class="section-title">Who We Are</h2>
 
-        <p class="section-sub">Malaysia's leading IT support company since 2011, with a nationwide service network.</p>
+        <p class="section-sub">An IT support and managed-services company operating since 2011, with 18 service centres across Malaysia.</p>
 
         <div class="about-points">
 
@@ -10664,9 +10798,9 @@
 
       <div class="section-tag" style="justify-content:center;">What We Offer</div>
 
-      <h2 class="section-title">Comprehensive IT Services</h2>
+      <h2 class="section-title">What We Do</h2>
 
-      <p class="section-sub" style="margin: 0 auto;">IT solutions for corporate and SME clients.</p>
+      <p class="section-sub" style="margin: 0 auto;">IT support and services for corporate and SME clients.</p>
 
     </div>
 
@@ -10873,9 +11007,9 @@
 
         <div class="section-tag">Why Choose HPE</div>
 
-        <h2 class="section-title">A Partner You Can Rely On</h2>
+        <h2 class="section-title">Why Companies Stay With Us</h2>
 
-        <p class="section-sub">National reach, local expertise.</p>
+        <p class="section-sub">Engineers on the ground in every region, backed by contracted response times.</p>
 
         <div class="why-points">
 
@@ -10987,9 +11121,9 @@
 
     <div class="section-tag">Industries Served</div>
 
-    <h2 class="section-title">Trusted Across Sectors</h2>
+    <h2 class="section-title">Industries We Support</h2>
 
-    <p class="section-sub">Trusted across many industries.</p>
+    <p class="section-sub">Clients in banking, retail, telecommunications, government, and manufacturing.</p>
 
     <div class="industries-grid px-drift" data-parallax="0.18">
 
@@ -11143,16 +11277,9 @@
 
       <div class="section-tag" style="justify-content:center;">Case Study</div>
 
-      <h2 class="section-title">Real Results for Real Businesses</h2>
+      <h2 class="section-title">Client Projects</h2>
 
-      <p class="section-sub" style="margin:0 auto 20px;">14 real client outcomes. Click any project for details.</p>
-
-      <a class="btn-orange" href="case-study.html"
-        style="display:inline-flex;align-items:center;gap:8px;font-size:14px;">
-
-        <i class="fa-solid fa-folder-open"></i> View All Case Studies
-
-      </a>
+      <p class="section-sub" style="margin:0 auto;">14 completed engagements across banking, retail, telco, and government. Click any project for details.</p>
 
     </div>
 
@@ -11162,7 +11289,7 @@
 
     <div class="cs-home-category">
 
-      <div class="cs-home-cat-label"><i class="fa-solid fa-server"></i> IT Management &amp; Support</div>
+      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i class="fa-solid fa-server"></i> IT Management &amp; Support<i class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
 
       <!-- 5 cards: the trailing pair widens to span 3 so the row closes -->
       <div class="cs-home-grid cs-grid-5 px-drift" data-parallax="0.16">
@@ -11288,7 +11415,7 @@
 
     <div class="cs-home-category">
 
-      <div class="cs-home-cat-label"><i class="fa-solid fa-diagram-project"></i> Project Deployment</div>
+      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i class="fa-solid fa-diagram-project"></i> Project Deployment<i class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
 
       <div class="cs-home-grid px-drift" data-parallax="0.16">
 
@@ -11367,7 +11494,7 @@
 
     <div class="cs-home-category">
 
-      <div class="cs-home-cat-label"><i class="fa-solid fa-headset"></i> IT Helpdesk &amp; Warranty</div>
+      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i class="fa-solid fa-headset"></i> IT Helpdesk &amp; Warranty<i class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
 
       <div class="cs-home-grid px-drift" data-parallax="0.16">
 
@@ -11451,7 +11578,7 @@
 
     <div class="cs-home-category">
 
-      <div class="cs-home-cat-label"><i class="fa-solid fa-users"></i> IT Staffing &amp; Total Solutions</div>
+      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i class="fa-solid fa-users"></i> IT Staffing &amp; Total Solutions<i class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
 
       <div class="cs-home-grid px-drift" data-parallax="0.16">
 
@@ -11530,6 +11657,25 @@
 
   </section>
 
+  <script>
+    // Case-study categories behave as collapsible dropdowns: click (or
+    // Enter/Space) a category label to reveal/hide its cards.
+    function toggleCsCat(el) {
+      var cat = el.closest('.cs-home-category');
+      if (!cat) return;
+      var open = cat.classList.toggle('open');
+      el.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    document.querySelectorAll('.cs-home-cat-label').forEach(function (el) {
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          toggleCsCat(el);
+        }
+      });
+    });
+  </script>
+
 
 
   <!-- SERVICE CENTERS -->
@@ -11559,20 +11705,16 @@
 
 
 
+    <!-- The two maps sit side by side (network dot-map | Leaflet geo-map),
+         stacking on narrow screens. -->
+    <div class="centers-maps-row">
+
     <!-- NETWORK MAP — vanilla clone of the "WorldMap" dotted-map React component.
          Dot field rasterised from Natural Earth Malaysia geometry; all animated
          arcs originate at the Puchong HQ and land on every branch. Self-contained
          (no build step) — markup below, points/arcs generated by the script. -->
 
     <div class="netmap-wrap" data-parallax="0.10">
-
-      <div class="netmap-head">
-
-        <p class="netmap-title">One Network, Nationwide</p>
-
-        <p class="netmap-sub">Dispatched from <b>Puchong HQ</b> to 17 branches.</p>
-
-      </div>
 
       <div class="netmap" id="netmap">
 
@@ -11858,6 +12000,9 @@
         style="width:100%;height:340px;border-radius:12px;overflow:hidden;position:relative;z-index:1;"></div>
 
     </div>
+
+    </div>
+    <!-- /centers-maps-row -->
 
 
 
