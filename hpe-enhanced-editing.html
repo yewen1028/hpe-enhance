@@ -16335,21 +16335,16 @@
 
         if (item) {
 
-          // Clear the active card only within this branch's own region block
-          // (Peninsular vs Sabah/Sarawak), so a selected — and animating —
-          // card in the *other* list keeps running instead of resetting.
+          // Only ever one selected card in the whole list. Clear the active
+          // highlight from every other list item — across BOTH region blocks
+          // (Peninsular and Sabah/Sarawak) — so switching to a location in the
+          // other region doesn't leave the previous selection still highlighted.
 
-          var block = item.closest('.centers-region-block');
+          document.querySelectorAll('.center-list-item.item-active').forEach(function (other) {
 
-          if (block) {
+            if (other !== item) other.classList.remove('item-active');
 
-            block.querySelectorAll('.center-list-item.item-active').forEach(function (other) {
-
-              if (other !== item) other.classList.remove('item-active');
-
-            });
-
-          }
+          });
 
           item.classList.add('item-active');
 
