@@ -107,6 +107,28 @@
     .btn-quote:hover { background: var(--orange-d); transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(244, 121, 32, .9); }
     .btn-quote:active { transform: translateY(0); }
 
+    /* Shiny hover sweep on orange-filled buttons (matches the main page).
+       Uses ::before because .nav-cta's ::after is already taken (underline). */
+    .nav-cta, .btn-quote, .btn-orange, .form-submit, .mobile-menu .m-cta {
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-cta::before, .btn-quote::before, .btn-orange::before, .form-submit::before, .mobile-menu .m-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 55%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .35), transparent);
+      transform: skewX(-18deg);
+      pointer-events: none;
+    }
+    .nav-cta:hover::before, .btn-quote:hover::before, .btn-orange:hover::before, .form-submit:hover::before, .mobile-menu .m-cta:hover::before {
+      left: 130%;
+      transition: left .7s ease;
+    }
+
     /* BODY */
     .d-body { padding: clamp(46px, 6vw, 76px) 0 20px; }
     .sec { margin-bottom: clamp(38px, 5vw, 56px); }
@@ -189,13 +211,30 @@
     .svc-card:hover .svc-more i { transform: translateX(4px); }
 
     /* FOOTER */
-    footer { background: #060a11; color: rgba(255, 255, 255, .7); padding: 40px 0; }
-    footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
-    footer .f-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #fff; }
-    footer .f-brand b { background: var(--orange); color: #fff; padding: 4px 9px; border-radius: 6px; font-size: 13px; }
-    footer .f-links { display: flex; flex-wrap: wrap; gap: 22px; font-size: 14px; font-weight: 600; }
-    footer .f-links a:hover { color: var(--orange); }
-    footer .f-copy { width: 100%; font-size: 12.5px; color: rgba(255, 255, 255, .4); border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 18px; }
+    /* ─── FOOTER — replicated from hpe-enhanced-editing.html so it is identical
+       across the main page and the sub-pages. #0a111d matches the main page's
+       dark-theme --navy (its base #0d1b2a is overridden there). ─── */
+    footer { background: #0a111d; color: rgba(255, 255, 255, .7); padding: 60px 5% 28px; }
+    .footer-grid { display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-logo { height: 44px; width: auto; margin-bottom: 16px; opacity: .95; }
+    .footer-brand p { font-size: 13.5px; line-height: 1.7; margin-bottom: 20px; }
+    .footer-contact-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; margin-bottom: 10px; }
+    .footer-contact-item i { color: var(--orange); margin-top: 2px; flex-shrink: 0; width: 14px; }
+    .footer-contact-item a { color: rgba(255, 255, 255, .7); text-decoration: none; }
+    .footer-contact-item a:hover { color: white; }
+    .footer-heading { font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { text-decoration: none; color: rgba(255, 255, 255, .6); font-size: 13.5px; transition: color .2s; display: flex; align-items: center; gap: 6px; }
+    .footer-links a:hover { color: var(--orange); }
+    .footer-links a i { font-size: 10px; color: var(--orange); }
+    .footer-social { display: flex; gap: 10px; margin-top: 20px; }
+    .social-btn { width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, .65); font-size: 15px; text-decoration: none; transition: background .2s, color .2s, border-color .2s; }
+    .social-btn:hover { background: var(--orange); color: white; border-color: var(--orange); }
+    .footer-bottom { border-top: 1px solid rgba(255, 255, 255, .09); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12.5px; }
+    .footer-bottom a { color: rgba(255, 255, 255, .5); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--orange); }
+    @media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr; } }
 
     /* REVEAL */
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16, 1, .3, 1), transform .7s cubic-bezier(.16, 1, .3, 1); }
@@ -1071,6 +1110,81 @@
       box-shadow: 0 0 6px rgba(244, 121, 32, .6);
     }
 
+    /* ═══ "Contact Us" CTA (base from 21st.dev, recoloured to the navy/orange
+       theme). Navy body with an orange paper-plane box sitting next to the label;
+       on hover the box expands to flood the button (behind the label). ═══ */
+    .am-cta {
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 140px !important;
+      height: 42px !important;
+      padding: 0 !important;
+      margin-left: 8px;
+      overflow: hidden !important;
+      border: 1px solid rgba(255, 255, 255, .12) !important;
+      border-radius: 11px !important;
+      background: linear-gradient(180deg, #17293f 0%, #0d1b2a 100%) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 6px 16px -6px rgba(0, 0, 0, .55) !important;
+      transition: transform .15s ease, box-shadow .25s ease, border-color .25s ease !important;
+    }
+    .am-cta:hover {
+      background: linear-gradient(180deg, #1b2f49 0%, #0d1b2a 100%) !important;
+      transform: translateY(-2px) !important;
+      border-color: rgba(244, 121, 32, .6) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 12px 26px -8px rgba(244, 121, 32, .5) !important;
+    }
+    .am-cta:active { transform: translateY(0) scale(.98) !important; }
+    .am-cta::before, .am-cta::after { content: none !important; display: none !important; }
+
+    .am-label {
+      position: absolute;
+      top: 0; bottom: 0; right: 16px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: #fff !important;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .am-plane-box {
+      position: absolute;
+      top: 5px; bottom: 5px; left: 6px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 34px;
+      overflow: hidden;
+      border-radius: 7px;
+      padding-left: 10px;
+      background: linear-gradient(180deg, var(--orange) 0%, var(--orange-d) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -2px 4px rgba(0, 0, 0, .14), 0 2px 5px rgba(244, 121, 32, .3);
+      transition: width .3s cubic-bezier(.65, 0, .35, 1);
+    }
+    .am-cta:hover .am-plane-box { width: calc(100% - 12px); }
+
+    .am-plane {
+      color: #0d1b2a;
+      font-size: 13px;
+      flex-shrink: 0;
+      animation: am-float 1.8s ease-in-out infinite;
+    }
+    @keyframes am-float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(1.5px, -1.5px) rotate(-8deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .am-plane { animation: none; }
+      .am-cta:hover { transform: none !important; }
+      .am-cta:active { transform: none !important; }
+    }
+
   </style>
 </head>
 
@@ -1132,7 +1246,7 @@
       <li><a href="hpe-enhanced-editing.html#casestudy"><i class="fa-solid fa-file-lines fa-sm" style="color:var(--orange);margin-right:2px;"></i> Case Study</a></li>
       <li><a href="hpe-enhanced-editing.html#centers"><i class="fa-solid fa-map-location-dot fa-sm" style="color:var(--orange);margin-right:2px;"></i> Service Centers</a></li>
       <li><a href="hpe-enhanced-editing.html#bizpartners"><i class="fa-solid fa-handshake fa-sm" style="color:var(--orange);margin-right:2px;"></i> Business Partners</a></li>
-      <li><a href="hpe-enhanced-editing.html#contact" class="nav-cta"><i class="fa-solid fa-paper-plane"></i> Contact Us</a></li>
+      <li><a href="hpe-enhanced-editing.html#contact" class="nav-cta am-cta"><span class="am-plane-box" aria-hidden="true"><i class="am-plane fa-solid fa-paper-plane"></i></span><span class="am-label">Contact Us</span></a></li>
     </ul>
 
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
@@ -1163,15 +1277,71 @@
   <main id="app"><!-- rendered by JS --></main>
 
   <footer>
-    <div class="wrap">
-      <a class="f-brand" href="hpe-enhanced-editing.html"><b>hpe</b> HPE Solutions Sdn Bhd</a>
-      <div class="f-links">
-        <a href="services.html">Services</a>
-        <a href="case-study.html">Case Studies</a>
-        <a href="hpe-enhanced-editing.html#centers">Service Centers</a>
-        <a href="hpe-enhanced-editing.html#contact">Contact</a>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img class="footer-logo" src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png"
+          alt="HPE Solutions Sdn Bhd"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+        <span style="display:none; align-items:center; gap:8px; font-weight:800; font-size:18px; color:white; margin-bottom:16px;">
+          <span style="background:var(--orange);color:white;padding:4px 10px;border-radius:6px;font-size:15px;">hpe</span>
+          HPE Solutions Sdn Bhd</span>
+        <p>Malaysia's IT support provider since 2011, with a nationwide service network.</p>
+        <div class="footer-contact-item"><i class="fa-solid fa-location-dot"></i><span>Block C 3-2, Setia Walk, Pusat Bandar Puchong, 47160 Puchong, Selangor, Malaysia.</span></div>
+        <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span><a href="tel:+60358889817">+60.3.5888.9817</a></span></div>
+        <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span><a href="mailto:sales@hpe.com.my">sales@hpe.com.my</a></span></div>
+        <div class="footer-social">
+          <a class="social-btn" href="#" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a class="social-btn" href="#" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a class="social-btn" href="#" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a class="social-btn" href="mailto:sales@hpe.com.my" title="Email"><i class="fa-solid fa-envelope"></i></a>
+        </div>
       </div>
-      <div class="f-copy">© <span id="yr"></span> HPE Solutions Sdn Bhd. Nationwide IT support &amp; managed services across Malaysia.</div>
+      <div>
+        <div class="footer-heading">Services</div>
+        <ul class="footer-links">
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> IT Managed Services</a></li>
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> Project Deployment</a></li>
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> IT Helpdesk</a></li>
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> IT Staffing</a></li>
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> Warranty Provider</a></li>
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> Total Sourcing</a></li>
+          <li><a href="hpe-enhanced-editing.html#services"><i class="fa-solid fa-chevron-right"></i> Value Added Service</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Company</div>
+        <ul class="footer-links">
+          <li><a href="hpe-enhanced-editing.html#about"><i class="fa-solid fa-chevron-right"></i> About Us</a></li>
+          <li><a href="hpe-enhanced-editing.html#casestudy"><i class="fa-solid fa-chevron-right"></i> Case Studies</a></li>
+          <li><a href="hpe-enhanced-editing.html#centers"><i class="fa-solid fa-chevron-right"></i> Service Centers</a></li>
+          <li><a href="hpe-enhanced-editing.html#bizpartners"><i class="fa-solid fa-chevron-right"></i> Business Partners</a></li>
+          <li><a href="hpe-enhanced-editing.html#contact"><i class="fa-solid fa-chevron-right"></i> Careers</a></li>
+          <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Contact</div>
+        <ul class="footer-links">
+          <li><a href="mailto:sales@hpe.com.my"><i class="fa-solid fa-chevron-right"></i> Sales &amp; Marketing</a></li>
+          <li><a href="mailto:support@hpe.com.my"><i class="fa-solid fa-chevron-right"></i> Technical Support</a></li>
+          <li><a href="mailto:hr@hpe.com.my"><i class="fa-solid fa-chevron-right"></i> HR / Vacancy</a></li>
+        </ul>
+        <div style="margin-top:24px;">
+          <div class="footer-heading">Support Hours</div>
+          <p style="font-size:13px;line-height:2;color:rgba(255,255,255,.6);">
+            <i class="fa-regular fa-clock" style="color:var(--orange);margin-right:4px;"></i>Mon–Fri: 9am – 6pm<br>
+            <i class="fa-regular fa-clock" style="color:var(--orange);margin-right:4px;"></i>Sat: 9am – 1pm<br>
+            <i class="fa-solid fa-circle-exclamation" style="color:var(--orange);margin-right:4px;"></i>Emergency: 24/7
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2011–2026 HPE Solutions (M) Sdn Bhd — All Rights Reserved</span>
+      <div style="display:flex;gap:20px;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+      </div>
     </div>
   </footer>
 
@@ -1608,7 +1778,7 @@
       var key = qp('service');
       if (key && SERVICES[key]) renderDetail(key); else renderIndex();
 
-      document.getElementById('yr').textContent = new Date().getFullYear();
+      var yrEl = document.getElementById('yr'); if (yrEl) yrEl.textContent = new Date().getFullYear();
       window.scrollTo(0, 0);
 
       var els = document.querySelectorAll('.reveal');
