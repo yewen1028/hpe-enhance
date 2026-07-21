@@ -3846,6 +3846,19 @@
 
     }
 
+    /* Match the left network map's box to the right Leaflet map (fixed 340px
+       tall) so the two sit as equal, balanced panels. The SVG uses
+       preserveAspectRatio="meet", so overriding the aspect-ratio just letterboxes
+       cleanly within the taller box rather than distorting the dot field. */
+
+    .centers-maps-row > .netmap-wrap .netmap {
+
+      aspect-ratio: auto;
+
+      height: 340px;
+
+    }
+
     @media (max-width: 900px) {
 
       .centers-maps-row {
