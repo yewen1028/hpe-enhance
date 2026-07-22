@@ -4035,10 +4035,9 @@
     }
     /* sliding liquid-glass thumb (the liquid-radio pill) */
     .map-switch-thumb {
-      position: absolute; z-index: 0; top: 5px; left: 5px; bottom: 5px;
-      width: calc(50% - 5px); border-radius: 999px;
-      background: rgba(255, 255, 255, .07);
-      box-shadow:
+      /* the liquid-radio glass, held in a var so the orange hover/press states
+         can layer their glow on top without re-listing every inset */
+      --thumb-glass:
         0 0 8px rgba(0, 0, 0, .03),
         0 2px 6px rgba(0, 0, 0, .08),
         inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
@@ -4048,7 +4047,14 @@
         inset 0 0 6px 6px rgba(255, 255, 255, .12),
         inset 0 0 2px 2px rgba(255, 255, 255, .06),
         0 0 12px rgba(0, 0, 0, .15);
-      transition: transform .5s cubic-bezier(.16, 1, .3, 1);
+      position: absolute; z-index: 0; top: 5px; left: 5px; bottom: 5px;
+      width: calc(50% - 5px); border-radius: 999px;
+      /* the selected map's thumb stays HPE orange (blended into the glass) */
+      background:
+        linear-gradient(180deg, rgba(255, 125, 26, .32), rgba(255, 125, 26, .19)),
+        rgba(255, 255, 255, .05);
+      box-shadow: var(--thumb-glass), 0 0 18px rgba(255, 125, 26, .34);
+      transition: transform .5s cubic-bezier(.16, 1, .3, 1), background .3s ease, box-shadow .3s ease;
     }
     .map-switch-thumb::before {
       content: ''; position: absolute; inset: 0; border-radius: inherit;
@@ -4057,6 +4063,28 @@
       mix-blend-mode: screen; opacity: .7;
     }
     .map-switch[data-map="geo"] .map-switch-thumb { transform: translateX(100%); }
+    /* Point the mouse at the liquid glass → it glows a half-transparent orange
+       (HPE brand). Layered over the existing glass so the material shows through. */
+    .map-switch:hover .map-switch-thumb {
+      background:
+        linear-gradient(180deg, rgba(255, 125, 26, .44), rgba(255, 125, 26, .28)),
+        rgba(255, 255, 255, .05);
+      box-shadow:
+        var(--thumb-glass),
+        0 0 28px rgba(255, 125, 26, .55),
+        inset 0 0 22px rgba(255, 125, 26, .22);
+    }
+    /* Click / press the liquid glass → it blends into a deeper orange. */
+    .map-switch:active .map-switch-thumb {
+      background:
+        linear-gradient(180deg, rgba(255, 125, 26, .58), rgba(255, 125, 26, .4)),
+        rgba(255, 255, 255, .04);
+      box-shadow:
+        var(--thumb-glass),
+        0 0 38px rgba(255, 125, 26, .72),
+        inset 0 0 32px rgba(255, 125, 26, .36);
+    }
+    .map-switch:active .map-switch-thumb::before { opacity: .95; }
     .map-switch-opt {
       position: relative; z-index: 1;
       display: inline-flex; align-items: center; justify-content: center; gap: 9px;
@@ -4068,8 +4096,8 @@
     }
     .map-switch-opt i { font-size: 13px; color: var(--orange); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
     .map-switch-opt.is-active { color: var(--heading); }
-    .map-switch-opt.is-active i { transform: scale(1.12) rotate(-4deg); }
-    .map-switch-opt:hover:not(.is-active) { color: rgba(255, 255, 255, .82); }
+    .map-switch-opt.is-active i { transform: scale(1.12) rotate(-4deg); color: #fff; }
+    .map-switch-opt:hover:not(.is-active) { color: #ffbe8f; }
     .map-switch-opt:focus-visible { outline: 2px solid rgba(255, 125, 26, .6); outline-offset: 3px; }
     @media (prefers-reduced-motion: reduce) {
       .map-switch-thumb, .map-switch-opt i { transition: none; }
@@ -4079,23 +4107,61 @@
       .map-switch-thumb::before { display: none; }
     }
 
-    /* Single centered map stage — one map at a time, chosen by #mapSwitch. */
-    #centersMapsRow { display: block; max-width: 900px; margin: 0 auto 30px; }
+    /* Single centered map stage — one map at a time, chosen by #mapSwitch.
+       Swapping is a transition: the current map fades + drifts away, the next
+       fades + drifts in, and a burst of orange glass "bubbles" rises over the
+       stage (JS spawns them on each switch). */
+    #centersMapsRow { position: relative; isolation: isolate; display: block; max-width: 900px; margin: 0 auto 30px; }
     #centersMapsRow > .netmap-wrap,
     #centersMapsRow > .centers-map-wrap {
       width: 100%; max-width: 900px; margin: 0 auto; flex: none;
     }
     #centersMapsRow[data-map="network"] > .centers-map-wrap { display: none; }
     #centersMapsRow[data-map="geo"] > .netmap-wrap { display: none; }
-    #centersMapsRow[data-map="geo"] > .centers-map-wrap {
-      animation: mapSwapIn .5s cubic-bezier(.16, 1, .3, 1);
+    /* incoming map fades + drifts in (only after an actual swap, via .did-swap,
+       so the first-load netmap reveal is left untouched) */
+    #centersMapsRow.did-swap[data-map="network"] > .netmap-wrap,
+    #centersMapsRow.did-swap[data-map="geo"] > .centers-map-wrap {
+      animation: mapSwapIn .6s cubic-bezier(.16, 1, .3, 1);
     }
     @keyframes mapSwapIn {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(22px) scale(.984); }
       to { opacity: 1; transform: none; }
     }
+    /* outgoing (still-active) map fades + drifts away during the swap */
+    #centersMapsRow.is-swapping[data-map="network"] > .netmap-wrap,
+    #centersMapsRow.is-swapping[data-map="geo"] > .centers-map-wrap {
+      opacity: 0;
+      transform: translateY(-16px) scale(.984);
+      transition: opacity .42s ease, transform .42s cubic-bezier(.5, 0, .75, 0);
+    }
+    /* ── transition bubbles: orange glass circles that pop + rise over the map
+         as it swaps. ── */
+    .map-bubbles {
+      position: absolute; inset: 0; z-index: 6; pointer-events: none;
+      overflow: hidden; border-radius: 18px;
+    }
+    .map-bubble {
+      position: absolute; border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0); opacity: 0;
+      background: radial-gradient(circle at 34% 30%, rgba(255, 195, 145, .62), rgba(255, 125, 26, .3) 55%, rgba(255, 125, 26, 0) 72%);
+      border: 1px solid rgba(255, 195, 145, .45);
+      box-shadow: 0 0 18px rgba(255, 125, 26, .3);
+      -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+      animation: mapBubble .95s cubic-bezier(.22, 1, .36, 1) forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes mapBubble {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      28% { opacity: .95; }
+      100% { transform: translate(-50%, calc(-50% - 34px)) scale(1.18); opacity: 0; }
+    }
     @media (prefers-reduced-motion: reduce) {
-      #centersMapsRow[data-map="geo"] > .centers-map-wrap { animation: none; }
+      #centersMapsRow.did-swap[data-map="network"] > .netmap-wrap,
+      #centersMapsRow.did-swap[data-map="geo"] > .centers-map-wrap { animation: none; }
+      #centersMapsRow.is-swapping[data-map="network"] > .netmap-wrap,
+      #centersMapsRow.is-swapping[data-map="geo"] > .centers-map-wrap { transition: none; opacity: 1; transform: none; }
+      .map-bubble { display: none; }
     }
 
     /* ─── NETWORK MAP (ported dotted-map "WorldMap" component, Malaysia dot field).
@@ -12355,22 +12421,64 @@
       var row = document.getElementById('centersMapsRow');
       if (!sw || !row) return;
       var opts = Array.prototype.slice.call(sw.querySelectorAll('.map-switch-opt'));
-      function select(target) {
-        if (sw.getAttribute('data-map') === target) return;
-        sw.setAttribute('data-map', target);
-        row.setAttribute('data-map', target);
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var swapping = false;
+
+      function updateOpts(target) {
         opts.forEach(function (o) {
           var on = o.getAttribute('data-target') === target;
           o.classList.toggle('is-active', on);
           o.setAttribute('aria-checked', on ? 'true' : 'false');
           o.tabIndex = on ? 0 : -1;
         });
-        // Leaflet renders blank while its container is display:none — re-measure
-        // once it is shown (and again after the swap-in animation settles).
-        if (target === 'geo' && window._centersMap) {
-          requestAnimationFrame(function () { window._centersMap.invalidateSize(); });
-          setTimeout(function () { window._centersMap.invalidateSize(); }, 540);
+      }
+      // Leaflet renders blank while its container is display:none — re-measure
+      // once it is shown (and again after the swap-in animation settles).
+      function sizeGeo() {
+        if (!window._centersMap) return;
+        requestAnimationFrame(function () { window._centersMap.invalidateSize(); });
+        setTimeout(function () { window._centersMap.invalidateSize(); }, 660);
+      }
+      // burst of glass bubbles that pop + rise over the map during the swap
+      function spawnBubbles() {
+        var layer = row.querySelector('.map-bubbles');
+        if (!layer) {
+          layer = document.createElement('div');
+          layer.className = 'map-bubbles';
+          layer.setAttribute('aria-hidden', 'true');
+          row.appendChild(layer);
         }
+        layer.innerHTML = '';
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < 16; i++) {
+          var b = document.createElement('span');
+          b.className = 'map-bubble';
+          var s = 18 + Math.random() * 74;
+          b.style.width = b.style.height = s.toFixed(0) + 'px';
+          b.style.left = (6 + Math.random() * 88).toFixed(1) + '%';
+          b.style.top = (14 + Math.random() * 72).toFixed(1) + '%';
+          b.style.animationDelay = (Math.random() * 0.3).toFixed(2) + 's';
+          frag.appendChild(b);
+        }
+        layer.appendChild(frag);
+        setTimeout(function () { if (layer) layer.innerHTML = ''; }, 1350);
+      }
+
+      function select(target) {
+        if (swapping || row.getAttribute('data-map') === target) return;
+        sw.setAttribute('data-map', target);   // slide the glass thumb immediately
+        updateOpts(target);
+        if (reduce) { row.setAttribute('data-map', target); if (target === 'geo') sizeGeo(); return; }
+        swapping = true;
+        spawnBubbles();
+        row.classList.add('is-swapping');       // fade + drift the current map away
+        setTimeout(function () {
+          row.setAttribute('data-map', target); // display-swap to the chosen map
+          row.classList.remove('is-swapping');
+          row.classList.add('did-swap');        // fade + drift the new map in
+          if (target === 'geo') sizeGeo();
+          setTimeout(function () { row.classList.remove('did-swap'); swapping = false; }, 680);
+        }, 430);
       }
       opts.forEach(function (o, i) {
         o.addEventListener('click', function () { select(o.getAttribute('data-target')); });
@@ -17642,7 +17750,7 @@
 
       });
 
-      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .step, .kf-item, .why-metric, .why-point, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
+      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .kf-item, .why-metric, .why-point, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
 
       document.querySelectorAll(CARD_SEL).forEach(function (card) {
 
