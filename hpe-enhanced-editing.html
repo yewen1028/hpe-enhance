@@ -4013,6 +4013,91 @@
 
 
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       SERVICE-CENTERS MAP SWITCH — visitor chooses which map to view; the left
+       "Network Map" shows by default, the "Interactive Map" (Leaflet) is the
+       other option. Both render centered, one at a time. The control is a
+       liquid-glass segmented toggle (originui "liquid-radio" look, reusing the
+       #radio-glass SVG filter). data-parallax gives it a subtle scroll drift. */
+    .map-switch-wrap {
+      display: flex; justify-content: center; margin: 0 auto 34px;
+      transform: translate3d(0, var(--py, 0px), 0);
+    }
+    .map-switch {
+      position: relative; isolation: isolate;
+      display: grid; grid-template-columns: 1fr 1fr; align-items: stretch;
+      padding: 5px; border-radius: 999px;
+      background: rgba(255, 255, 255, .045);
+      border: 1px solid rgba(255, 255, 255, .1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 20px 44px -26px rgba(0, 0, 0, .95);
+      -webkit-backdrop-filter: blur(9px) saturate(150%);
+      backdrop-filter: blur(9px) saturate(150%);
+    }
+    /* sliding liquid-glass thumb (the liquid-radio pill) */
+    .map-switch-thumb {
+      position: absolute; z-index: 0; top: 5px; left: 5px; bottom: 5px;
+      width: calc(50% - 5px); border-radius: 999px;
+      background: rgba(255, 255, 255, .07);
+      box-shadow:
+        0 0 8px rgba(0, 0, 0, .03),
+        0 2px 6px rgba(0, 0, 0, .08),
+        inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
+        inset -3px -3px .5px -3.5px rgba(255, 255, 255, .85),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .6),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .6),
+        inset 0 0 6px 6px rgba(255, 255, 255, .12),
+        inset 0 0 2px 2px rgba(255, 255, 255, .06),
+        0 0 12px rgba(0, 0, 0, .15);
+      transition: transform .5s cubic-bezier(.16, 1, .3, 1);
+    }
+    .map-switch-thumb::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      background: radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, .25), transparent 60%);
+      filter: url("#radio-glass");
+      mix-blend-mode: screen; opacity: .7;
+    }
+    .map-switch[data-map="geo"] .map-switch-thumb { transform: translateX(100%); }
+    .map-switch-opt {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      padding: 11px 24px; border: 0; background: transparent; cursor: pointer;
+      font: inherit; font-size: 13.5px; font-weight: 600; letter-spacing: .01em;
+      color: var(--muted); white-space: nowrap; border-radius: 999px;
+      transition: color .3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .map-switch-opt i { font-size: 13px; color: var(--orange); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+    .map-switch-opt.is-active { color: var(--heading); }
+    .map-switch-opt.is-active i { transform: scale(1.12) rotate(-4deg); }
+    .map-switch-opt:hover:not(.is-active) { color: rgba(255, 255, 255, .82); }
+    .map-switch-opt:focus-visible { outline: 2px solid rgba(255, 125, 26, .6); outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) {
+      .map-switch-thumb, .map-switch-opt i { transition: none; }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .map-switch { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(20, 32, 51, .92); }
+      .map-switch-thumb::before { display: none; }
+    }
+
+    /* Single centered map stage — one map at a time, chosen by #mapSwitch. */
+    #centersMapsRow { display: block; max-width: 900px; margin: 0 auto 30px; }
+    #centersMapsRow > .netmap-wrap,
+    #centersMapsRow > .centers-map-wrap {
+      width: 100%; max-width: 900px; margin: 0 auto; flex: none;
+    }
+    #centersMapsRow[data-map="network"] > .centers-map-wrap { display: none; }
+    #centersMapsRow[data-map="geo"] > .netmap-wrap { display: none; }
+    #centersMapsRow[data-map="geo"] > .centers-map-wrap {
+      animation: mapSwapIn .5s cubic-bezier(.16, 1, .3, 1);
+    }
+    @keyframes mapSwapIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #centersMapsRow[data-map="geo"] > .centers-map-wrap { animation: none; }
+    }
+
     /* ─── NETWORK MAP (ported dotted-map "WorldMap" component, Malaysia dot field).
        Animated arcs all originate at the Puchong HQ and land on each branch. ─── */
 
@@ -12261,6 +12346,44 @@
         }
       });
     });
+
+    /* ── Service-centers map switch: choose which map to view. The left network
+       map is the default; the Leaflet geo-map is the other option. Deferred to
+       DOM-ready because this script is parsed before the centers markup. ── */
+    function initMapSwitch() {
+      var sw = document.getElementById('mapSwitch');
+      var row = document.getElementById('centersMapsRow');
+      if (!sw || !row) return;
+      var opts = Array.prototype.slice.call(sw.querySelectorAll('.map-switch-opt'));
+      function select(target) {
+        if (sw.getAttribute('data-map') === target) return;
+        sw.setAttribute('data-map', target);
+        row.setAttribute('data-map', target);
+        opts.forEach(function (o) {
+          var on = o.getAttribute('data-target') === target;
+          o.classList.toggle('is-active', on);
+          o.setAttribute('aria-checked', on ? 'true' : 'false');
+          o.tabIndex = on ? 0 : -1;
+        });
+        // Leaflet renders blank while its container is display:none — re-measure
+        // once it is shown (and again after the swap-in animation settles).
+        if (target === 'geo' && window._centersMap) {
+          requestAnimationFrame(function () { window._centersMap.invalidateSize(); });
+          setTimeout(function () { window._centersMap.invalidateSize(); }, 540);
+        }
+      }
+      opts.forEach(function (o, i) {
+        o.addEventListener('click', function () { select(o.getAttribute('data-target')); });
+        o.addEventListener('keydown', function (e) {
+          var n = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = opts[(i + 1) % opts.length];
+          else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = opts[(i - 1 + opts.length) % opts.length];
+          if (n) { e.preventDefault(); n.focus(); n.click(); }
+        });
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMapSwitch);
+    else initMapSwitch();
   </script>
 
 
@@ -12292,9 +12415,25 @@
 
 
 
-    <!-- The two maps sit side by side (network dot-map | Leaflet geo-map),
-         stacking on narrow screens. -->
-    <div class="centers-maps-row">
+    <!-- Map switch: the visitor chooses which map to view. The left "Network
+         Map" shows by default; "Interactive Map" (Leaflet) is the other option.
+         Liquid-glass segmented control (originui "liquid-radio" look, reusing
+         the #radio-glass filter); data-parallax gives it a subtle drift. -->
+    <div class="map-switch-wrap" data-parallax="0.05">
+      <div class="map-switch" role="radiogroup" aria-label="Choose which map to view" id="mapSwitch" data-map="network">
+        <span class="map-switch-thumb" aria-hidden="true"></span>
+        <button type="button" class="map-switch-opt is-active" role="radio" aria-checked="true" data-target="network" tabindex="0">
+          <i class="fa-solid fa-diagram-project"></i><span>Network Map</span>
+        </button>
+        <button type="button" class="map-switch-opt" role="radio" aria-checked="false" data-target="geo" tabindex="-1">
+          <i class="fa-solid fa-map-location-dot"></i><span>Interactive Map</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- One map shows at a time (centered), chosen by #mapSwitch. Default: the
+         network dot-map on the left; the other option is the Leaflet geo-map. -->
+    <div class="centers-maps-row" id="centersMapsRow" data-map="network">
 
     <!-- NETWORK MAP — vanilla clone of the "WorldMap" dotted-map React component.
          Dot field rasterised from Natural Earth Malaysia geometry; all animated
@@ -16776,6 +16915,11 @@
         minZoom: 4, maxZoom: 12
 
       });
+
+
+
+      // Expose for the map-switch toggle (calls invalidateSize when shown).
+      window._centersMap = map;
 
 
 
