@@ -9842,6 +9842,156 @@
         0 0 0 1px rgba(244, 121, 32, .35);
     }
 
+    /* ═══════════════════════════════════════════════════════════════════
+       CASE-STUDY "BREATHE" ENHANCEMENT LAYER (front-end taste pass)
+       Deeper section backdrop, roomier grid, premium glassy category pills,
+       and larger image cards with a spring corner-CTA chip on hover. This
+       layer is authored last so it re-skins the rules above by source order.
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* section backdrop: soft dual orange glow + a faint masked dot field */
+    .casestudy {
+      position: relative;
+      isolation: isolate;
+      background:
+        radial-gradient(115% 75% at 50% -8%, rgba(255, 125, 26, .10), transparent 52%),
+        radial-gradient(80% 55% at 50% 118%, rgba(255, 125, 26, .06), transparent 60%),
+        var(--light) !important;
+    }
+    .casestudy::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px);
+      background-size: 26px 26px;
+      -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 30%, transparent 78%);
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 30%, transparent 78%);
+    }
+
+    /* more air between stacked categories and before each revealed grid */
+    .cs-home-category { margin-bottom: 22px; }
+    .cs-home-category > .cs-home-grid { gap: 24px; margin-top: 24px; }
+
+    /* premium glassy category pill */
+    .cs-home-cat-label {
+      font-size: 12.5px;
+      letter-spacing: 1.8px;
+      color: var(--heading);
+      gap: 12px;
+      padding: 19px 26px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(20, 32, 51, 0), rgba(20, 32, 51, .55)),
+        var(--navy2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 12px 34px -24px rgba(0, 0, 0, .9);
+      transition:
+        border-color .35s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .35s ease, background .35s ease,
+        transform .35s cubic-bezier(.22, 1, .36, 1);
+    }
+    .cs-home-cat-label i:first-child {
+      font-size: 14px;
+      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .cs-home-cat-label:hover,
+    .cs-home-cat-label:focus-visible {
+      border-color: rgba(255, 125, 26, .55);
+      background:
+        linear-gradient(180deg, rgba(255, 125, 26, .05), rgba(20, 32, 51, .6)),
+        var(--surface-2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 16px 40px -22px rgba(255, 125, 26, .4);
+      transform: translateY(-2px);
+    }
+    .cs-home-cat-label:hover i:first-child { transform: scale(1.12) rotate(-6deg); }
+    .cs-home-category.open > .cs-home-cat-label {
+      border-color: rgba(255, 125, 26, .6);
+      background:
+        linear-gradient(180deg, rgba(255, 125, 26, .06), rgba(20, 32, 51, .6)),
+        var(--surface-2);
+    }
+    .cs-home-cat-label .cs-cat-chevron { color: rgba(255, 255, 255, .55); }
+
+    /* roomier, softer image cards with an inner top highlight */
+    .cs-home-card {
+      min-height: 270px;
+      padding: 26px;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), var(--shadow);
+    }
+    .cs-home-card:hover {
+      transform: translateY(-10px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .09),
+        0 34px 64px -20px rgba(0, 0, 0, .88),
+        0 0 0 1px rgba(255, 125, 26, .4);
+    }
+    .cs-home-card::before { filter: saturate(.86) brightness(.72) contrast(1.05); }
+    .cs-home-card:hover::before { filter: saturate(.98) brightness(.92) contrast(1.03); }
+    .cs-home-card::after {
+      background: linear-gradient(to top, rgba(6,10,18,.96) 0%, rgba(6,10,18,.82) 40%, rgba(6,10,18,.4) 78%, rgba(6,10,18,.28) 100%);
+    }
+    .cs-home-card:hover::after {
+      background: linear-gradient(to top, rgba(232,103,14,.9) 0%, rgba(6,10,18,.62) 52%, rgba(6,10,18,.12) 100%);
+    }
+
+    /* bigger frosted icon chip with a playful tilt on hover */
+    .cs-home-thumb {
+      width: 48px; height: 48px;
+      border-radius: 13px;
+      margin-bottom: 16px;
+    }
+    .cs-home-thumb i { font-size: 18px; }
+    .cs-home-card:hover .cs-home-thumb { transform: translateY(-3px) rotate(-5deg); }
+
+    /* copy: a touch larger with more breathing room */
+    .cs-home-industry {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 7px;
+    }
+    .cs-home-info h4 {
+      font-size: 17px !important;
+      line-height: 1.3;
+      margin-bottom: 13px;
+    }
+    .cs-home-metrics { gap: 8px; }
+    .cs-home-metrics span { padding: 4px 12px; font-size: 11.5px; }
+
+    /* the hidden arrow becomes a circular CTA chip that springs in on hover */
+    .cs-home-arrow {
+      display: grid !important;
+      place-items: center;
+      position: absolute;
+      top: 18px; right: 18px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .14);
+      border: 1px solid rgba(255, 255, 255, .28);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      color: #fff !important;
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(-8px) scale(.8);
+      transition: opacity .45s ease, transform .5s cubic-bezier(.34, 1.56, .64, 1), background .35s ease, border-color .35s ease;
+      z-index: 4;
+    }
+    .cs-home-card:hover .cs-home-arrow {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cs-home-cat-label:hover,
+      .cs-home-cat-label:hover i:first-child,
+      .cs-home-card:hover .cs-home-thumb { transform: none; }
+    }
+
     /* --- About points: quiet cards that warm up and lift on hover, with
        the icon tile flipping to the brand fill. --- */
     .about-point {
