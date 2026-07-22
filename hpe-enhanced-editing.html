@@ -1723,8 +1723,12 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      clip-path: inset(0 0 0 0);
-      transition: clip-path 1s cubic-bezier(.76, 0, .24, 1);
+      transform-origin: center 45%;
+      will-change: transform, opacity, filter;
+      transition:
+        transform 1.05s cubic-bezier(.7, 0, .2, 1),
+        opacity .9s ease .08s,
+        filter .9s ease;
     }
 
     /* fine film grain over the whole frame for premium depth (static, cheap) */
@@ -1739,9 +1743,26 @@
       background-size: 160px 160px;
     }
 
+    /* Focus-zoom reveal: the whole splash scales up, blurs and fades away,
+       revealing the main page beneath — reads as passing "through" the logo. */
     #introCurtain.hide {
-      clip-path: inset(0 0 100% 0);
+      opacity: 0;
+      transform: scale(1.18);
+      filter: blur(14px);
       pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #introCurtain {
+        transition: opacity .6s ease;
+      }
+      #introCurtain.hide {
+        transform: none;
+        filter: none;
+      }
+      .intro-mark.pop {
+        transform: none;
+      }
     }
 
     /* soft dual-layer glow behind the mark — brand orange only, calm pulse */
@@ -1839,6 +1860,12 @@
       position: relative;
       z-index: 2;
       display: grid;
+      transition: transform .55s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    /* subtle anticipation "breath" the beat before the focus-zoom reveal fires */
+    .intro-mark.pop {
+      transform: scale(1.06);
     }
 
     .intro-mark > .intro-logo,
@@ -1973,6 +2000,62 @@
       .sev-loader #strobe_color1,
       .sev-loader #strobe_color3 {
         animation: none;
+      }
+    }
+
+    /* ── Dot-matrix background (ported from the LoaderDotMatrix React component) ──
+       The React component rendered a fixed grid of pulsing dots with per-dot
+       animation delays computed from a "ripple" pattern (delay grows with the
+       distance from the grid centre). Here it's recolored to the HPE orange and
+       stretched to fill the whole splash as a background texture, with the
+       centre masked out so the animation icon reads cleanly on top of it. */
+    .intro-dotmatrix {
+      position: absolute;
+      inset: 0;
+      z-index: 1;                 /* above aurora (0) / glow, below the mark (2) */
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s ease .1s;
+      /* keep the very centre clear so the centred icon/logo stays legible */
+      -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, transparent 20%, #000 48%);
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, transparent 20%, #000 48%);
+    }
+
+    .intro-dotmatrix.show {
+      opacity: .55;               /* visible enough that the pulse clearly reads while loading */
+    }
+
+    .intro-dotmatrix .dm-grid {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 40px;
+    }
+
+    .intro-dotmatrix .dm-dot {
+      width: 7px;
+      height: 7px;
+      justify-self: center;
+      align-self: center;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 6px rgba(244, 121, 32, .45);
+      will-change: transform, opacity;
+      animation: dot-matrix-pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes dot-matrix-pulse {
+      0%, 100% { opacity: .15; transform: scale(.3); }
+      50%      { opacity: 1;   transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .intro-dotmatrix .dm-dot {
+        animation: none;
+        opacity: .5;
       }
     }
 
@@ -10095,6 +10178,10 @@
 
     <div class="intro-aurora" aria-hidden="true"></div>
 
+    <div class="intro-dotmatrix" id="introDotMatrix" aria-hidden="true">
+      <div class="dm-grid"></div>
+    </div>
+
     <div class="intro-glow"></div>
 
     <div class="intro-mark">
@@ -10184,6 +10271,68 @@
 
       document.body.style.overflow = 'hidden';
 
+      // Build the HPE-orange dot-matrix background. Ported from the
+      // LoaderDotMatrix "ripple" pattern: each dot's animation delay grows with
+      // its distance from the grid centre, so the pulse radiates outward. The
+      // grid is sized to the viewport so it fills the splash as a background.
+      (function () {
+
+        var host = document.getElementById('introDotMatrix');
+
+        if (!host) return;
+
+        var grid = host.querySelector('.dm-grid');
+
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        var speed = 1.6;   // matches the dot-matrix-pulse duration
+
+        var cell = 44;     // px per dot cell — tune density
+
+        var cols = Math.max(7, Math.ceil(window.innerWidth / cell) + 1);
+
+        var rows = Math.max(5, Math.ceil(window.innerHeight / cell) + 1);
+
+        var centerX = (cols - 1) / 2;
+
+        var centerY = (rows - 1) / 2;
+
+        var maxDist = Math.sqrt(centerX * centerX + centerY * centerY) || 1;
+
+        grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+
+        grid.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+
+        var frag = document.createDocumentFragment();
+
+        for (var r = 0; r < rows; r++) {
+
+          for (var c = 0; c < cols; c++) {
+
+            var dist = Math.sqrt(Math.pow(c - centerX, 2) + Math.pow(r - centerY, 2));
+
+            var delay = (dist / maxDist) * speed;
+
+            var dot = document.createElement('span');
+
+            dot.className = 'dm-dot';
+
+            if (!reduce) dot.style.animationDelay = delay.toFixed(2) + 's';
+
+            frag.appendChild(dot);
+
+          }
+
+        }
+
+        grid.appendChild(frag);
+
+      })();
+
+      var dotmx = document.getElementById('introDotMatrix');
+
+      if (dotmx) setTimeout(function () { dotmx.classList.add('show'); }, 150);
+
       // Flow: animation icon → HPE logo → main page.
       // 1) the animation icon fades in and plays on its own,
       // 2) it then fades out as the HPE logo fades in over the same spot,
@@ -10191,10 +10340,16 @@
 
       if (loader) setTimeout(function () { loader.classList.add('show'); }, 200);
 
-      if (loader) setTimeout(function () { loader.classList.remove('show'); }, 1600);
+      if (loader) setTimeout(function () { loader.classList.remove('show'); }, 2200);
 
-      setTimeout(function () { logo.classList.add('show'); }, 1850);
+      setTimeout(function () { logo.classList.add('show'); }, 2450);
 
+      // once the logo has settled, give the mark a subtle anticipation "breath"…
+      var mark = document.querySelector('.intro-mark');
+
+      if (mark) setTimeout(function () { mark.classList.add('pop'); }, 3650);
+
+      // …then fire the focus-zoom reveal into the main page.
       setTimeout(function () {
 
         curtain.classList.add('hide');
@@ -10209,9 +10364,10 @@
 
         if (hr) setTimeout(function () { hr.classList.add('reveal'); }, 150);
 
-      }, 3500);
+      }, 4050);
 
-      setTimeout(function () { curtain.remove(); }, 3550);
+      // remove only after the ~1.05s reveal transition has fully played out
+      setTimeout(function () { curtain.remove(); }, 5250);
 
       // Safety net: guarantee the hero is visible even if something above fails
 
@@ -10225,7 +10381,7 @@
 
         if (hr) hr.classList.add('reveal');
 
-      }, 4300);
+      }, 4900);
 
     })();
 
