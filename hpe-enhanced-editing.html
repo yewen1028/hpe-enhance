@@ -10325,6 +10325,51 @@
       .lg-card > .lg-glass::before { display: none; }
     }
 
+    /* Case-study cards (the case-study "options") are dark full-bleed photos
+       with a dramatic orange hover, so the generic glass rim reads faintly.
+       Give them a brighter liquid-glass edge + sheen (scoped to .cs-home-card)
+       so the card effect is clearly present here too, on top of the orange
+       lift. Sits above the photo/scrim (::before/::after are z-index -2/-1). */
+    .cs-home-card > .lg-glass {
+      z-index: 6;
+      box-shadow:
+        inset 0 0 0 1.5px rgba(255, 255, 255, .3),
+        inset 4px 4px 1px -3px rgba(255, 255, 255, .5),
+        inset -4px -4px 1px -3px rgba(255, 255, 255, .95),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .8),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .8),
+        inset 0 0 10px 7px rgba(255, 255, 255, .14),
+        inset 0 0 3px 2px rgba(255, 255, 255, .08),
+        0 0 18px rgba(0, 0, 0, .2);
+    }
+    .cs-home-card > .lg-glass::before {
+      background:
+        radial-gradient(150% 75% at 22% -18%, rgba(255, 255, 255, .5), transparent 55%),
+        linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 42%);
+      opacity: .85;
+    }
+
+    /* The 4 case-study category headers ("options") are dark navy pills — give
+       them the same clearly-visible liquid-glass rim + sheen on hover, so the
+       main 4 categories carry the effect too. */
+    .cs-home-cat-label > .lg-glass {
+      z-index: 6;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, .22),
+        inset 3px 3px 1px -2.5px rgba(255, 255, 255, .45),
+        inset -3px -3px 1px -2.5px rgba(255, 255, 255, .9),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .7),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .7),
+        inset 0 0 8px 5px rgba(255, 255, 255, .12),
+        0 0 14px rgba(0, 0, 0, .18);
+    }
+    .cs-home-cat-label > .lg-glass::before {
+      background:
+        radial-gradient(140% 120% at 20% -30%, rgba(255, 255, 255, .42), transparent 55%),
+        linear-gradient(180deg, rgba(255, 255, 255, .14), transparent 60%);
+      opacity: .8;
+    }
+
     /* Featured panel → real navigation to the case-study page */
     .mega .mega-feature {
       display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
@@ -17453,7 +17498,7 @@
 
       });
 
-      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .step, .kf-item, .why-metric, .why-point, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
+      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .step, .kf-item, .why-metric, .why-point, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
 
       document.querySelectorAll(CARD_SEL).forEach(function (card) {
 
