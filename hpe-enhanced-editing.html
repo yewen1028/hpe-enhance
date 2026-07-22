@@ -2460,6 +2460,38 @@
       }
     }
 
+    /* ── Section-title scroll reveal: each word blurs + rises into place with a
+       stagger as the heading enters view (21st.dev "text generate" style). The
+       main script splits every h2.section-title into .tw word spans and toggles
+       .title-in when the heading scrolls in. ── */
+    h2.section-title.title-anim .tw {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(.45em);
+      filter: blur(10px);
+      transition:
+        opacity .6s cubic-bezier(.22, 1, .36, 1),
+        transform .6s cubic-bezier(.22, 1, .36, 1),
+        filter .6s cubic-bezier(.22, 1, .36, 1);
+      transition-delay: var(--tw-d, 0ms);
+      will-change: opacity, transform, filter;
+    }
+
+    h2.section-title.title-anim.title-in .tw {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      h2.section-title.title-anim .tw {
+        opacity: 1;
+        transform: none;
+        filter: none;
+        transition: none;
+      }
+    }
+
 
 
     .about-img-badge {
@@ -15464,7 +15496,7 @@
 
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      var sel = '.section-tag, .section-title, .section-sub, .about-media, .service-card, .industry-card, .why-point, .center-list-item, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
+      var sel = '.section-tag, .section-sub, .about-media, .service-card, .industry-card, .why-point, .center-list-item, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
 
       var els = Array.prototype.slice.call(document.querySelectorAll(sel));
 
@@ -15511,6 +15543,81 @@
         els.forEach(function (el) { el.classList.add('sr-in'); });
 
       }, 4500);
+
+    })();
+
+
+
+    /* ════════════════════════════════════════════
+
+       SECTION TITLES — word-by-word blur-in reveal (21st.dev "text generate").
+       Each h2.section-title is split into .tw word spans with a staggered
+       delay; a per-title IntersectionObserver toggles .title-in when it scrolls
+       into view. aria-label preserves the readable heading for assistive tech.
+
+    ════════════════════════════════════════════ */
+
+    (function () {
+
+      var titles = Array.prototype.slice.call(document.querySelectorAll('h2.section-title'));
+
+      if (!titles.length) return;
+
+      function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+      titles.forEach(function (t) {
+
+        var text = t.textContent.replace(/\s+/g, ' ').trim();
+
+        t.setAttribute('aria-label', text);
+
+        t.innerHTML = text.split(' ').map(function (w, i) {
+
+          return '<span class="tw" aria-hidden="true" style="--tw-d:' + Math.min(i * 60, 420) + 'ms">' + esc(w) + '</span>';
+
+        }).join(' ');
+
+        t.classList.add('title-anim');
+
+      });
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduce || !('IntersectionObserver' in window)) {
+
+        titles.forEach(function (t) { t.classList.add('title-in'); });
+
+        return;
+
+      }
+
+      var tObs = new IntersectionObserver(function (entries) {
+
+        entries.forEach(function (e) {
+
+          if (e.isIntersecting) { e.target.classList.add('title-in'); tObs.unobserve(e.target); }
+
+        });
+
+      }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
+
+      titles.forEach(function (t) { tObs.observe(t); });
+
+      // Safety net: only force-reveal titles that are ALREADY in view (so one can
+      // never stay stuck hidden above the fold). Below-fold titles are left to
+      // the observer so their word reveal still plays when the user scrolls to them.
+
+      setTimeout(function () {
+
+        titles.forEach(function (t) {
+
+          var r = t.getBoundingClientRect();
+
+          if (r.top < window.innerHeight && r.bottom > 0) t.classList.add('title-in');
+
+        });
+
+      }, 6000);
 
     })();
 
