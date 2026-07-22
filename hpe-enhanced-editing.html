@@ -9503,10 +9503,14 @@
     .nav-links > li > a:hover { background: rgba(255,255,255,.06); color: var(--orange); }
     .nav-links > li > a.active { color: var(--orange); background: var(--orange-l); }
     .hamburger span { background: var(--text); }
+    /* heavily frosted glass: still translucent, but the page behind is blurred
+       enough that it never reads as legible content through the menu */
     .dropdown-inner {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      background: rgba(13, 22, 37, .94);   /* near-opaque navy */
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), var(--shadow);
+      -webkit-backdrop-filter: blur(40px) saturate(150%);
+      backdrop-filter: blur(40px) saturate(150%);
     }
     .dropdown a { color: var(--text); }
     .mobile-menu {
@@ -10163,13 +10167,13 @@
     }
 
     /* ═══ SERVICES MEGA-MENU — two-column service grid + featured case-study panel ═══ */
-    .has-dropdown .dropdown { min-width: 660px; }
+    .has-dropdown .dropdown { min-width: 360px; }
     .dropdown-inner.mega {
       display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
-      padding: 14px;
-      width: 460px;
+      padding: 12px;
+      width: 360px;
       max-width: calc(100vw - 32px);
     }
     /* keep the original hover decorations (accent bar + sliding chevron) on the service
@@ -10178,12 +10182,44 @@
 
     /* minmax(0,1fr) pins the two tracks to exactly half the card so hover/press
        states can never grow an item and re-flow the grid (no box jitter) */
-    .mega .mega-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; }
+    /* AnimatedList (Magic UI) port: a single vertical column of notification-style
+       cards. The cascade is driven from JS (each card gets .mi-in one after the
+       other, like the component's setInterval) so it reliably plays one by one
+       every time the menu opens — CSS just supplies the spring transition. */
+    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; }
     .mega .mega-item {
       display: flex; align-items: center; gap: 12px;
-      padding: 11px 12px; border-radius: 10px;
-      opacity: 0; transform: translateY(9px);
-      transition: background .18s ease;
+      padding: 11px 13px; border-radius: 13px;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .08);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .04) inset;
+      /* start-state — matches the component's { scale: 0, opacity: 0 } */
+      opacity: 0; transform: scale(.3); transform-origin: center;
+      will-change: transform, opacity;
+      transition:
+        opacity .5s cubic-bezier(.34, 1.56, .64, 1),
+        transform .5s cubic-bezier(.34, 1.56, .64, 1),
+        background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    /* kill the inherited generic dropdown-item entrance so only the JS cascade drives these */
+    .has-dropdown.dd-open .mega .mega-item { animation: none; }
+    .mega .mega-item.mi-in { opacity: 1; transform: scale(1); }
+
+    /* The services cascade is an explicit, requested effect, so it must keep
+       playing one-by-one even when the OS asks for reduced motion. These two
+       rules out-specify the reduced-motion `!important` flatteners
+       (`.dropdown a`, `.has-dropdown.dd-open .dropdown a`) so a card stays hidden
+       until JS gives it .mi-in, then springs in. */
+    .has-dropdown.dd-open .mega .mega-item:not(.mi-in) {
+      opacity: 0 !important;
+      transform: scale(.3) !important;
+    }
+    .has-dropdown.dd-open .mega .mega-item.mi-in {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      transition:
+        opacity .5s cubic-bezier(.34, 1.56, .64, 1),
+        transform .5s cubic-bezier(.34, 1.56, .64, 1) !important;
     }
     .mega .mega-item .mi-ico {
       width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
@@ -10198,7 +10234,12 @@
        `.dropdown a:hover` 20px nudge) so the item box never resizes; the hover
        cue is an orange tint + the existing accent bar/chevron, and clicking
        deepens the orange like the site's other :active feedback */
-    .mega .mega-item:hover { padding-left: 12px; background: rgba(244, 121, 32, .12); }
+    .mega .mega-item:hover {
+      padding-left: 13px;
+      background: rgba(244, 121, 32, .13);
+      border-color: rgba(244, 121, 32, .32);
+      box-shadow: 0 6px 18px -8px rgba(244, 121, 32, .4);
+    }
     .mega .mega-item:active { background: rgba(244, 121, 32, .26); }
     .mega .mega-item:hover .mi-ico { background: var(--orange); color: #fff; transform: scale(1.08) rotate(-6deg); }
     .mega .mega-item:hover .mi-tx strong { color: var(--orange); }
@@ -10225,8 +10266,8 @@
 
     /* Narrower desktop widths: collapse to a single column, feature becomes a banner row */
     @media (max-width: 1120px) {
-      .has-dropdown .dropdown { min-width: 430px; }
-      .dropdown-inner.mega { grid-template-columns: 1fr; width: 430px; }
+      .has-dropdown .dropdown { min-width: 360px; }
+      .dropdown-inner.mega { grid-template-columns: 1fr; width: 360px; }
       .mega .mega-feature { flex-direction: row; align-items: center; flex-wrap: wrap; padding: 14px 16px; }
       .mega .mega-feature .mf-title { flex: 1 1 auto; }
       .mega .mega-feature .mf-cta { margin-top: 0; }
@@ -15224,11 +15265,54 @@
 
       let ddTimer = null;
 
+      // Services mega-menu: reveal the service cards one by one when it opens
+      // (JS-driven port of the Magic UI AnimatedList interval reveal).
+      var megaItems = Array.prototype.slice.call(ddParent.querySelectorAll('.mega .mega-item'));
+
+      var megaTimers = [];
+
+      function clearMegaTimers() { megaTimers.forEach(clearTimeout); megaTimers = []; }
+
+      function revealMegaItems() {
+
+        clearMegaTimers();
+
+        // Always reveal one-by-one (explicit site-owner request). The CSS override
+        // below keeps this cascade running even under prefers-reduced-motion.
+
+        megaItems.forEach(function (it) { it.classList.remove('mi-in'); });
+
+        // force reflow so removing + re-adding the class restarts the transition
+
+        void ddParent.offsetWidth;
+
+        // start after the panel has faded in (~0.22s) so each card clearly pops in turn
+
+        megaItems.forEach(function (it, i) {
+
+          megaTimers.push(setTimeout(function () { it.classList.add('mi-in'); }, 160 + i * 150));
+
+        });
+
+      }
+
+      function resetMegaItems() { clearMegaTimers(); megaItems.forEach(function (it) { it.classList.remove('mi-in'); }); }
 
 
-      const openDD = () => { clearTimeout(ddTimer); ddParent.classList.add('dd-open'); };
 
-      const closeDD = () => { ddTimer = setTimeout(() => ddParent.classList.remove('dd-open'), 180); };
+      const openDD = () => {
+
+        clearTimeout(ddTimer);
+
+        var wasOpen = ddParent.classList.contains('dd-open');
+
+        ddParent.classList.add('dd-open');
+
+        if (!wasOpen) revealMegaItems();   // only cascade on a fresh open, not on re-enter
+
+      };
+
+      const closeDD = () => { ddTimer = setTimeout(() => { ddParent.classList.remove('dd-open'); resetMegaItems(); }, 180); };
 
 
 
@@ -15262,7 +15346,9 @@
 
           e.preventDefault();
 
-          ddParent.classList.toggle('dd-open');
+          var nowOpen = ddParent.classList.toggle('dd-open');
+
+          if (nowOpen) revealMegaItems(); else resetMegaItems();
 
         }
 
@@ -15274,7 +15360,7 @@
 
       document.addEventListener('click', e => {
 
-        if (!ddParent.contains(e.target)) ddParent.classList.remove('dd-open');
+        if (!ddParent.contains(e.target)) { ddParent.classList.remove('dd-open'); resetMegaItems(); }
 
       });
 
