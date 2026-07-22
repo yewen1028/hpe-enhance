@@ -10244,6 +10244,87 @@
     .mega .mega-item:hover .mi-ico { background: var(--orange); color: #fff; transform: scale(1.08) rotate(-6deg); }
     .mega .mega-item:hover .mi-tx strong { color: var(--orange); }
 
+    /* ═══ Liquid-glass hover on each Services item ═══════════════════════
+       Ported from the originui "liquid-radio" component: the #radio-glass
+       SVG displacement filter (feTurbulence + feDisplacementMap) plus the
+       component's dark "glass" layered box-shadow. A .mi-glass layer is
+       injected into every .mega-item by JS and revealed on hover, giving the
+       frosted, liquid-refraction pill. Falls back to a plain frosted tint
+       under prefers-reduced-transparency. */
+    .mega .mega-item { position: relative; isolation: isolate; }
+    .mega .mega-item .mi-glass {
+      position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+      pointer-events: none; opacity: 0;
+      transition: opacity .3s cubic-bezier(.16, 1, .3, 1);
+      background: rgba(255, 255, 255, .08);
+      -webkit-backdrop-filter: blur(4px) saturate(160%);
+      backdrop-filter: blur(4px) saturate(160%);
+      box-shadow:
+        0 0 8px rgba(0, 0, 0, .03),
+        0 2px 6px rgba(0, 0, 0, .08),
+        inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
+        inset -3px -3px .5px -3.5px rgba(255, 255, 255, .85),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .6),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .6),
+        inset 0 0 6px 6px rgba(255, 255, 255, .12),
+        inset 0 0 2px 2px rgba(255, 255, 255, .06),
+        0 0 12px rgba(0, 0, 0, .15);
+    }
+    /* the liquid warble: a highlight sheen distorted by the SVG filter */
+    .mega .mega-item .mi-glass::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      background:
+        radial-gradient(120% 85% at 28% 0%, rgba(255, 255, 255, .28), transparent 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 55%);
+      filter: url("#radio-glass");
+      mix-blend-mode: screen; opacity: .75;
+    }
+    .mega .mega-item:hover .mi-glass,
+    .mega .mega-item:focus-visible .mi-glass { opacity: 1; }
+    /* the frosted pill now carries the surface, so soften the old solid tint */
+    .mega .mega-item:hover {
+      padding-left: 13px;
+      background: rgba(255, 255, 255, .02);
+      border-color: rgba(255, 255, 255, .20);
+      box-shadow: none;
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .mega .mega-item .mi-glass {
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+        background: rgba(255, 255, 255, .12);
+      }
+      .mega .mega-item .mi-glass::before { display: none; }
+    }
+
+    /* ═══ Liquid-glass hover on every card (same #radio-glass system as the
+       Services nav). A .lg-glass overlay is injected into each card by JS and
+       fades in on hover: the component's glass bevel box-shadow + a highlight
+       sheen distorted by #radio-glass. pointer-events:none keeps cards fully
+       clickable. Falls back to a plain bevel under reduced transparency. */
+    .lg-card { position: relative; }
+    .lg-card > .lg-glass {
+      position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+      z-index: 5; opacity: 0; transition: opacity .4s cubic-bezier(.16, 1, .3, 1);
+      box-shadow:
+        inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
+        inset -3px -3px .5px -3.5px rgba(255, 255, 255, .8),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .55),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .55),
+        inset 0 0 6px 6px rgba(255, 255, 255, .1),
+        inset 0 0 2px 2px rgba(255, 255, 255, .05),
+        0 0 14px rgba(0, 0, 0, .15);
+    }
+    .lg-card > .lg-glass::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      background: radial-gradient(135% 60% at 22% -12%, rgba(255, 255, 255, .28), transparent 55%);
+      filter: url("#radio-glass");
+      mix-blend-mode: screen; opacity: .5;
+    }
+    .lg-card:hover > .lg-glass { opacity: 1; }
+    @media (prefers-reduced-transparency: reduce) {
+      .lg-card > .lg-glass::before { display: none; }
+    }
+
     /* Featured panel → real navigation to the case-study page */
     .mega .mega-feature {
       display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
@@ -17175,6 +17256,220 @@
       document.head.appendChild(style);
 
 
+
+    })();
+
+  </script>
+
+
+
+  <!-- Scroll "fold-up" on images + magnetic primary buttons (2026 motion pass) -->
+
+  <script>
+
+    (function () {
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduce) return;
+
+
+
+      /* ── Fold-up: as an image/photo-tile leaves through the top of the
+         viewport it hinges at its top edge and folds back, like a page turning
+         up. The inline transform is cleared while the element is at rest, so
+         existing :hover transforms still run. The hero media, partner-logo
+         marquee, nav/footer logos and icons are excluded. Parallax layers own
+         their own transform, so they are skipped too. rAF-throttled, passive. ── */
+
+      var MAXDEG = 56, items = [], vh = window.innerHeight, ticking = false;
+
+
+
+      function collect() {
+
+        var set = [];
+
+        function add(el) {
+
+          if (!el || set.indexOf(el) !== -1) return;
+
+          if (el.matches('[data-parallax], .px-drift')) return;   // owns its own transform
+
+          el.style.transformOrigin = 'center top';
+
+          el.style.backfaceVisibility = 'hidden';
+
+          el.style.willChange = 'transform, opacity';
+
+          set.push(el);
+
+        }
+
+        document.querySelectorAll('.svc-thumb, .cs-thumb').forEach(add);
+
+        document.querySelectorAll('img').forEach(function (img) {
+
+          if (img.closest('nav, footer, .mobile-menu, .hero, [class*="marquee"], [class*="partner"], [class*="logo"], [class*="brand"]')) return;
+
+          if (/logo|icon/i.test(img.className) || /logo|icon/i.test(img.id)) return;
+
+          var r = img.getBoundingClientRect();
+
+          if (r.width < 190 || r.height < 130) return;
+
+          add(img.closest('.service-card-img') || img);
+
+        });
+
+        items = set;
+
+      }
+
+
+
+      function apply() {
+
+        ticking = false;
+
+        var start = vh * 0.32;
+
+        for (var i = 0; i < items.length; i++) {
+
+          var el = items[i], r = el.getBoundingClientRect();
+
+          if (r.height === 0) { if (el._fold) { el.style.transform = ''; el.style.opacity = ''; el._fold = false; } continue; }
+
+          var t = (start - r.top) / (start + r.height * 0.6);
+
+          if (t < 0) t = 0; else if (t > 1) t = 1;
+
+          if (t < 0.004) {
+
+            if (el._fold) { el.style.transform = ''; el.style.opacity = ''; el._fold = false; }
+
+            continue;
+
+          }
+
+          el.style.transform = 'perspective(1500px) rotateX(' + (t * MAXDEG).toFixed(2) + 'deg)';
+
+          el.style.opacity = (1 - t * 0.5).toFixed(3);
+
+          el._fold = true;
+
+        }
+
+      }
+
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
+
+
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      window.addEventListener('resize', function () { vh = window.innerHeight; collect(); apply(); }, { passive: true });
+
+      window.addEventListener('load', function () { collect(); apply(); });
+
+      collect(); apply();
+
+
+
+      /* ── Magnetic primary buttons: a gentle pull toward the cursor. ── */
+
+      document.querySelectorAll('.btn-orange').forEach(function (btn) {
+
+        btn.style.transition = 'transform .25s cubic-bezier(.22,1,.36,1)';
+
+        btn.addEventListener('pointermove', function (e) {
+
+          var r = btn.getBoundingClientRect();
+
+          btn.style.transform = 'translate(' +
+
+            ((e.clientX - r.left - r.width / 2) / r.width * 7).toFixed(1) + 'px,' +
+
+            ((e.clientY - r.top - r.height / 2) / r.height * 7).toFixed(1) + 'px)';
+
+        });
+
+        btn.addEventListener('pointerleave', function () { btn.style.transform = ''; });
+
+      });
+
+    })();
+
+  </script>
+
+
+
+  <!-- GlassFilter — ported verbatim from the originui "liquid-radio" component.
+       Provides the #radio-glass SVG displacement filter used by the Services
+       mega-menu items' liquid-glass hover. -->
+
+  <svg class="hidden" aria-hidden="true" style="position:absolute;width:0;height:0">
+
+    <defs>
+
+      <filter id="radio-glass" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+
+        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence" />
+
+        <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise" />
+
+        <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="30" xChannelSelector="R" yChannelSelector="B" result="displaced" />
+
+        <feGaussianBlur in="displaced" stdDeviation="2" result="finalBlur" />
+
+        <feComposite in="finalBlur" in2="finalBlur" operator="over" />
+
+      </filter>
+
+    </defs>
+
+  </svg>
+
+
+
+  <script>
+
+    /* Inject the liquid-glass hover layer into every Services mega-menu item
+       and every card on the page. */
+
+    (function () {
+
+      document.querySelectorAll('.mega .mega-item').forEach(function (it) {
+
+        if (it.querySelector('.mi-glass')) return;
+
+        var g = document.createElement('span');
+
+        g.className = 'mi-glass';
+
+        g.setAttribute('aria-hidden', 'true');
+
+        it.insertBefore(g, it.firstChild);
+
+      });
+
+      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .step, .kf-item, .why-metric, .why-point, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
+
+      document.querySelectorAll(CARD_SEL).forEach(function (card) {
+
+        if (card.__lg) return; card.__lg = true;
+
+        card.classList.add('lg-card');
+
+        var g = document.createElement('span');
+
+        g.className = 'lg-glass';
+
+        g.setAttribute('aria-hidden', 'true');
+
+        card.appendChild(g);
+
+      });
 
     })();
 
