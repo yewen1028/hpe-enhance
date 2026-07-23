@@ -4192,7 +4192,7 @@
       background: rgba(9, 14, 23, .6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     }
     .ns-hint { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--muted); }
-    .ns-foot kbd {
+    .ns-foot kbd, .mega-foot kbd {
       display: inline-grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px;
       font-family: inherit; font-size: 10px; font-weight: 700; color: var(--text);
       background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14);
@@ -10513,12 +10513,13 @@
     /* ═══ SERVICES MEGA-MENU — two-column service grid + featured case-study panel ═══ */
     .has-dropdown .dropdown { min-width: 360px; }
     .dropdown-inner.mega {
-      display: grid;
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
       padding: 12px;
       width: 360px;
       max-width: calc(100vw - 32px);
+      max-height: min(78vh, 560px);
     }
     /* keep the original hover decorations (accent bar + sliding chevron) on the service
        items; strip them only on the featured panel */
@@ -10530,7 +10531,34 @@
        cards. The cascade is driven from JS (each card gets .mi-in one after the
        other, like the component's setInterval) so it reliably plays one by one
        every time the menu opens — CSS just supplies the spring transition. */
-    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; }
+    /* the service list scrolls; the keyboard-guide footer below it stays pinned */
+    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+    .mega .mega-grid::-webkit-scrollbar { width: 9px; }
+    .mega .mega-grid::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .12); border-radius: 9px; border: 3px solid transparent; background-clip: padding-box; }
+    .mega .mega-grid::-webkit-scrollbar-thumb:hover { background: rgba(255, 125, 26, .45); background-clip: padding-box; }
+
+    /* navigation guide pinned to the bottom of the service list — same treatment
+       as the nav-search dropdown's .ns-foot keyboard hints */
+    .mega .mega-foot {
+      flex: none; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      margin: 4px -12px -12px; padding: 10px 18px 11px;
+      border-top: 1px solid rgba(255, 255, 255, .08); border-radius: 0 0 12px 12px;
+      background: rgba(9, 14, 23, .6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+
+    /* keyboard-focused service item — mirrors the pointer :hover cue */
+    .mega .mega-item.mi-active {
+      padding-left: 13px;
+      background: rgba(244, 121, 32, .13);
+      border-color: rgba(244, 121, 32, .32);
+      box-shadow: 0 6px 18px -8px rgba(244, 121, 32, .4);
+      outline: none;
+    }
+    .mega .mega-item.mi-active .mi-ico { background: var(--orange); color: #fff; transform: scale(1.08) rotate(-6deg); }
+    .mega .mega-item.mi-active .mi-tx strong { color: var(--orange); }
+    .mega .mega-item.mi-active .mi-glass { opacity: 1; }
+    .dropdown a.mega-item.mi-active::before { transform: scaleY(1); }
+    .dropdown a.mega-item.mi-active::after { opacity: 1; transform: translateX(0); }
     .mega .mega-item {
       display: flex; align-items: center; gap: 12px;
       padding: 11px 13px; border-radius: 13px;
@@ -11232,6 +11260,13 @@
                 <span class="mi-tx"><strong>Value Added Service</strong><em>Cabling, WiFi, UPS &amp; structured add-ons</em></span>
               </a>
 
+            </div>
+
+            <!-- keyboard-navigation guide, pinned to the bottom of the service list (mirrors the nav-search footer) -->
+            <div class="mega-foot">
+              <span class="ns-hint"><kbd>&#8593;</kbd><kbd>&#8595;</kbd> navigate</span>
+              <span class="ns-hint"><kbd>&#8629;</kbd> open</span>
+              <span class="ns-hint"><kbd>esc</kbd> close</span>
             </div>
 
           </div>
@@ -15998,7 +16033,22 @@
 
       }
 
-      function resetMegaItems() { clearMegaTimers(); megaItems.forEach(function (it) { it.classList.remove('mi-in'); }); }
+      function resetMegaItems() { clearMegaTimers(); clearMegaActive(); megaItems.forEach(function (it) { it.classList.remove('mi-in'); }); }
+
+      // ── Keyboard navigation for the service list (drives the guide pinned at its foot) ──
+      var megaActive = -1;
+
+      function setMegaActive(i) {
+        if (!megaItems.length) return;
+        if (i < 0) i = megaItems.length - 1;
+        else if (i >= megaItems.length) i = 0;
+        megaActive = i;
+        megaItems.forEach(function (it, idx) { it.classList.toggle('mi-active', idx === megaActive); });
+        var el = megaItems[megaActive];
+        if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }); }
+      }
+
+      function clearMegaActive() { megaActive = -1; megaItems.forEach(function (it) { it.classList.remove('mi-active'); }); }
 
 
 
@@ -16035,6 +16085,31 @@
         dd.addEventListener('mouseenter', openDD);
 
         dd.addEventListener('mouseleave', closeDD);
+
+        // arrow keys move through the service list; Escape closes it (Enter opens
+        // the focused item natively — it's an anchor). Matches the pinned guide.
+        dd.addEventListener('keydown', function (e) {
+
+          if (e.key === 'ArrowDown') { e.preventDefault(); setMegaActive(megaActive + 1); }
+
+          else if (e.key === 'ArrowUp') { e.preventDefault(); setMegaActive(megaActive - 1); }
+
+          else if (e.key === 'Escape') { e.preventDefault(); clearTimeout(ddTimer); ddParent.classList.remove('dd-open'); resetMegaItems(); trigger && trigger.focus(); }
+
+        });
+
+      }
+
+      // open the list from the keyboard and land on the first service
+      const trigger = ddParent.querySelector(':scope > a');
+
+      if (trigger) {
+
+        trigger.addEventListener('keydown', function (e) {
+
+          if (e.key === 'ArrowDown') { e.preventDefault(); openDD(); setMegaActive(0); }
+
+        });
 
       }
 
