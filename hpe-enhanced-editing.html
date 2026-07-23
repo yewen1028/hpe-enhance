@@ -7132,20 +7132,20 @@
 
 
     /* ─── SCROLL PROGRESS BAR ───
-       A slim reading-progress rail pinned to the top edge of the sticky navbar.
-       The fill warms from deep to bright orange and is led by a glowing "comet"
-       head, so scrolling reads as a hot filament advancing across the nav. The
-       head is the one bold detail; the rest stays deliberately quiet. */
+       A reading-progress rail that lives INSIDE the sticky navbar, pinned to its
+       top edge, so it always rides with the nav (no separate fixed layer that a
+       browser could mis-composite). The fill warms from bright orange to a hot
+       white tip and is led by a glowing "comet" head — the one bold detail. */
     #scroll-bar {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
-      z-index: 9999;
+      height: 4px;
+      z-index: 6;
       pointer-events: none;
       opacity: 0;
-      transition: opacity .35s ease;
+      transition: opacity .3s ease;
     }
     #scroll-bar.on { opacity: 1; }
 
@@ -7153,13 +7153,13 @@
       position: relative;
       height: 100%;
       width: 0;
-      border-radius: 0 3px 3px 0;
+      border-radius: 0 4px 4px 0;
       background: linear-gradient(90deg,
         var(--orange) 0%, #ff8e2b 45%, #ffab52 78%, #ffe3bf 100%);
       box-shadow:
-        0 0 12px rgba(255, 138, 43, .7),
-        0 0 4px rgba(255, 138, 43, .6),
-        0 1px 6px rgba(244, 121, 32, .5);
+        0 0 12px rgba(255, 138, 43, .75),
+        0 0 4px rgba(255, 138, 43, .65),
+        0 1px 7px rgba(244, 121, 32, .55);
       transition: width .12s cubic-bezier(.22, 1, .36, 1);
     }
 
@@ -11256,12 +11256,6 @@
 
 
 
-  <!-- SCROLL PROGRESS -->
-
-  <div id="scroll-bar" aria-hidden="true"><span class="sb-fill"><span class="sb-head"></span></span></div>
-
-
-
   <!-- TOP BAR -->
 
   <div class="topbar">
@@ -11289,6 +11283,10 @@
   <!-- NAVBAR -->
 
   <nav id="navbar">
+
+    <!-- SCROLL PROGRESS — rides the top edge of the (sticky) navbar so it can't
+         be affected by fixed-layer compositing quirks; always sits on the nav. -->
+    <div id="scroll-bar" aria-hidden="true"><span class="sb-fill"><span class="sb-head"></span></span></div>
 
     <a href="#" class="nav-logo">
 
