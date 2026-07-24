@@ -1147,17 +1147,25 @@
     }
 
   
-    /* Orange scroll-progress bar (shared with main page) — sits above the header */
+    /* Orange scroll-progress bar (shared with main page) — sits above the header.
+       Brightened to match the main page's #scroll-bar .sb-fill: the same vivid
+       orange→hot-white gradient + multi-layer glow, so it reads just as bright
+       as the main-page bar. */
     #scroll-bar {
       position: fixed;
       top: 0;
       left: 0;
-      height: 3px;
+      height: 4px;
       width: 0%;
-      background: linear-gradient(90deg, var(--orange), #f9a34a);
+      border-radius: 0 4px 4px 0;
+      background: linear-gradient(90deg,
+        var(--orange) 0%, #ff8e2b 45%, #ffab52 78%, #ffe3bf 100%);
       z-index: 9999;
-      transition: width .1s linear;
-      box-shadow: 0 0 6px rgba(244, 121, 32, .6);
+      transition: width .12s cubic-bezier(.22, 1, .36, 1);
+      box-shadow:
+        0 0 12px rgba(255, 138, 43, .75),
+        0 0 4px rgba(255, 138, 43, .65),
+        0 1px 7px rgba(244, 121, 32, .55);
     }
 
     /* ═══ "Contact Us" CTA (base from 21st.dev, recoloured to the navy/orange

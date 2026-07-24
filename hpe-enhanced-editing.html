@@ -7150,6 +7150,10 @@
     #scroll-bar.on { opacity: 1; }
 
     #scroll-bar .sb-fill {
+      /* MUST be block: .sb-fill is a <span> (inline by default), and inline
+         elements ignore width/height — so without this the JS-set width never
+         renders and the bar appears frozen. */
+      display: block;
       position: relative;
       height: 100%;
       width: 0;
@@ -18369,7 +18373,10 @@
 
       });
 
-      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .kf-item, .why-metric, .why-point, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
+      /* NOTE: .kf-item (the keyfacts "10+ years" bar above About) and the
+         "Why Companies Stay With Us" section cards (.why-metric, .why-point)
+         are intentionally excluded — no liquid-glass hover on those. */
+      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
 
       document.querySelectorAll(CARD_SEL).forEach(function (card) {
 
