@@ -6375,6 +6375,29 @@
 
     }
 
+    /* ═══ BUSINESS PARTNERS — one-by-one rise-up reveal (2026) ═══
+       Each partner logo starts faded + dropped and floats up into place one
+       after another as the section scrolls into view, layered over the running
+       carousel. JS arms `.pb-armed` on the marquee and adds `.pb-in` to each
+       bubble in left-to-right order. Uses the individual translate/opacity props
+       so the rise composes with both the track's marquee transform and the
+       logo's :hover lift. */
+    .partners-marquee.pb-armed .partner-bubble {
+      opacity: 0;
+      translate: 0 24px;
+      transition: opacity .6s ease, translate .66s cubic-bezier(.22, 1, .36, 1);
+      will-change: translate, opacity;
+    }
+    .partners-marquee.pb-armed .partner-bubble.pb-in {
+      opacity: 1;
+      translate: 0 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .partners-marquee.pb-armed .partner-bubble {
+        opacity: 1 !important; translate: none !important; transition: none !important;
+      }
+    }
+
 
 
     @media (prefers-reduced-motion: reduce) {
@@ -10141,6 +10164,32 @@
     /* Liquid glass frosts the collapsed row; switch it off while a card is
        expanded so it never veils the mini-map panel below the row. */
     .center-list-item.expanded > .lg-glass { opacity: 0 !important; }
+
+    /* Slow one-by-one parallax-reveal: each branch card starts dropped + faded,
+       then floats up into place in turn as the list scrolls into view. JS arms
+       `.br-armed` on the wrap and adds `.br-in` to each card one after another.
+       Uses the individual translate/scale props (not transform) so it layers
+       over each card's :hover lift without fighting it. */
+    .centers-list-wrap.br-armed .center-list-item {
+      opacity: 0;
+      translate: 0 32px;
+      scale: .955;
+      transition:
+        opacity .72s cubic-bezier(.22, 1, .36, 1),
+        translate .72s cubic-bezier(.22, 1, .36, 1),
+        scale .72s cubic-bezier(.22, 1, .36, 1);
+      will-change: translate, opacity;
+    }
+    .centers-list-wrap.br-armed .center-list-item.br-in {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .centers-list-wrap.br-armed .center-list-item {
+        opacity: 1 !important; translate: none !important; scale: 1 !important; transition: none !important;
+      }
+    }
 
     /* case-study drill-down + full pages + service modal shells */
     .cs-page, .cs-detail { background: var(--base); }
@@ -16622,7 +16671,9 @@
 
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      var sel = '.section-tag, .section-sub, .about-media, .service-card, .industry-card, .why-point, .center-list-item, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
+      /* .center-list-item is intentionally NOT here — the branch cards get their
+         own slow one-by-one cascade below (SERVICE-CENTRE BRANCHES). */
+      var sel = '.section-tag, .section-sub, .about-media, .service-card, .industry-card, .why-point, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
 
       var els = Array.prototype.slice.call(document.querySelectorAll(sel));
 
@@ -16670,6 +16721,35 @@
 
       }, 4500);
 
+    })();
+
+    /* ════════════════════════════════════════════
+       SERVICE-CENTRE BRANCHES — slow one-by-one reveal cascade. As each region
+       panel scrolls into view, its branch cards float up into place one after
+       another (parallax rise + fade), instead of the generic all-at-once reveal.
+    ════════════════════════════════════════════ */
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var wrap = document.querySelector('.centers-list-wrap');
+      if (!wrap || reduce) return;
+      wrap.classList.add('br-armed');            // arm the dropped/faded start state
+      var STEP = 120;                            // ms between successive cards — deliberately slow
+      var brObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var cards = Array.prototype.slice.call(e.target.querySelectorAll('.center-list-item'));
+          cards.forEach(function (card, i) {
+            setTimeout(function () { card.classList.add('br-in'); }, i * STEP);
+          });
+          brObs.unobserve(e.target);
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+      var blocks = wrap.querySelectorAll('.centers-region-block');
+      (blocks.length ? blocks : [wrap]).forEach(function (b) { brObs.observe(b); });
+      // safety net: force-reveal every card after 5s if the observer never fires
+      setTimeout(function () {
+        wrap.querySelectorAll('.center-list-item').forEach(function (c) { c.classList.add('br-in'); });
+      }, 5000);
     })();
 
 
@@ -16974,6 +17054,39 @@
 
       raf = requestAnimationFrame(step);
 
+    })();
+
+    /* ════════════════════════════════════════════
+       BUSINESS PARTNERS — one-by-one rise-up reveal cascade. When the marquee
+       scrolls into view, each partner logo floats up into place in turn
+       (left → right), then the carousel keeps running. Composes with the
+       JS-driven marquee transform via the individual `translate` prop.
+    ════════════════════════════════════════════ */
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var wrap = document.querySelector('.partners-marquee');
+      var track = wrap && wrap.querySelector('.pb-track');
+      if (!wrap || !track || reduce) return;
+      wrap.classList.add('pb-armed');            // arm the dropped/faded start state
+      var STEP = 95, done = false;
+      function cascade() {
+        if (done) return; done = true;
+        var bubbles = Array.prototype.slice.call(track.querySelectorAll('.partner-bubble'));
+        var vw = window.innerWidth, visible = [];
+        bubbles.forEach(function (b) {
+          var r = b.getBoundingClientRect();
+          if (r.right < 0 || r.left > vw + 200) b.classList.add('pb-in');   // off-screen → reveal instantly
+          else visible.push(b);
+        });
+        // rise the on-screen logos one after another, left → right
+        visible.sort(function (a, b) { return a.getBoundingClientRect().left - b.getBoundingClientRect().left; });
+        visible.forEach(function (b, i) { setTimeout(function () { b.classList.add('pb-in'); }, i * STEP); });
+      }
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { cascade(); obs.disconnect(); } });
+      }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+      obs.observe(wrap);
+      setTimeout(cascade, 6000);   // safety net if the observer never fires
     })();
 
 
