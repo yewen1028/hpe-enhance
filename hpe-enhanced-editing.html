@@ -1483,11 +1483,14 @@
     h2.section-title::before {
       content: '';
       display: block;
-      width: 34px;
+      width: 40px;
       height: 3px;
       margin: 0 0 18px;
       border-radius: 3px;
       background: var(--orange);
+      /* soft warm glow so the kicker reads as the one lit accent on the dark
+         ground — ties into the site's orange-glow language (buttons, scroll bar) */
+      box-shadow: 0 0 12px rgba(255, 125, 26, .55);
     }
 
     /* centred section heads get a centred bar */
@@ -9910,7 +9913,11 @@
     /* -0.02em was set when these were 38px; at the display scale they need to
        close up further or the letters drift apart. Type tracks tighter as it
        gets bigger — same reason the hero sits at -0.03em. */
-    h2.section-title { font-weight: 600; color: var(--orange); letter-spacing: -0.032em; }
+    /* Clean-premium titles: near-white heading, orange kept only as the kicker
+       mark (see h2.section-title::before). White reads more expensive than a
+       fully-saturated accent-colour heading; weight lifts to hold presence in
+       white on the dark ground. */
+    h2.section-title { font-weight: 700; color: var(--heading); letter-spacing: -0.032em; }
     /* 'pretty' (not 'balance') for body: keeps the measure even but only
        fixes the last-line widow, which is what long copy wants */
     p.section-sub { color: var(--muted); text-wrap: pretty; }
@@ -10097,6 +10104,43 @@
     }
 
     .hq-item .cli-name { color: var(--orange); }
+
+    /* ═══ BRANCHES LIST — design pass (2026) ═══
+       Liquid-glass frost is added to every branch card via CARD_SEL (the same
+       #radio-glass system as the service cards / mega-menu). On top of that:
+       the bare pin is promoted to an orange icon-chip so the branch cards match
+       the site's card language, and resting cards get a faint top-highlight so
+       the grid reads as crafted glass tiles rather than flat slabs. */
+
+    /* pin → icon chip. Scoped to the first child so the injected .cli-chev
+       (accordion chevron) and the .cli-map mini-map icons are left untouched. */
+    .center-list-item > i:first-child {
+      width: 34px; height: 34px; flex: none;
+      display: grid; place-items: center;
+      border-radius: 10px; font-size: 14px;
+      background: var(--orange-l); color: var(--orange);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+    }
+    .center-list-item:hover > i:first-child {
+      background: var(--orange); color: #fff;
+      transform: scale(1.08) rotate(-6deg);
+    }
+    .center-list-item.item-active > i:first-child,
+    .hq-item > i:first-child {
+      background: var(--orange); color: #fff !important;
+    }
+
+    /* resting material: a faint inner top-highlight for tactile depth */
+    .center-list-item {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, 0) 44%),
+        var(--surface-2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+    }
+
+    /* Liquid glass frosts the collapsed row; switch it off while a card is
+       expanded so it never veils the mini-map panel below the row. */
+    .center-list-item.expanded > .lg-glass { opacity: 0 !important; }
 
     /* case-study drill-down + full pages + service modal shells */
     .cs-page, .cs-detail { background: var(--base); }
@@ -18376,7 +18420,7 @@
       /* NOTE: .kf-item (the keyfacts "10+ years" bar above About) and the
          "Why Companies Stay With Us" section cards (.why-metric, .why-point)
          are intentionally excluded — no liquid-glass hover on those. */
-      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a';
+      var CARD_SEL = '.service-card, .industry-card, .cs-home-card, .cs-home-cat-label, .feat-card, .sla-card, .svc-card, .panel, .cs-card, .d-metric, .pager a, .center-list-item';
 
       document.querySelectorAll(CARD_SEL).forEach(function (card) {
 
