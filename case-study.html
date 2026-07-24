@@ -1445,6 +1445,280 @@
       .lg-card > .lg-glass::before { display: none; }
     }
 
+  
+    /* ═══ NAV SEARCH — ported from hpe-enhanced-editing.html so the sub-pages
+       carry the same live site search. Dark tokens come from :root / the nav
+       token re-scope; #radio-glass filter already present on the page. ═══ */
+.nav-search-li { display: flex; align-items: center; }
+    .nav-search { position: relative; display: flex; align-items: center; }
+    .nav-search-toggle {
+      position: relative; z-index: 2; flex: none;
+      width: 42px; height: 42px; display: grid; place-items: center;
+      border: 1px solid rgba(255, 255, 255, .14); border-radius: 50%;
+      background: rgba(255, 255, 255, .06); color: var(--heading); cursor: pointer;
+      isolation: isolate; overflow: hidden;
+      -webkit-backdrop-filter: blur(6px) saturate(150%); backdrop-filter: blur(6px) saturate(150%);
+      box-shadow:
+        0 0 8px rgba(0, 0, 0, .03), 0 2px 6px rgba(0, 0, 0, .08),
+        inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
+        inset -3px -3px .5px -3.5px rgba(255, 255, 255, .85),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .6),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .6),
+        inset 0 0 6px 6px rgba(255, 255, 255, .1);
+      transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease, background .3s ease, border-color .3s ease;
+    }
+    /* the liquid-glass sheen (reuses the #radio-glass filter) */
+    .ns-glass {
+      position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+      background: radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, .22), transparent 60%);
+      filter: url("#radio-glass"); mix-blend-mode: screen; opacity: .7;
+    }
+    .ns-ico { position: relative; z-index: 1; font-size: 15px; color: var(--heading); }
+    /* Point at the icon → HPE-orange glow + the icon springs/blurs in. */
+    .nav-search-toggle:hover, .nav-search.open .nav-search-toggle {
+      border-color: rgba(255, 125, 26, .5);
+      background: linear-gradient(180deg, rgba(255, 125, 26, .16), rgba(255, 125, 26, .07)), rgba(255, 255, 255, .05);
+      box-shadow:
+        0 0 8px rgba(0, 0, 0, .03), 0 2px 6px rgba(0, 0, 0, .08),
+        inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
+        inset -3px -3px .5px -3.5px rgba(255, 255, 255, .85),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .6),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .6),
+        inset 0 0 6px 6px rgba(255, 255, 255, .1),
+        0 0 24px rgba(255, 125, 26, .5), inset 0 0 16px rgba(255, 125, 26, .2);
+    }
+    .nav-search-toggle:hover .ns-ico { animation: nsBlurIn .6s cubic-bezier(.34, 1.56, .64, 1); }
+    .nav-search.open .nav-search-toggle .ns-ico { color: #fff; }
+    @keyframes nsBlurIn {
+      0% { filter: blur(5px); opacity: .35; transform: scale(.8) translateX(-4px); }
+      100% { filter: blur(0); opacity: 1; transform: none; }
+    }
+
+    /* the search bar: expands out to the left of the icon on click */
+    .nav-search-field {
+      position: absolute; right: 50px; top: 50%; z-index: 1;
+      height: 40px; width: 0; padding: 0; opacity: 0; pointer-events: none;
+      transform: translateY(-50%) scale(.96); filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px;
+      background: rgba(13, 22, 38, .92);
+      -webkit-backdrop-filter: blur(12px) saturate(150%); backdrop-filter: blur(12px) saturate(150%);
+      box-shadow: 0 14px 34px -18px rgba(0, 0, 0, .9), inset 0 1px 0 rgba(255, 255, 255, .06);
+      color: var(--heading); font: inherit; font-size: 14px; outline: none;
+      transition: width .5s cubic-bezier(.22, 1, .36, 1), padding .5s cubic-bezier(.22, 1, .36, 1),
+        opacity .35s ease, filter .45s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
+    }
+    .nav-search-field::placeholder { color: var(--muted); }
+    .nav-search.open .nav-search-field {
+      width: 232px; padding: 0 18px; opacity: 1; pointer-events: auto;
+      filter: blur(0); transform: translateY(-50%) scale(1);
+    }
+    /* Point at / click into the search bar → HPE-orange glow (matches the icon). */
+    .nav-search-field:hover, .nav-search-field:focus {
+      border-color: rgba(255, 125, 26, .55);
+      background: linear-gradient(180deg, rgba(255, 125, 26, .12), rgba(13, 22, 38, .92));
+      box-shadow:
+        0 14px 34px -18px rgba(0, 0, 0, .9), inset 0 1px 0 rgba(255, 255, 255, .06),
+        0 0 24px rgba(255, 125, 26, .45), inset 0 0 16px rgba(255, 125, 26, .18);
+    }
+    .nav-search-field:focus::placeholder { color: rgba(255, 190, 143, .7); }
+
+    /* results dropdown — items blur-in one by one (like the component) */
+    .nav-search-results {
+      position: absolute; top: calc(100% + 14px); right: 0; z-index: 300;
+      width: 344px; max-height: 420px; overflow: hidden; padding: 7px;
+      display: flex; flex-direction: column;
+      background: linear-gradient(180deg, rgba(18, 27, 42, .98), rgba(9, 14, 23, .98));
+      border: 1px solid rgba(255, 255, 255, .1); border-radius: 18px;
+      box-shadow: 0 30px 72px -24px rgba(0, 0, 0, .95), inset 0 1px 0 rgba(255, 255, 255, .06), 0 0 0 1px rgba(255, 125, 26, .05);
+      -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+      opacity: 0; transform: translateY(-10px) scale(.98); transform-origin: top right; pointer-events: none;
+      transition: opacity .28s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
+    }
+    .nav-search.open.has-results .nav-search-results { opacity: 1; transform: none; pointer-events: auto; }
+    /* the results scroll; the keyboard-guide footer stays pinned at the bottom.
+       The native scrollbar is hidden — a custom orange one (.ns-prog) replaces it. */
+    .ns-scroll { position: relative; isolation: isolate; flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    .ns-scroll::-webkit-scrollbar { width: 0; height: 0; }
+
+    /* Scroll containment — scrolling inside any of these lists/panels must NOT
+       chain to (scroll) the page behind them once the list hits its top or bottom. */
+    .mobile-menu,
+    .ns-scroll,
+    .mega .mega-grid,
+    .cs-detail,
+    .cs-page-scroll,
+    .svc-modal-body { overscroll-behavior: contain; }
+
+    /* Search-list scroll indicator — the SAME orange progress bar as the navbar
+       one (warm fill + glowing comet head), turned vertical and draggable so you
+       can scrub the results. JS sizes/positions it over the scroll area, fills it
+       to the scroll fraction, and moves scrollTop when you drag it. */
+    .ns-prog {
+      position: absolute; right: 5px; width: 4px; z-index: 3;
+      border-radius: 4px; background: rgba(255, 255, 255, .06);
+      opacity: 0; transition: opacity .3s ease; cursor: pointer; touch-action: none;
+    }
+    .ns-prog.on { opacity: 1; }
+    .ns-prog:hover { background: rgba(255, 255, 255, .1); }
+    .ns-prog-fill {
+      position: absolute; top: 0; left: 0; right: 0; height: 0;
+      border-radius: 4px;
+      background: linear-gradient(180deg, var(--orange) 0%, #ff8e2b 45%, #ffab52 78%, #ffe3bf 100%);
+      box-shadow: 0 0 12px rgba(255, 138, 43, .7), 0 0 4px rgba(255, 138, 43, .6);
+    }
+    .ns-prog-head {
+      position: absolute; left: 50%; bottom: 0; width: 9px; height: 9px;
+      transform: translate(-50%, 50%); border-radius: 50%; pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, #fff 0%, #ffdcae 38%, var(--orange) 72%);
+      animation: sbHeadPulse 1.9s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ns-prog-head { animation: none; box-shadow: 0 0 8px 2px rgba(255, 157, 63, .8), 0 0 16px 5px rgba(244, 121, 32, .5); }
+    }
+
+    .ns-group + .ns-group { margin-top: 3px; border-top: 1px solid rgba(255, 255, 255, .055); padding-top: 5px; }
+    .ns-group-label {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); padding: 9px 12px 6px;
+    }
+    .ns-group-label .ns-group-n {
+      font-size: 9.5px; font-weight: 700; letter-spacing: .02em; color: var(--muted);
+      min-width: 16px; height: 16px; padding: 0 5px; display: inline-grid; place-items: center;
+      background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); border-radius: 999px;
+    }
+
+    .ns-result {
+      position: relative; isolation: isolate; display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 12px; color: var(--text); text-decoration: none; cursor: pointer;
+      /* slow one-by-one cascade — the EXACT mechanism the Services mega-menu
+         uses: rows start hidden + scaled, JS adds .ns-in one at a time
+         (160ms + 150ms apart) so each result slowly springs in, in turn. */
+      opacity: 0; transform: scale(.3); transform-origin: center; will-change: transform, opacity;
+      transition:
+        opacity .5s cubic-bezier(.34, 1.56, .64, 1),
+        transform .5s cubic-bezier(.34, 1.56, .64, 1),
+        background .18s ease;
+    }
+    .ns-result.ns-in { opacity: 1; transform: none; }
+    /* ONE frosted #radio-glass pill (the same liquid glass the Services mega-menu
+       items use) that GLIDES between rows as the pointer/keyboard moves — it
+       flows from the previous option to the next instead of each row fading its
+       own glass. JS translates + resizes it to the hovered/active row; the CSS
+       transition below is what makes it slowly stream across. */
+    .ns-glide {
+      position: absolute; top: 0; left: 0; z-index: -1; width: 0; height: 0;
+      border-radius: 12px; pointer-events: none; opacity: 0;
+      /* when parked on a row the glass reads HPE-orange (the white insets keep the
+         glass-edge refraction on top of the orange fill) */
+      background: linear-gradient(180deg, rgba(255, 125, 26, .24), rgba(255, 125, 26, .11)), rgba(255, 255, 255, .04);
+      -webkit-backdrop-filter: blur(4px) saturate(160%); backdrop-filter: blur(4px) saturate(160%);
+      box-shadow:
+        0 0 8px rgba(0, 0, 0, .03), 0 2px 6px rgba(0, 0, 0, .08),
+        inset 3px 3px .5px -3.5px rgba(255, 255, 255, .09),
+        inset -3px -3px .5px -3.5px rgba(255, 255, 255, .85),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .6),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .6),
+        inset 0 0 6px 6px rgba(255, 255, 255, .12),
+        inset 0 0 2px 2px rgba(255, 255, 255, .06),
+        0 0 22px rgba(255, 125, 26, .48), inset 0 0 18px rgba(255, 125, 26, .2);
+      /* the flow: position + size ease between rows; opacity fades on enter/leave */
+      transition:
+        transform .46s cubic-bezier(.34, 1.32, .48, 1),
+        width .46s cubic-bezier(.34, 1.32, .48, 1),
+        height .46s cubic-bezier(.34, 1.32, .48, 1),
+        opacity .28s ease;
+      will-change: transform, width, height, opacity;
+    }
+    .ns-glide::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      background:
+        radial-gradient(120% 85% at 28% 0%, rgba(255, 255, 255, .28), transparent 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 55%);
+      filter: url("#radio-glass"); mix-blend-mode: screen; opacity: .75;
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .ns-glide { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 125, 26, .22); }
+      .ns-glide::before { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ns-glide { transition: opacity .2s ease; }
+    }
+    .ns-result::before {
+      content: ''; position: absolute; left: 4px; top: 50%; width: 3px; height: 20px; border-radius: 3px;
+      background: var(--orange); transform: translateY(-50%) scaleY(0); transform-origin: center; z-index: 1;
+      transition: transform .22s cubic-bezier(.22, 1, .36, 1);
+    }
+    .ns-result:hover, .ns-result.is-active { background: rgba(255, 255, 255, .02); }
+    .ns-result:hover::before, .ns-result.is-active::before { transform: translateY(-50%) scaleY(1); }
+    .ns-r-ico {
+      width: 34px; height: 34px; flex: none; border-radius: 10px; display: grid; place-items: center;
+      background: linear-gradient(155deg, rgba(255, 125, 26, .22), rgba(255, 125, 26, .1));
+      border: 1px solid rgba(255, 125, 26, .24); color: var(--orange); font-size: 13px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), background .2s ease;
+    }
+    .ns-result:hover .ns-r-ico, .ns-result.is-active .ns-r-ico {
+      transform: scale(1.08) rotate(-5deg);
+      background: linear-gradient(155deg, rgba(255, 125, 26, .42), rgba(255, 125, 26, .2));
+    }
+    .ns-r-tx { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; color: var(--heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* matched substring gets a soft orange wash (command-palette match highlight) */
+    .ns-hl { background: rgba(255, 125, 26, .16); color: #ffd0a3; font-weight: 700; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255, 125, 26, .12); }
+    /* trailing "press Enter" keycap — appears only on the hovered/active row */
+    .ns-r-go {
+      flex: none; display: inline-flex; align-items: center; gap: 5px;
+      opacity: 0; transform: translateX(-6px);
+      transition: opacity .2s ease, transform .2s cubic-bezier(.22, 1, .36, 1);
+    }
+    .ns-r-go kbd {
+      display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px;
+      font: 700 10px/1 inherit; color: #fff;
+      background: linear-gradient(180deg, rgba(255, 146, 62, .96), rgba(244, 121, 32, .82));
+      border: 1px solid rgba(255, 190, 140, .55); border-radius: 6px;
+      box-shadow: 0 1.5px 0 rgba(120, 45, 5, .5), inset 0 1px 0 rgba(255, 255, 255, .32);
+    }
+    .ns-result:hover .ns-r-go, .ns-result.is-active .ns-r-go { opacity: 1; transform: none; }
+
+    .ns-empty { display: flex; flex-direction: column; align-items: center; gap: 11px; padding: 32px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+    .ns-empty .ns-empty-ico {
+      width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; font-size: 16px;
+      color: var(--orange); background: linear-gradient(155deg, rgba(255, 125, 26, .16), rgba(255, 125, 26, .05));
+      border: 1px solid rgba(255, 125, 26, .2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+    }
+    .ns-empty .ns-empty-sub { font-size: 11px; color: rgba(255, 255, 255, .34); }
+
+    .ns-foot {
+      flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin: 6px -7px -7px; padding: 9px 15px 10px;
+      border-top: 1px solid rgba(255, 255, 255, .08); border-radius: 0 0 18px 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .022), rgba(9, 14, 23, .62));
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+    .ns-foot-count { font-size: 10.5px; letter-spacing: .01em; color: var(--muted); white-space: nowrap; }
+    .ns-foot-count strong { color: var(--heading); font-weight: 700; }
+    .ns-foot-hints { display: inline-flex; align-items: center; gap: 11px; flex-wrap: wrap; justify-content: flex-end; }
+    .ns-hint { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--muted); }
+    /* physical keycaps — top sheen + bottom edge give a real key feel */
+    .ns-foot kbd, .mega-foot kbd {
+      display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px;
+      font-family: inherit; font-size: 10px; font-weight: 700; line-height: 1; color: var(--heading);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .05));
+      border: 1px solid rgba(255, 255, 255, .18); border-radius: 5px;
+      box-shadow: 0 1.5px 0 rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .14);
+    }
+    @keyframes nsResIn {
+      0% { opacity: 0; transform: scale(.3); }
+      100% { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-search-field { transition: opacity .2s ease; filter: none; }
+      .nav-search.open .nav-search-field { filter: none; }
+      .nav-search-toggle:hover .ns-ico { animation: none; }
+      .ns-result { animation: none; }
+      .ns-r-ico, .ns-result::before, .ns-r-go { transition: none; }
+    }
+    @media (max-width: 1080px) { .nav-search.open .nav-search-field { width: 180px; } }
   </style>
 </head>
 
@@ -1465,6 +1739,16 @@
     </a>
 
     <ul class="nav-links">
+      <li class="nav-search-li">
+        <div class="nav-search" id="navSearch">
+          <input type="text" class="nav-search-field" id="navSearchField" placeholder="Search HPE…" aria-label="Search the site" autocomplete="off" spellcheck="false" />
+          <button type="button" class="nav-search-toggle" id="navSearchToggle" aria-label="Open search" aria-expanded="false">
+            <span class="ns-glass" aria-hidden="true"></span>
+            <i class="fa-solid fa-magnifying-glass ns-ico"></i>
+          </button>
+          <div class="nav-search-results" id="navSearchResults" role="listbox" aria-label="Search results"></div>
+        </div>
+      </li>
       <li><a href="hpe-enhanced-editing.html#about"><i class="fa-solid fa-circle-info fa-sm" style="color:var(--orange);margin-right:2px;"></i> About Us</a></li>
       <li class="has-dropdown">
         <a href="hpe-enhanced-editing.html#services">Services <i class="fa-solid fa-chevron-down chevron"></i></a>
@@ -1999,6 +2283,224 @@
         card.appendChild(g);
       });
     })();
+  </script>
+
+
+  <!-- Nav site-search (ported from the main page; case studies indexed from
+       the CS data object on case-study.html, absent on services.html). -->
+  <script>
+    function initNavSearch() {
+      var wrap = document.getElementById('navSearch');
+      var toggle = document.getElementById('navSearchToggle');
+      var field = document.getElementById('navSearchField');
+      var results = document.getElementById('navSearchResults');
+      if (!wrap || !toggle || !field || !results) return;
+
+      function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+      // Build a live search index straight from the page so it stays in sync.
+      var index = [], seen = {};
+      function add(label, href, kind, icon) {
+        label = (label || '').replace(/\s+/g, ' ').trim();
+        if (!label || !href) return;
+        var key = kind + '|' + label.toLowerCase();
+        if (seen[key]) return; seen[key] = 1;
+        index.push({ label: label, href: href, kind: kind, icon: icon });
+      }
+      document.querySelectorAll('#navbar .nav-links > li > a[href]').forEach(function (a) {
+        if (a.closest('.nav-search')) return;
+        add(a.textContent, a.getAttribute('href'), 'Section', 'fa-hashtag');
+      });
+      document.querySelectorAll('.mega-item').forEach(function (a) {
+        var t = a.querySelector('.mi-tx strong');
+        if (t) add(t.textContent, a.getAttribute('href'), 'Service', 'fa-screwdriver-wrench');
+      });
+      // case studies: sub-pages have no .cs-home-card, so pull them from the
+      // global CS data object when it exists (present on case-study.html)
+      if (window.CS) {
+        Object.keys(window.CS).forEach(function (id) {
+          var d = window.CS[id];
+          if (d && d.title) add(d.title, 'case-study.html?case=' + id, 'Case study', d.icon || 'fa-file-lines');
+        });
+      }
+
+      var activeIdx = -1;
+
+      // The single liquid-glass pill that streams between rows. placeGlide sizes +
+      // translates it onto a row; the CSS transition does the flowing motion.
+      var glide = null;
+      function placeGlide(el) {
+        if (!glide || !el) return;
+        var x = el.offsetLeft, y = el.offsetTop, w = el.offsetWidth, h = el.offsetHeight;
+        if (glide.style.opacity !== '1') {
+          // first appearance — snap onto the row (no transition) so it doesn't fly in from a corner
+          glide.style.transition = 'none';
+          glide.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+          glide.style.width = w + 'px'; glide.style.height = h + 'px';
+          void glide.offsetWidth;               // commit, then restore the transition
+          glide.style.transition = '';
+        } else {
+          // already parked on a row — let it flow across to the new one
+          glide.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+          glide.style.width = w + 'px'; glide.style.height = h + 'px';
+        }
+        glide.style.opacity = '1';
+      }
+      function hideGlide() { if (glide) glide.style.opacity = '0'; }
+
+      // one-by-one reveal, same as the Services mega-menu (revealMegaItems)
+      var revealTimers = [];
+      function clearReveal() { revealTimers.forEach(clearTimeout); revealTimers = []; }
+      function reveal() {
+        var items = results.querySelectorAll('.ns-result');
+        void results.offsetWidth;   // reflow so each row starts from its hidden state
+        items.forEach(function (el, i) {
+          revealTimers.push(setTimeout(function () { el.classList.add('ns-in'); }, 160 + i * 150));
+        });
+      }
+      function open() {
+        wrap.classList.add('open'); toggle.setAttribute('aria-expanded', 'true');
+        setTimeout(function () { field.focus(); }, 80);
+      }
+      function close() {
+        clearReveal();
+        wrap.classList.remove('open', 'has-results'); toggle.setAttribute('aria-expanded', 'false');
+        field.value = ''; results.innerHTML = ''; activeIdx = -1;
+      }
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        wrap.classList.contains('open') ? close() : open();
+      });
+
+      function hl(label, q) {
+        var i = label.toLowerCase().indexOf(q);
+        if (i < 0) return esc(label);
+        return esc(label.slice(0, i)) + '<mark class="ns-hl">' + esc(label.slice(i, i + q.length)) + '</mark>' + esc(label.slice(i + q.length));
+      }
+      var KIND_LABEL = { 'Section': 'Sections', 'Service': 'Services', 'Case study': 'Case studies' };
+      var KIND_ORDER = ['Section', 'Service', 'Case study'];
+      function render(q) {
+        clearReveal();
+        var ql = q.trim().toLowerCase(); activeIdx = -1;
+        if (!ql) { results.innerHTML = ''; wrap.classList.remove('has-results'); return; }
+        var matches = index.filter(function (it) { return it.label.toLowerCase().indexOf(ql) !== -1; }).slice(0, 8);
+        if (!matches.length) {
+          results.innerHTML = '<div class="ns-empty"><span class="ns-empty-ico"><i class="fa-solid fa-magnifying-glass"></i></span>' +
+            '<span>No matches for &ldquo;' + esc(q) + '&rdquo;</span>' +
+            '<span class="ns-empty-sub">Try a section, service, or case-study name</span></div>';
+          wrap.classList.add('has-results'); return;
+        }
+        var by = {};
+        matches.forEach(function (m) { (by[m.kind] = by[m.kind] || []).push(m); });
+        var gi = 0, html = '<div class="ns-scroll"><span class="ns-glide" aria-hidden="true"></span>';
+        KIND_ORDER.forEach(function (kind) {
+          var arr = by[kind]; if (!arr) return;
+          html += '<div class="ns-group"><div class="ns-group-label"><span>' + (KIND_LABEL[kind] || kind) + '</span><span class="ns-group-n">' + arr.length + '</span></div>';
+          arr.forEach(function (it) {
+            html += '<a class="ns-result" href="' + esc(it.href) + '" role="option" data-i="' + gi + '">' +
+              '<span class="ns-r-ico"><i class="fa-solid ' + it.icon + '"></i></span>' +
+              '<span class="ns-r-tx">' + hl(it.label, ql) + '</span>' +
+              '<span class="ns-r-go"><kbd>&#8629;</kbd></span></a>';
+            gi++;
+          });
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '<div class="ns-prog"><div class="ns-prog-fill"><span class="ns-prog-head"></span></div></div>';
+        html += '<div class="ns-foot">' +
+          '<span class="ns-foot-count"><strong>' + matches.length + '</strong> result' + (matches.length === 1 ? '' : 's') + '</span>' +
+          '<span class="ns-foot-hints">' +
+            '<span class="ns-hint"><kbd>&#8593;</kbd><kbd>&#8595;</kbd> navigate</span>' +
+            '<span class="ns-hint"><kbd>&#8629;</kbd> open</span>' +
+            '<span class="ns-hint"><kbd>esc</kbd> close</span></span></div>';
+        results.innerHTML = html;
+        wrap.classList.add('has-results');
+        // wire the gliding glass: it flows to whichever row the pointer enters,
+        // and returns to the keyboard-active row (or fades out) when the pointer leaves
+        glide = results.querySelector('.ns-glide');
+        var rowEls = results.querySelectorAll('.ns-result');
+        rowEls.forEach(function (el) {
+          el.addEventListener('mouseenter', function () { placeGlide(el); });
+        });
+        var scrollEl = results.querySelector('.ns-scroll');
+        if (scrollEl) scrollEl.addEventListener('mouseleave', function () {
+          if (activeIdx >= 0 && rowEls[activeIdx]) placeGlide(rowEls[activeIdx]); else hideGlide();
+        });
+
+        // custom orange scroll-progress bar for the list — matches the navbar bar
+        // (fill + comet head) and is draggable to scrub through the results
+        var prog = results.querySelector('.ns-prog');
+        var progFill = prog ? prog.querySelector('.ns-prog-fill') : null;
+        if (prog && scrollEl) {
+          function layoutProg() {
+            prog.style.top = scrollEl.offsetTop + 'px';
+            prog.style.height = scrollEl.clientHeight + 'px';
+          }
+          function updateProg() {
+            var maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
+            if (maxScroll <= 1) { prog.classList.remove('on'); return; }
+            prog.classList.add('on');
+            var frac = scrollEl.scrollTop / maxScroll;
+            if (progFill) progFill.style.height = (frac * scrollEl.clientHeight) + 'px';
+          }
+          function scrubTo(e) {
+            var r = prog.getBoundingClientRect();
+            var frac = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+            scrollEl.scrollTop = frac * (scrollEl.scrollHeight - scrollEl.clientHeight);
+            updateProg();
+          }
+          layoutProg(); updateProg();
+          // rows scale-in after render can shift the layout height — recompute shortly after
+          setTimeout(function () { layoutProg(); updateProg(); }, 60);
+          scrollEl.addEventListener('scroll', updateProg, { passive: true });
+          var dragging = false;
+          prog.addEventListener('pointerdown', function (e) {
+            e.preventDefault(); dragging = true;
+            try { prog.setPointerCapture(e.pointerId); } catch (_) {}
+            scrubTo(e);
+          });
+          prog.addEventListener('pointermove', function (e) { if (dragging) scrubTo(e); });
+          function endDrag(e) { dragging = false; try { prog.releasePointerCapture(e.pointerId); } catch (_) {} }
+          prog.addEventListener('pointerup', endDrag);
+          prog.addEventListener('pointercancel', endDrag);
+        }
+
+        reveal();
+      }
+
+      var deb;
+      field.addEventListener('input', function () {
+        clearTimeout(deb); var v = field.value; deb = setTimeout(function () { render(v); }, 120);
+      });
+      function highlight(items) {
+        items.forEach(function (it, i) { it.classList.toggle('is-active', i === activeIdx); });
+        if (activeIdx >= 0 && items[activeIdx]) { items[activeIdx].scrollIntoView({ block: 'nearest' }); placeGlide(items[activeIdx]); }
+      }
+      field.addEventListener('keydown', function (e) {
+        var items = results.querySelectorAll('.ns-result');
+        if (e.key === 'Escape') { close(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); if (items.length) { activeIdx = (activeIdx + 1) % items.length; highlight(items); } }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); if (items.length) { activeIdx = (activeIdx - 1 + items.length) % items.length; highlight(items); } }
+        else if (e.key === 'Enter') { var t = (activeIdx >= 0 ? items[activeIdx] : items[0]); if (t) { e.preventDefault(); t.click(); } }
+      });
+      // let same-page anchor links close the overlay after the jump — but only
+      // when an actual result row is clicked, not the scroll bar / footer / chrome
+      results.addEventListener('click', function (e) { if (e.target.closest('.ns-result')) setTimeout(close, 60); });
+      // keep the wheel inside the list: never let it move the page behind, even
+      // when the pointer is over the footer / scrollbar (the panel's non-scroll areas)
+      results.addEventListener('wheel', function (e) {
+        var sc = results.querySelector('.ns-scroll');
+        if (!sc || sc.scrollHeight <= sc.clientHeight + 1) return;   // nothing to scroll → leave the page alone
+        var step = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? sc.clientHeight : 1;
+        var atTop = sc.scrollTop <= 0;
+        var atBottom = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1;
+        if (!sc.contains(e.target)) { sc.scrollTop += e.deltaY * step; e.preventDefault(); }
+        else if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) { e.preventDefault(); }
+      }, { passive: false });
+      document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNavSearch);
+    else initNavSearch();
   </script>
 
 </body>
