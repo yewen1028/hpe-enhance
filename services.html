@@ -243,6 +243,36 @@
     .svc-more i { transition: transform .2s; }
     .svc-card:hover .svc-more i { transform: translateX(4px); }
 
+    /* Desktop (>1024px): swap the responsive grid for a single horizontal
+       scroll-snap row — fixed-width cards that snap into place as you scroll
+       sideways. The base .svc-grid still applies below 1025px, so the grid
+       stays the mobile fallback. overflow-y is hidden (not visible) so it pairs
+       cleanly with overflow-x:auto; the top/bottom padding gives the card
+       hover-lift + shadow room without spawning a vertical scrollbar. */
+    @media (min-width: 1025px) {
+      .svc-snap {
+        display: flex;
+        gap: 26px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 4px;
+        scroll-behavior: smooth;
+        padding: 14px 4px 30px;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+      }
+      .svc-snap > .svc-card {
+        flex: 0 0 clamp(340px, 30vw, 400px);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+      .svc-snap::-webkit-scrollbar { height: 8px; }
+      .svc-snap::-webkit-scrollbar-track { background: rgba(255, 255, 255, .05); border-radius: 999px; }
+      .svc-snap::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .16); border-radius: 999px; }
+      .svc-snap::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+    }
+
     /* FOOTER */
     /* ─── FOOTER — replicated from hpe-enhanced-editing.html so it is identical
        across the main page and the sub-pages. #0a111d matches the main page's
@@ -289,6 +319,7 @@
       html { scroll-behavior: auto; }
       .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
       .i-word { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .svc-snap { scroll-behavior: auto; }
       .hero-bg { transform: translate3d(0, 0, 0) scale(1.16); }
       .hero-glow, .hero .wrap { transform: none; }
     }
@@ -2344,7 +2375,7 @@
             '</div>' +
           '</div>' +
         '</section>' +
-        '<section class="i-body" data-nav-accent="services"><div class="wrap"><div class="svc-grid">' + cards + '</div></div></section>';
+        '<section class="i-body" data-nav-accent="services"><div class="wrap"><div class="svc-grid svc-snap">' + cards + '</div></div></section>';
 
       document.title = 'Services — HPE Solutions Sdn Bhd';
 
