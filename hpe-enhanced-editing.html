@@ -283,17 +283,34 @@
 
       background: rgba(0, 0, 0, .06);
 
-      color: var(--orange);
+      color: var(--nav-accent, var(--orange));
 
     }
 
 
 
+    /* ─── Per-section nav accent ───────────────────────────────────────
+       The scroll-spy sets --nav-accent / --nav-accent-soft on #navbar to the
+       colour of the section currently in view; the active pill, its underline
+       and hover all read these, so the nav's accent shifts to match the
+       section instead of only fading its content in. Defaults to the brand
+       orange, so nothing changes until a section drives it. The referencing
+       properties (color/background) already transition, so the shift eases.
+       Declared on :root (not #navbar) so the scroll bar — a sibling of the
+       nav on the sub-pages — inherits it too; JS sets the override on :root. */
+    :root {
+
+      --nav-accent: var(--orange);
+
+      --nav-accent-soft: var(--orange-l);
+
+    }
+
     .nav-links>li>a.active {
 
-      color: var(--orange);
+      color: var(--nav-accent, var(--orange));
 
-      background: var(--orange-l);
+      background: var(--nav-accent-soft, var(--orange-l));
 
     }
 
@@ -315,7 +332,7 @@
 
       height: 2px;
 
-      background: var(--orange);
+      background: var(--nav-accent, var(--orange));
 
       border-radius: 2px;
 
@@ -323,7 +340,7 @@
 
       transform-origin: center;
 
-      transition: transform .25s ease;
+      transition: transform .25s ease, background .3s ease;
 
     }
 
@@ -9987,8 +10004,8 @@
       box-shadow: 0 12px 40px -12px rgba(0,0,0,.7);
     }
     .nav-links > li > a { color: var(--text); }
-    .nav-links > li > a:hover { background: rgba(255,255,255,.06); color: var(--orange); }
-    .nav-links > li > a.active { color: var(--orange); background: var(--orange-l); }
+    .nav-links > li > a:hover { background: rgba(255,255,255,.06); color: var(--nav-accent, var(--orange)); }
+    .nav-links > li > a.active { color: var(--nav-accent, var(--orange)); background: var(--nav-accent-soft, var(--orange-l)); }
     .hamburger span { background: var(--text); }
     /* heavily frosted glass: still translucent, but the page behind is blurred
        enough that it never reads as legible content through the menu */
@@ -17296,6 +17313,32 @@
 
       if (!links.length) return;
 
+      const nav = document.getElementById('navbar');
+      /* Per-section accent the nav shifts to as each section scrolls into view.
+         Keyed by section element id: solid drives the active pill's text +
+         underline + hover, soft is the pill background. #services & #contact
+         stay brand orange (flagship + CTA); the middle sections carry their own
+         hue so the nav reads the section you're in. */
+      const SECTION_ACCENTS = {
+        about:       { solid: '#f59e42', soft: 'rgba(245,158,66,.16)' },
+        services:    { solid: '#ff7d1a', soft: 'rgba(255,125,26,.15)' },
+        casestudy:   { solid: '#7c6cf0', soft: 'rgba(124,108,240,.17)' },
+        centers:     { solid: '#23b5c9', soft: 'rgba(35,181,201,.17)' },
+        bizpartners: { solid: '#45b47a', soft: 'rgba(69,180,122,.17)' },
+        contact:     { solid: '#ff7d1a', soft: 'rgba(255,125,26,.15)' }
+      };
+      const root = document.documentElement;     // set on :root so the nav pill AND the scroll bar inherit
+      function applyAccent(cur) {
+        const acc = cur ? SECTION_ACCENTS[cur.el.id] : null;
+        if (acc) {
+          root.style.setProperty('--nav-accent', acc.solid);
+          root.style.setProperty('--nav-accent-soft', acc.soft);
+        } else {                                   // above the first section (hero)
+          root.style.removeProperty('--nav-accent');
+          root.style.removeProperty('--nav-accent-soft');
+        }
+      }
+
       const navH = parseInt(getComputedStyle(document.documentElement)
         .getPropertyValue('--nav-h')) || 76;
 
@@ -17324,6 +17367,7 @@
         }
 
         links.forEach(l => l.a.classList.toggle('active', l === current));
+        applyAccent(current);
       }
 
       function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
