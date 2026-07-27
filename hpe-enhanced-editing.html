@@ -3518,25 +3518,28 @@
 
       overflow: visible;
 
+      /* clip-path drives the scroll draw-in (left→right); the dash pattern is
+         reserved for the dots, so the reveal rides on clip-path instead. */
+      clip-path: inset(0 0 0 0);
+
+      transition: clip-path .12s linear;
+
     }
 
     .steps-connector path {
 
       fill: none;
 
-      stroke: rgba(255, 255, 255, .22);
+      stroke: rgba(255, 255, 255, .28);
 
-      stroke-width: 2;
+      /* small, tightly-spaced round dots (compressed dotted connector) */
+      stroke-width: 1.6;
 
       stroke-linecap: round;
 
-      stroke-dasharray: 1;
-
-      stroke-dashoffset: 0;
+      stroke-dasharray: 0.1 5;
 
       vector-effect: non-scaling-stroke;
-
-      transition: stroke-dashoffset .12s linear;
 
     }
 
@@ -14421,7 +14424,7 @@
 
       <svg class="steps-connector" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true">
 
-        <path d="M 10 2 L 90 2" pathLength="1" />
+        <path d="M 10 2 L 90 2" />
 
       </svg>
 
@@ -19146,25 +19149,26 @@
 
     /* ── Self-drawing process connector ──────────────────────────────────
        Maps scroll progress of the .steps row through the viewport onto the
-       SVG stroke-dashoffset (1 = undrawn → 0 = fully drawn), so the line
-       between the step circles draws itself as the user scrolls through the
-       #process section. rAF-throttled + passive, per the shared scroll rules.
-       Bails to a fully-drawn line under reduced motion; the CSS default (offset
-       0) covers the no-JS case. */
+       SVG's clip-path inset (100% = undrawn → 0% = fully drawn), so the dotted
+       line between the step circles draws itself left→right as the user scrolls
+       through the #process section. clip-path (not stroke-dashoffset) does the
+       reveal, leaving the dash pattern free to render the dots. rAF-throttled +
+       passive, per the shared scroll rules. Bails to a fully-drawn line under
+       reduced motion; the CSS default (inset 0) covers the no-JS case. */
 
     (function () {
 
       var steps = document.querySelector('.process .steps');
 
-      var path = steps && steps.querySelector('.steps-connector path');
+      var svg = steps && steps.querySelector('.steps-connector');
 
-      if (!path) return;
+      if (!svg) return;
 
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (reduce) { path.style.strokeDashoffset = '0'; return; }
+      if (reduce) { svg.style.clipPath = 'none'; return; }
 
-      path.style.strokeDashoffset = '1';   // JS present → start undrawn
+      svg.style.clipPath = 'inset(0 100% 0 0)';   // JS present → start undrawn
 
       var ticking = false;
 
@@ -19184,7 +19188,7 @@
 
         if (p < 0) p = 0; else if (p > 1) p = 1;
 
-        path.style.strokeDashoffset = (1 - p).toFixed(4);
+        svg.style.clipPath = 'inset(0 ' + ((1 - p) * 100).toFixed(2) + '% 0 0)';
 
       }
 
