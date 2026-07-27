@@ -21,6 +21,30 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <style>
+    /* ── Cross-page View Transitions ─────────────────────────────
+       Opt every same-origin navigation (Home ⇄ Services ⇄ Case Studies)
+       into the View Transitions API so nav clicks crossfade + slide
+       instead of hard-reloading. Chromium 126+ honours this at-rule;
+       Firefox / older Safari ignore it and fall back to a plain
+       navigation with no flash — no JS feature-detect needed. */
+    @view-transition { navigation: auto; }
+
+    @keyframes vt-fade-out { to   { opacity: 0; transform: translateY(-12px); } }
+    @keyframes vt-fade-in  { from { opacity: 0; transform: translateY(14px);  } }
+
+    ::view-transition-old(root) { animation: vt-fade-out .32s cubic-bezier(.4,0,.2,1) both; }
+    ::view-transition-new(root) { animation: vt-fade-in  .38s cubic-bezier(.4,0,.2,1) both; }
+
+    /* Keep the shared top navbar pinned: it snapshots separately and
+       morphs between pages instead of crossfading with the body. */
+    #navbar { view-transition-name: site-nav; }
+    ::view-transition-group(site-nav) { animation-duration: .38s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-old(root),
+      ::view-transition-new(root) { animation-duration: .01s; transform: none; }
+    }
+
     :root {
       --orange: #f47920;
       --orange-d: #d9631a;
