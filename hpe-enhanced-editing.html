@@ -1159,6 +1159,33 @@
       pointer-events: none;
     }
 
+    /* Soft radial "spotlight" that follows the cursor, sitting behind the
+       hero text (hero-left is z-index:2). --mx/--my are set in JS as px
+       offsets; starts centred. Fades in on first move via .is-lit.
+       Disabled on touch / reduced-motion (see the JS guard + media query). */
+    .hero-spotlight {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .6s ease;
+      background: radial-gradient(340px 340px at var(--mx, 50%) var(--my, 40%),
+          rgba(244, 121, 32, .28) 0%,
+          rgba(244, 121, 32, .12) 32%,
+          rgba(244, 121, 32, 0) 68%);
+    }
+
+    .hero-spotlight.is-lit {
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-spotlight {
+        display: none;
+      }
+    }
+
     /* keep the product image above the network canvas */
     .hero-right {
       z-index: 1;
@@ -13470,6 +13497,8 @@
 
     <canvas class="hero-net" id="heroNet" aria-hidden="true"></canvas>
 
+    <div class="hero-spotlight" id="heroSpotlight" aria-hidden="true"></div>
+
     <div class="hero-left">
 
       <div class="hero-badge">
@@ -13511,6 +13540,42 @@
     </div>
 
   </section>
+
+  <script>
+    /* Cursor-following hero spotlight. Sets --mx/--my (px offsets within the
+       hero) on the radial-gradient div, rAF-throttled and passive. Skipped
+       entirely on touch/hover-less devices and under reduced motion — CSS
+       also hides the div in those cases, so both layers agree. */
+    (function () {
+      var hero = document.querySelector('.hero');
+      var spot = document.getElementById('heroSpotlight');
+      if (!hero || !spot) return;
+
+      var mm = window.matchMedia;
+      var noHover = mm && mm('(hover: none), (pointer: coarse)').matches;
+      var reduce = mm && mm('(prefers-reduced-motion: reduce)').matches;
+      if (noHover || reduce) return;
+
+      var pending = false, lastX = 0, lastY = 0;
+
+      function apply() {
+        pending = false;
+        var r = hero.getBoundingClientRect();
+        spot.style.setProperty('--mx', (lastX - r.left) + 'px');
+        spot.style.setProperty('--my', (lastY - r.top) + 'px');
+        if (!spot.classList.contains('is-lit')) spot.classList.add('is-lit');
+      }
+
+      hero.addEventListener('mousemove', function (e) {
+        lastX = e.clientX; lastY = e.clientY;
+        if (!pending) { pending = true; requestAnimationFrame(apply); }
+      }, { passive: true });
+
+      hero.addEventListener('mouseleave', function () {
+        spot.classList.remove('is-lit');
+      }, { passive: true });
+    })();
+  </script>
 
   <script>
     /* Ambient hero network — nodes drift and link when close, with a few
