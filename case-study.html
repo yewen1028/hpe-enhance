@@ -311,6 +311,7 @@
     .sc-step {
       position: relative; background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 30px 32px; box-shadow: var(--shadow);
+      scroll-margin-top: calc(var(--nav-h, 68px) + 24px);
     }
     .sc-step-head { display: flex; align-items: center; gap: 13px; margin-bottom: 15px; }
     .sc-step-num {
@@ -320,6 +321,47 @@
     .sc-step-k { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
     .sc-step-t { font-size: 18px; font-weight: 800; color: var(--heading); letter-spacing: -.01em; line-height: 1.25; }
     .sc-step p { color: var(--muted); font-size: 15.5px; line-height: 1.72; }
+
+    /* ── Section progress rail (renderDetail only) ──
+       Fixed vertical dots + thin line on the left edge showing which of the
+       three case-study sections (Challenge / Approach / Outcome) the reader is
+       in. The active dot is driven by an IntersectionObserver as they scroll.
+       Clicking a dot jumps to that section. Hidden once the two-column layout
+       collapses (≤1024px) so it never overlaps content. */
+    .cs-progress {
+      position: fixed; left: 28px; top: 50%; transform: translateY(-50%);
+      z-index: 55; display: flex; flex-direction: column; gap: 26px; padding: 4px 0;
+    }
+    .cs-progress::before {
+      content: ''; position: absolute; left: 7px; top: 9px; bottom: 9px;
+      width: 2px; border-radius: 2px; background: rgba(255, 255, 255, .16);
+    }
+    .cs-progress-item {
+      position: relative; display: flex; align-items: center; gap: 12px;
+      text-decoration: none; color: rgba(255, 255, 255, .55);
+    }
+    .cs-progress-dot {
+      width: 12px; height: 12px; flex-shrink: 0; border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .32); background: var(--base);
+      transition: border-color .3s ease, background .3s ease, box-shadow .3s ease, transform .3s ease;
+    }
+    .cs-progress-label {
+      font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+      white-space: nowrap; opacity: 0; transform: translateX(-6px);
+      transition: opacity .3s ease, transform .3s ease, color .3s ease;
+    }
+    .cs-progress-item:hover { color: rgba(255, 255, 255, .85); }
+    .cs-progress-item:hover .cs-progress-label,
+    .cs-progress-item.active .cs-progress-label { opacity: 1; transform: none; }
+    .cs-progress-item.active { color: var(--orange); }
+    .cs-progress-item.active .cs-progress-dot {
+      border-color: var(--orange); background: var(--orange);
+      box-shadow: 0 0 0 5px rgba(255, 125, 26, .16); transform: scale(1.05);
+    }
+    @media (max-width: 1024px) { .cs-progress { display: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .cs-progress-dot, .cs-progress-label, .cs-progress-item { transition: none; }
+    }
 
     /* "Key moves" mini-list inside the Approach step */
     .sc-moves { list-style: none; margin-top: 16px; display: grid; gap: 11px; }
@@ -2198,18 +2240,18 @@
               '</div>' +
             '</div>' +
             '<div class="sc-flow">' +
-              '<article class="sc-step reveal">' +
+              '<article id="cs-challenge" class="sc-step reveal">' +
                 '<div class="sc-step-head"><span class="sc-step-num"><i class="fa-solid fa-triangle-exclamation"></i></span>' +
                   '<div><div class="sc-step-k">Step 01</div><div class="sc-step-t">The Challenge</div></div></div>' +
                 '<p>' + esc(d.challenge) + '</p>' +
               '</article>' +
-              '<article class="sc-step reveal">' +
+              '<article id="cs-approach" class="sc-step reveal">' +
                 '<div class="sc-step-head"><span class="sc-step-num"><i class="fa-solid fa-lightbulb"></i></span>' +
                   '<div><div class="sc-step-k">Step 02</div><div class="sc-step-t">Our Approach</div></div></div>' +
                 '<p>HPE Solutions deployed a comprehensive, SLA-governed strategy tailored to this client\'s environment and operational requirements, coordinated end to end by a dedicated delivery team.</p>' +
                 '<ul class="sc-moves">' + moves + '</ul>' +
               '</article>' +
-              '<article class="sc-step reveal">' +
+              '<article id="cs-outcome" class="sc-step reveal">' +
                 '<div class="sc-step-head"><span class="sc-step-num"><i class="fa-solid fa-flag-checkered"></i></span>' +
                   '<div><div class="sc-step-k">Step 03</div><div class="sc-step-t">The Outcome</div></div></div>' +
                 '<p>With the rollout complete, ' + esc(d.industry) + ' gained a resilient, fully-supported environment — the results below capture the measurable impact HPE Solutions delivered across the engagement.</p>' +
@@ -2232,7 +2274,12 @@
           '</div>' +
 
           '<div class="pager">' + pager(prev, 'prev') + pager(next, 'next') + '</div>' +
-        '</div></section>';
+        '</div></section>' +
+        '<nav class="cs-progress" aria-label="Case study sections">' +
+          '<a class="cs-progress-item active" href="#cs-challenge" aria-current="true"><span class="cs-progress-dot"></span><span class="cs-progress-label">Challenge</span></a>' +
+          '<a class="cs-progress-item" href="#cs-approach"><span class="cs-progress-dot"></span><span class="cs-progress-label">Approach</span></a>' +
+          '<a class="cs-progress-item" href="#cs-outcome"><span class="cs-progress-dot"></span><span class="cs-progress-label">Outcome</span></a>' +
+        '</nav>';
 
       document.title = d.title + ' — HPE Solutions Case Study';
       var md = document.querySelector('meta[name="description"]');
@@ -2341,6 +2388,30 @@
           pickAccent();
         }, { rootMargin: '-' + navH + 'px 0px -55% 0px', threshold: 0 });
         zones.forEach(function (z) { aio.observe(z); });
+      }
+
+      /* ── Section progress rail (detail view only) ──────────────────────
+         Reuses the same IntersectionObserver idea: a thin band near the
+         middle of the viewport marks whichever of the three .sc-step
+         sections (Challenge / Approach / Outcome) is currently under the
+         reader, so the fixed side rail's active dot tracks their scroll. */
+      var prog = document.querySelector('.cs-progress');
+      var secs = [].slice.call(document.querySelectorAll('.sc-flow .sc-step'));
+      if (prog && secs.length && 'IntersectionObserver' in window) {
+        var pitems = [].slice.call(prog.querySelectorAll('.cs-progress-item'));
+        function setActiveSection(idx) {
+          pitems.forEach(function (it, n) {
+            var on = n === idx;
+            it.classList.toggle('active', on);
+            if (on) it.setAttribute('aria-current', 'true'); else it.removeAttribute('aria-current');
+          });
+        }
+        var pio = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) setActiveSection(secs.indexOf(e.target));
+          });
+        }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+        secs.forEach(function (s) { pio.observe(s); });
       }
     })();
   </script>
