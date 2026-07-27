@@ -11106,23 +11106,28 @@
          downward tail) — the assistant "saying" the greeting. The secondary
          FABs tuck aside while it shows so it never collides with them. */
       right: 18px;
-      /* the chat launcher sits above the call + WhatsApp FABs (2 slots up from
-         the bottom), so the bubble is raised to match: 28 + 2×(52+10) + gap */
-      bottom: 218px;
+      /* Positioned at runtime by positionTeaser() from #chatFab's live
+         getBoundingClientRect(), so the tail always lines up with the launcher
+         no matter the FAB order/count or viewport (incl. the mobile bottom:16px
+         override). This fixed value is only a no-JS fallback — it matches
+         #chatFab's resting top edge as the bottom-most FAB in the stack
+         (fabTop, call, wa, chatFab → launcher spans bottom 28–80px). */
+      bottom: 86px;
       z-index: 195;
       width: max-content;
       max-width: min(276px, calc(100vw - 40px));
       transform-origin: bottom right;
-      background: rgba(12, 20, 34, .62);
-      -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.05);
-      backdrop-filter: blur(22px) saturate(180%) brightness(1.05);
+      /* Solid, near-opaque panel — deliberately NO backdrop-filter. The glass /
+         blur version rendered with invisible text on some GPUs (the copy shared
+         a composited backdrop-filter layer that never painted). A plain opaque
+         background guarantees the text is always legible on every machine. */
+      background: linear-gradient(180deg, rgba(20, 30, 48, .98), rgba(12, 20, 34, .98));
       border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 18px;
       box-shadow:
         0 18px 44px -14px rgba(0, 0, 0, .6),
-        inset 1px 1px 1px -.5px rgba(255, 255, 255, .5),
-        inset -1px -1px 1px -.5px rgba(255, 255, 255, .4),
-        inset 0 0 8px 4px rgba(255, 255, 255, .04);
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .16),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .1);
       opacity: 0;
       transform: translateY(10px) scale(.9);
       pointer-events: none;
@@ -11141,11 +11146,12 @@
     .cb-teaser::after {
       content: "";
       position: absolute;
-      right: 40px;
+      /* horizontal offset set by positionTeaser() to center on the launcher */
+      right: var(--cb-tail-right, 40px);
       bottom: -6px;
       width: 14px;
       height: 14px;
-      background: rgba(14, 23, 38, .82);
+      background: rgba(13, 21, 35, .98);
       border-right: 1px solid rgba(255, 255, 255, .16);
       border-bottom: 1px solid rgba(255, 255, 255, .16);
       border-bottom-right-radius: 3px;
@@ -11173,7 +11179,10 @@
       background: none;
       border: none;
       font: inherit;
-      color: var(--heading);
+      /* literal fallback first so the copy is never dark/invisible if the
+         theme custom-properties fail to resolve in some browser */
+      color: #f3f7fc;
+      color: var(--heading, #f3f7fc);
       cursor: pointer;
       padding: 11px 13px;
       border-radius: inherit;
@@ -11207,7 +11216,9 @@
       font-size: 11px;
       font-weight: 700;
       letter-spacing: .02em;
-      color: var(--orange);
+      color: #ff7d1a;
+      color: var(--orange, #ff7d1a) !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
       display: flex;
       align-items: center;
       gap: 5px;
@@ -11224,7 +11235,9 @@
       font-size: 13px;
       line-height: 1.4;
       font-weight: 500;
-      color: var(--heading);
+      color: #f3f7fc;
+      color: var(--heading, #f3f7fc) !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
     }
 
     .cb-teaser-x {
@@ -11246,14 +11259,6 @@
     }
     .cb-teaser-x:hover { color: #fff; transform: scale(1.12); }
 
-    @media (prefers-reduced-transparency: reduce) {
-      .cb-teaser {
-        background: rgba(12, 20, 34, .97);
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-      }
-      .cb-teaser::after { background: rgba(12, 20, 34, .97); }
-    }
     @media (prefers-reduced-motion: reduce) {
       .cb-teaser { transform: none; transition: opacity .2s ease; }
       .cb-teaser.show .cb-teaser-ava { animation: none; }
@@ -17924,20 +17929,8 @@
 
     </button>
 
-    <button class="fab fab-chat" id="chatFab" onclick="toggleChat()" title="Chat with us"
-      aria-label="Open chat assistant" style="position:relative;">
-
-      <!-- Self-contained animated chatbot (robot) icon — shown when the panel
-           is closed; the × icon replaces it while chatting. -->
-      <span class="chat-bot-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="cb-antenna" cx="12" cy="3" r="1.5" fill="currentColor"/><path d="M12 4.6V6.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="3.5" y="6.5" width="17" height="12.5" rx="4.4" fill="currentColor"/><circle class="cb-eye" cx="8.9" cy="12.5" r="1.8" fill="#0d1b2a"/><circle class="cb-eye" cx="15.1" cy="12.5" r="1.8" fill="#0d1b2a"/><rect x="9.3" y="15.4" width="5.4" height="1.5" rx="0.75" fill="#0d1b2a"/></svg></span>
-
-      <i class="fa-solid fa-xmark" id="chatFabIcon" aria-hidden="true"></i>
-
-      <span class="chat-dot" id="chatDot"></span>
-
-    </button>
-
-    <!-- Call + WhatsApp sit below the chat launcher so the chatbot is the top of the contact FABs -->
+    <!-- Call + WhatsApp sit above the chat launcher; the chatbot is now the
+         bottom-most FAB (below the WhatsApp icon) -->
     <a class="fab fab-call" href="tel:+60358889817" title="Call us" style="position:relative;">
 
       <i class="fa-solid fa-phone"></i>
@@ -17950,6 +17943,19 @@
       <i class="fa-brands fa-whatsapp"></i>
 
     </a>
+
+    <button class="fab fab-chat" id="chatFab" onclick="toggleChat()" title="Chat with us"
+      aria-label="Open chat assistant" style="position:relative;">
+
+      <!-- Self-contained animated chatbot (robot) icon — shown when the panel
+           is closed; the × icon replaces it while chatting. -->
+      <span class="chat-bot-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="cb-antenna" cx="12" cy="3" r="1.5" fill="currentColor"/><path d="M12 4.6V6.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="3.5" y="6.5" width="17" height="12.5" rx="4.4" fill="currentColor"/><circle class="cb-eye" cx="8.9" cy="12.5" r="1.8" fill="#0d1b2a"/><circle class="cb-eye" cx="15.1" cy="12.5" r="1.8" fill="#0d1b2a"/><rect x="9.3" y="15.4" width="5.4" height="1.5" rx="0.75" fill="#0d1b2a"/></svg></span>
+
+      <i class="fa-solid fa-xmark" id="chatFabIcon" aria-hidden="true"></i>
+
+      <span class="chat-dot" id="chatDot"></span>
+
+    </button>
 
   </div>
 
@@ -18055,24 +18061,44 @@
   <script>
     (function () {
       var bodyEl, inputEl, chipsEl, panelEl, fabEl, dotEl, fabIconEl, greeted = false;
-      var teaserEl, teaserTextEl, teaserTimer, fabGroupEl;
+      var teaserEl, teaserTextEl, teaserTimer, fabGroupEl, teaserDismissed = false;
 
       /* Proactive greeting bubble that floats by the launcher. Shown once per
-         session after a short pause, unless the visitor has already opened or
-         dismissed it. It never appears while the panel is open. */
+         PAGE LOAD after a short pause, unless the visitor has already opened or
+         dismissed it on this view. It never appears while the panel is open.
+         (Suppression is in-memory only — NOT persisted to sessionStorage — so a
+         reload always re-shows it and a mere hover can't silence it for good.) */
       function hideTeaser(persist) {
         if (!teaserEl) return;
         clearTimeout(teaserTimer);
         teaserEl.classList.remove('show');
         if (fabGroupEl) fabGroupEl.classList.remove('cb-greeting'); // restore FABs
         setTimeout(function () { teaserEl.hidden = true; }, 320);
-        if (persist !== false) { try { sessionStorage.setItem('hpeChatTeaser', 'off'); } catch (e) {} }
+        if (persist !== false) { teaserDismissed = true; } // this page view only
+      }
+
+      /* Align the bubble to the chat launcher from its LIVE geometry rather than
+         a hardcoded offset — robust to the FAB order/count and the responsive
+         bottom (28px desktop / 16px mobile). Sets the teaser's `bottom` so its
+         tail sits just above #chatFab, and `--cb-tail-right` so the tail centers
+         on the launcher. #chatFab's box doesn't move when .cb-greeting tucks the
+         other FABs (that only changes opacity/transform, not layout), so this is
+         safe to call either before or after the tuck. */
+      function positionTeaser() {
+        if (!teaserEl || !fabEl) return;
+        var r = fabEl.getBoundingClientRect();
+        if (!r.width) return; // not laid out yet — keep the CSS fallback
+        // bubble bottom edge ~10px above the launcher's top edge
+        teaserEl.style.bottom = Math.round(window.innerHeight - r.top + 10) + 'px';
+        // point the downward tail at the launcher's horizontal center
+        var tailRight = (window.innerWidth - (r.left + r.width / 2)) - 18 - 7;
+        teaserEl.style.setProperty('--cb-tail-right', Math.max(12, Math.round(tailRight)) + 'px');
       }
 
       function showTeaser() {
-        if (!teaserEl || panelEl.classList.contains('open')) return;
-        try { if (sessionStorage.getItem('hpeChatTeaser') === 'off') return; } catch (e) {}
+        if (!teaserEl || teaserDismissed || panelEl.classList.contains('open')) return;
         teaserEl.hidden = false;
+        positionTeaser(); // align to the launcher before the entrance plays
         void teaserEl.offsetWidth; // reflow so the entrance transition plays
         teaserEl.classList.add('show');
         if (fabGroupEl) fabGroupEl.classList.add('cb-greeting'); // tuck secondary FABs aside
@@ -18302,10 +18328,16 @@
           fabEl.addEventListener('mouseenter', function () { hideTeaser(); });
 
           /* Appear a couple of seconds after load — late enough that it doesn't
-             compete with the page's entrance animations. Shown once per session
-             (the sessionStorage guard lives in showTeaser) and never while the
-             chat panel is open. */
+             compete with the page's entrance animations. Shown once per page
+             load (in-memory teaserDismissed guard in showTeaser) and never while
+             the chat panel is open. */
           setTimeout(showTeaser, 2500);
+
+          // keep the bubble aligned to the launcher if the viewport changes
+          // (rotation / resize) while it is on screen
+          window.addEventListener('resize', function () {
+            if (teaserEl.classList.contains('show')) positionTeaser();
+          }, { passive: true });
         }
 
         /* Scroll lock: while the cursor is anywhere over the panel, the wheel

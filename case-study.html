@@ -358,7 +358,10 @@
       border-color: var(--orange); background: var(--orange);
       box-shadow: 0 0 0 5px rgba(255, 125, 26, .16); transform: scale(1.05);
     }
-    @media (max-width: 1024px) { .cs-progress { display: none; } }
+    /* Hide the rail whenever the side gutter is too narrow for it to sit clear
+       of the centred content (1120px wrap + the active label needs ~1400px),
+       so it never overlaps the hero copy or the sticky stage caption. */
+    @media (max-width: 1399px) { .cs-progress { display: none; } }
     @media (prefers-reduced-motion: reduce) {
       .cs-progress-dot, .cs-progress-label, .cs-progress-item { transition: none; }
     }
@@ -507,6 +510,58 @@
     }
     .cs-more i { transition: transform .2s; }
     .cs-card:hover .cs-more i { transform: translateX(4px); }
+
+    /* ── Industry filter bar (index view) ── */
+    .cs-filter {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      margin: 0 0 clamp(38px, 5vw, 60px);
+    }
+    .cs-filter-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); display: inline-flex; align-items: center; gap: 8px; margin-right: 4px;
+    }
+    .cs-filter-label i { color: var(--orange); }
+    .cs-chip {
+      font: inherit; font-size: 13px; font-weight: 600; line-height: 1;
+      padding: 9px 15px; border-radius: 999px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--surface); color: var(--text); border: 1px solid var(--border);
+      transition: background .2s, color .2s, border-color .2s, transform .15s, box-shadow .2s;
+    }
+    .cs-chip:hover { border-color: rgba(255, 125, 26, .5); color: var(--heading); transform: translateY(-1px); }
+    .cs-chip .n { font-size: 11px; font-weight: 700; opacity: .55; }
+    .cs-chip.active {
+      background: linear-gradient(135deg, var(--orange), var(--orange-d));
+      border-color: transparent; color: #fff; box-shadow: 0 8px 20px -8px rgba(255, 125, 26, .7);
+    }
+    .cs-chip.active .n { opacity: .85; }
+
+    /* ── Card industry / service tags ── */
+    .cs-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .cs-tag {
+      font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+      padding: 4px 9px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;
+      border: 1px solid var(--border); white-space: nowrap;
+    }
+    .cs-tag-svc { background: var(--orange-l); color: var(--orange); border-color: rgba(255, 125, 26, .25); }
+    .cs-tag-ind { background: var(--surface-2); color: var(--muted); }
+    .cs-tag-more { background: transparent; color: var(--muted); }
+
+    /* ── Filter show/hide animation ──
+       Snappier transition kicks in only once the visitor has filtered, so the
+       initial scroll-reveal keeps its own timing. Filtered-out cards fade +
+       scale away, then collapse out of the grid; empty categories hide whole. */
+    .i-body.filtering-active .cs-card {
+      transition: opacity .34s ease, transform .4s cubic-bezier(.22, 1, .36, 1), box-shadow .22s, border-color .22s;
+    }
+    .cs-card.filtering-out {
+      opacity: 0 !important; transform: scale(.92) translateY(8px) !important; pointer-events: none;
+    }
+    .cs-card.filtering-collapsed { display: none !important; }
+    .cat.cat-hidden { display: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      .i-body.filtering-active .cs-card { transition: none !important; }
+    }
 
     /* ─────────────────────────  FOOTER  ───────────────────────── */
     /* ─── FOOTER — replicated from hpe-enhanced-editing.html so it is identical
@@ -2171,12 +2226,46 @@
     function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
     function qp(name) { return new URLSearchParams(location.search).get(name); }
 
+    /* ── Industry taxonomy (derived from each case's `industry` label) ──
+       Multi-industry cases separate sectors with '·'. A couple of labels use
+       '/' for a single combined sector (kept intact via IND_COMBINE), while one
+       ('Technology / Oil & Gas') genuinely spans two, so it is split. This lets
+       one card match several industry filters. */
+    var IND_COMBINE = { 'Media / Broadcasting': 'Media & Broadcasting', 'Airlines / Hospitality': 'Airlines & Hospitality' };
+    var IND_ALIAS = { 'Telco': 'Telecommunications' };
+    function csIndustries(d) {
+      var out = [];
+      d.industry.split('·').forEach(function (raw) {
+        var tok = raw.trim();
+        if (IND_COMBINE[tok]) { out.push(IND_COMBINE[tok]); return; }
+        if (tok.indexOf('/') > -1) {
+          tok.split('/').forEach(function (t) { t = t.trim(); if (t) out.push(IND_ALIAS[t] || t); });
+          return;
+        }
+        if (tok) out.push(IND_ALIAS[tok] || tok);
+      });
+      return out.filter(function (v, i) { return out.indexOf(v) === i; });
+    }
+    function slugify(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+    /* Unique industries across all cases, most-covered first — drives the chips. */
+    var INDUSTRIES = (function () {
+      var counts = {};
+      ORDER.forEach(function (id) { csIndustries(CS[id]).forEach(function (n) { counts[n] = (counts[n] || 0) + 1; }); });
+      return Object.keys(counts).map(function (n) { return { name: n, slug: slugify(n), n: counts[n] }; })
+        .sort(function (a, b) { return b.n - a.n || a.name.localeCompare(b.name); });
+    })();
+
     /* ── Detail view ── */
     function renderDetail(id) {
       var d = CS[id];
       var i = ORDER.indexOf(id);
       var prev = i > 0 ? ORDER[i - 1] : null;
       var next = i < ORDER.length - 1 ? ORDER[i + 1] : null;
+      /* Hero backdrop uses a DIFFERENT case's photo than this case's own client
+         photo (the sticky stage further down), so the same image is never shown
+         twice. It's heavily dimmed (opacity .34 + dark tint) so it reads only as
+         abstract texture — the offset just guarantees hero image !== stage. */
+      var heroBgId = CS[ORDER[(i + 5) % ORDER.length]].img;
 
       var metrics = d.metrics.map(function (m) {
         return '<div class="d-metric reveal"><span class="v">' + esc(m.v) + '</span><span class="l">' + esc(m.l) + '</span></div>';
@@ -2213,7 +2302,7 @@
 
       document.getElementById('app').innerHTML =
         '<section class="hero d-hero" data-nav-accent="casestudy">' +
-          '<div class="hero-bg" data-parallax="0.10" style="background-image:url(' + img(d.img, 1600) + ')"></div>' +
+          '<div class="hero-bg" data-parallax="0.10" style="background-image:url(' + img(heroBgId, 1600) + ')"></div>' +
           '<div class="hero-glow" data-parallax="0.24"></div>' +
           '<div class="wrap" data-parallax="0.05">' +
             '<div class="crumb">' +
@@ -2296,20 +2385,36 @@
         var cards = ids.map(function (id) {
           var d = CS[id];
           var mets = d.metrics.slice(0, 2).map(function (m) { return '<span>' + esc(m.v) + ' ' + esc(m.l) + '</span>'; }).join('');
-          return '<a class="cs-card reveal" href="case-study.html?case=' + id + '">' +
+          var inds = csIndustries(d);
+          var indAttr = inds.map(slugify).join(' ');
+          var MAX = 3; // cap visible industry pills so multi-sector cards stay tidy
+          var indPills = inds.slice(0, MAX).map(function (n) { return '<span class="cs-tag cs-tag-ind">' + esc(n) + '</span>'; }).join('');
+          if (inds.length > MAX) indPills += '<span class="cs-tag cs-tag-more">+' + (inds.length - MAX) + '</span>';
+          return '<a class="cs-card reveal" data-inds="' + indAttr + '" data-svc="' + slugify(d.service) + '" href="case-study.html?case=' + id + '">' +
             '<div class="cs-thumb" style="background-image:url(' + img(d.img, 800) + ')"><span class="ico"><i class="fa-solid ' + d.icon + '"></i></span></div>' +
             '<div class="cs-info">' +
-              '<div class="cs-ind">' + esc(d.industry) + '</div>' +
+              '<div class="cs-tags">' +
+                '<span class="cs-tag cs-tag-svc"><i class="fa-solid ' + g.icon + '"></i>' + esc(d.service) + '</span>' +
+                indPills +
+              '</div>' +
               '<h3>' + esc(d.title) + '</h3>' +
               '<div class="cs-mets">' + mets + '</div>' +
               '<span class="cs-more">Read case study <i class="fa-solid fa-arrow-right"></i></span>' +
             '</div>' +
           '</a>';
         }).join('');
-        return '<div class="cat"><div class="cat-head"><span class="ci"><i class="fa-solid ' + g.icon + '"></i></span>' +
+        return '<div class="cat" data-svc="' + slugify(g.svc) + '"><div class="cat-head"><span class="ci"><i class="fa-solid ' + g.icon + '"></i></span>' +
           '<h2>' + esc(g.svc) + '</h2><span class="ccount">' + ids.length + ' ' + (ids.length === 1 ? 'case' : 'cases') + '</span></div>' +
           '<div class="card-grid">' + cards + '</div></div>';
       }).join('');
+
+      var filterBar = '<div class="cs-filter reveal" role="group" aria-label="Filter case studies by industry">' +
+        '<span class="cs-filter-label"><i class="fa-solid fa-filter"></i>Filter by industry</span>' +
+        '<button type="button" class="cs-chip active" data-filter="all">All<span class="n">' + ORDER.length + '</span></button>' +
+        INDUSTRIES.map(function (it) {
+          return '<button type="button" class="cs-chip" data-filter="' + it.slug + '">' + esc(it.name) + '<span class="n">' + it.n + '</span></button>';
+        }).join('') +
+      '</div>';
 
       document.getElementById('app').innerHTML =
         '<section class="hero i-hero" data-nav-accent="casestudy">' +
@@ -2326,9 +2431,69 @@
             '</div>' +
           '</div>' +
         '</section>' +
-        '<section class="i-body" data-nav-accent="casestudy"><div class="wrap">' + cats + '</div></section>';
+        '<section class="i-body" data-nav-accent="casestudy"><div class="wrap">' + filterBar + cats + '</div></section>';
 
       document.title = 'Case Studies — HPE Solutions Sdn Bhd';
+
+      /* ── Industry filter: animated show/hide of cards + empty-category collapse.
+         Suppression is purely visual; the DOM keeps every card so re-filtering is
+         instant. Matching cards fade/scale in with a small stagger; filtered-out
+         cards fade/scale away, then collapse out of the grid after the transition. */
+      (function wireFilter() {
+        var body = document.querySelector('.i-body');
+        var bar = document.querySelector('.cs-filter');
+        if (!body || !bar) return;
+        var chips = [].slice.call(bar.querySelectorAll('.cs-chip'));
+        var cats = [].slice.call(body.querySelectorAll('.cat'));
+        var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function apply(filter) {
+          body.classList.add('filtering-active'); // switch cards to the snappy transition
+          cats.forEach(function (cat) {
+            var cards = [].slice.call(cat.querySelectorAll('.cs-card'));
+            var shown = 0;
+            cards.forEach(function (card) {
+              var match = filter === 'all' ||
+                (' ' + (card.getAttribute('data-inds') || '') + ' ').indexOf(' ' + filter + ' ') > -1;
+              if (match) {
+                var idx = shown++;
+                card.classList.remove('filtering-collapsed');
+                card.classList.add('in'); // ensure it's revealed even if below the fold
+                if (reduce) {
+                  card.classList.remove('filtering-out');
+                } else {
+                  requestAnimationFrame(function () {
+                    card.style.transitionDelay = (idx * 35) + 'ms';
+                    card.classList.remove('filtering-out');
+                    setTimeout(function () { card.style.transitionDelay = ''; }, 520);
+                  });
+                }
+              } else {
+                card.classList.add('filtering-out');
+                if (reduce) {
+                  card.classList.add('filtering-collapsed');
+                } else {
+                  setTimeout(function () {
+                    if (card.classList.contains('filtering-out')) card.classList.add('filtering-collapsed');
+                  }, 300);
+                }
+              }
+            });
+            cat.classList.toggle('cat-hidden', shown === 0); // hide the header of an empty group
+            var cc = cat.querySelector('.ccount');
+            if (cc) cc.textContent = shown + ' ' + (shown === 1 ? 'case' : 'cases');
+          });
+        }
+
+        chips.forEach(function (chip) {
+          chip.addEventListener('click', function () {
+            if (chip.classList.contains('active')) return;
+            chips.forEach(function (c) { c.classList.remove('active'); });
+            chip.classList.add('active');
+            apply(chip.getAttribute('data-filter'));
+          });
+        });
+      })();
     }
 
     /* ── Boot ── */
@@ -2393,27 +2558,37 @@
       }
 
       /* ── Section progress rail (detail view only) ──────────────────────
-         Reuses the same IntersectionObserver idea: a thin band near the
-         middle of the viewport marks whichever of the three .sc-step
-         sections (Challenge / Approach / Outcome) is currently under the
-         reader, so the fixed side rail's active dot tracks their scroll. */
+         Position-based scroll-spy: the active step is the LAST one whose top has
+         crossed a reference line ~42% down the viewport. Unlike an
+         IntersectionObserver that only ever *sets* active on entry (which left a
+         stale highlight when you scrolled back up), this recomputes from live
+         geometry every frame, so it's correct in both directions and at the
+         extremes — Challenge at the very top, Outcome at the very bottom. */
       var prog = document.querySelector('.cs-progress');
       var secs = [].slice.call(document.querySelectorAll('.sc-flow .sc-step'));
-      if (prog && secs.length && 'IntersectionObserver' in window) {
+      if (prog && secs.length) {
         var pitems = [].slice.call(prog.querySelectorAll('.cs-progress-item'));
-        function setActiveSection(idx) {
+        var railIdx = -1;
+        function updateRail() {
+          var ref = window.innerHeight * 0.42;
+          var idx = 0;
+          for (var n = 0; n < secs.length; n++) {
+            if (secs[n].getBoundingClientRect().top <= ref) idx = n;
+          }
+          if (idx === railIdx) return;
+          railIdx = idx;
           pitems.forEach(function (it, n) {
             var on = n === idx;
             it.classList.toggle('active', on);
             if (on) it.setAttribute('aria-current', 'true'); else it.removeAttribute('aria-current');
           });
         }
-        var pio = new IntersectionObserver(function (entries) {
-          entries.forEach(function (e) {
-            if (e.isIntersecting) setActiveSection(secs.indexOf(e.target));
-          });
-        }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
-        secs.forEach(function (s) { pio.observe(s); });
+        var railTicking = false;
+        window.addEventListener('scroll', function () {
+          if (!railTicking) { railTicking = true; requestAnimationFrame(function () { railTicking = false; updateRail(); }); }
+        }, { passive: true });
+        window.addEventListener('resize', updateRail, { passive: true });
+        updateRail();
       }
     })();
   </script>
