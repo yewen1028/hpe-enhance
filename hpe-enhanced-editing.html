@@ -10979,11 +10979,12 @@
         inset -1px -1px 1px -.5px rgba(255, 255, 255, .4),
         inset 0 0 8px 4px rgba(255, 255, 255, .04);
       opacity: 0;
-      transform: translateY(10px) scale(.86);
+      transform: translateY(10px) scale(.9);
       pointer-events: none;
+      /* reuse the file's standard fade/slide easing, not a bespoke curve */
       transition:
-        opacity .28s ease-out,
-        transform .5s cubic-bezier(.175, .885, .32, 1.275);
+        opacity .3s ease-out,
+        transform .45s cubic-bezier(.22, 1, .36, 1);
     }
     .cb-teaser[hidden] { display: none; }
     .cb-teaser.show {
@@ -12841,7 +12842,11 @@
       gap: 8px;
       flex: 1 1 auto;
       min-height: 0;
+      /* vertical scroll only — overflow-x must be explicit, otherwise the
+         default `visible` computes to `auto` next to overflow-y:auto and lets
+         the service list scroll sideways too */
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .mega .mega-grid::-webkit-scrollbar {
@@ -17888,7 +17893,7 @@
         teaserEl.classList.add('show');
         if (fabGroupEl) fabGroupEl.classList.add('cb-greeting'); // tuck secondary FABs aside
         // fade out on its own if the visitor ignores it (restores the FABs)
-        teaserTimer = setTimeout(function () { hideTeaser(false); }, 9000);
+        teaserTimer = setTimeout(function () { hideTeaser(false); }, 7000);
       }
 
       /* Knowledge base — ordered by priority. First rule whose keywords match wins.
@@ -18090,38 +18095,33 @@
         teaserTextEl = document.getElementById('cbTeaserText');
         fabGroupEl = document.querySelector('.fab-group');
         if (teaserEl) {
+          /* Keep it short (max ~6-8 words), one picked at random. */
           var greetings = [
-            "Hi there! 👋 How can I help you today?",
-            "Hello! 👋 Do you need any help?",
-            "Need a hand finding the right IT support?"
+            "Need help? Chat with us 👋",
+            "Hi 👋 Chat with us anytime",
+            "Questions? We're here to help 👋"
           ];
           if (teaserTextEl) teaserTextEl.textContent = greetings[Math.floor(Math.random() * greetings.length)];
+
+          // Click the bubble → open the chatbot (and dismiss the bubble).
           document.getElementById('cbTeaserOpen').addEventListener('click', function () {
             hideTeaser();
             if (!panelEl.classList.contains('open')) window.toggleChat();
           });
+          // Manual close (the X).
           document.getElementById('cbTeaserClose').addEventListener('click', function (e) {
             e.stopPropagation();
             hideTeaser();
           });
+          // Dismiss the moment the visitor engages the launcher itself. A click
+          // on the launcher runs toggleChat(), which also hides the bubble.
+          fabEl.addEventListener('mouseenter', function () { hideTeaser(); });
 
-          /* Reveal the greeting once the visitor starts scrolling, so they
-             notice the assistant is there to help; time-based fallback in case
-             they never scroll. { passive:true } and one-shot (self-removing). */
-          var teaserShown = false;
-          var fallbackTimer;
-          function revealTeaserOnce() {
-            if (teaserShown) return;
-            teaserShown = true;
-            window.removeEventListener('scroll', onScrollReveal);
-            clearTimeout(fallbackTimer);
-            showTeaser();
-          }
-          function onScrollReveal() {
-            if (window.pageYOffset > 300) revealTeaserOnce();
-          }
-          window.addEventListener('scroll', onScrollReveal, { passive: true });
-          fallbackTimer = setTimeout(revealTeaserOnce, 3500);
+          /* Appear a couple of seconds after load — late enough that it doesn't
+             compete with the page's entrance animations. Shown once per session
+             (the sessionStorage guard lives in showTeaser) and never while the
+             chat panel is open. */
+          setTimeout(showTeaser, 2500);
         }
 
         /* Scroll lock: while the cursor is anywhere over the panel, the wheel

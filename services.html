@@ -297,6 +297,33 @@
       .svc-snap::-webkit-scrollbar-thumb:hover { background: var(--orange); }
     }
 
+    /* ── Service filter bar (rendered above the cards in renderIndex) ── */
+    .svc-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
+    .svc-fbtn {
+      font: inherit; font-size: 13.5px; font-weight: 600; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+      padding: 9px 18px; cursor: pointer;
+      transition: color .2s, background .2s, border-color .2s, transform .15s, box-shadow .2s;
+    }
+    .svc-fbtn:hover { color: var(--heading); border-color: rgba(244, 121, 32, .4); }
+    .svc-fbtn:active { transform: scale(.96); }
+    .svc-fbtn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+    .svc-fbtn.is-active {
+      color: #fff; border-color: transparent;
+      background: linear-gradient(135deg, var(--orange), var(--orange-d));
+      box-shadow: 0 8px 20px -8px rgba(244, 121, 32, .6);
+    }
+
+    /* Filter animation states. .svc-leaving fades a card out before it collapses;
+       .svc-anim carries the FLIP reorder slide (beats the base .svc-card transition
+       via specificity); .is-hidden removes a filtered-out card from the flow. */
+    .svc-card.svc-leaving { opacity: 0; transform: scale(.92); transition: opacity .24s ease, transform .24s ease; pointer-events: none; }
+    .svc-card.svc-anim { transition: transform .5s cubic-bezier(.22, 1, .36, 1), opacity .4s ease; }
+    .svc-card.is-hidden { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .svc-card.svc-leaving, .svc-card.svc-anim { transition: none; }
+    }
+
     /* FOOTER */
     /* ─── FOOTER — replicated from hpe-enhanced-editing.html so it is identical
        across the main page and the sub-pages. #0a111d matches the main page's
@@ -2229,6 +2256,22 @@
       staffing: 'IT Staffing', warranty: 'Warranty', sourcing: 'Total Solution', vas: 'Value Added'
     };
 
+    /* filter category per service + the filter-bar buttons rendered above the
+       service cards in renderIndex(). Plain data — the filtering itself is
+       vanilla JS array/DOM work (see setupFilter), no library. */
+    var SVC_CAT = {
+      managed: 'support', helpdesk: 'support', warranty: 'support',
+      project: 'deployment', vas: 'deployment',
+      staffing: 'staffing', sourcing: 'sourcing'
+    };
+    var SVC_FILTERS = [
+      { id: 'all', label: 'All' },
+      { id: 'support', label: 'Support' },
+      { id: 'deployment', label: 'Deployment' },
+      { id: 'staffing', label: 'Staffing' },
+      { id: 'sourcing', label: 'Sourcing' }
+    ];
+
     /* per-service "at a glance" facts — each drawn from the service's own copy
        above, so nothing here is invented. Kept qualitative to avoid fake-precise
        metrics. */
@@ -2364,11 +2407,19 @@
     function renderIndex() {
       var cards = ORDER.map(function (key) {
         var s = SERVICES[key];
-        return '<a class="svc-card reveal" href="services.html?service=' + key + '">' +
+        return '<a class="svc-card reveal" data-cat="' + (SVC_CAT[key] || 'all') + '" href="services.html?service=' + key + '">' +
           '<div class="svc-thumb" style="background-image:url(' + s.img + ')"><span class="ico">' + s.icon + '</span></div>' +
           '<div class="svc-info"><h3>' + esc(s.title) + '</h3><p>' + esc(s.desc) + '</p>' +
           '<span class="svc-more">View service <i class="fa-solid fa-arrow-right"></i></span></div></a>';
       }).join('');
+
+      /* Filter bar rendered above the grid. First button ('All') starts active. */
+      var filterHTML = '<div class="svc-filter reveal" role="group" aria-label="Filter services by category">' +
+        SVC_FILTERS.map(function (f, i) {
+          return '<button type="button" class="svc-fbtn' + (i === 0 ? ' is-active' : '') +
+            '" data-cat="' + f.id + '" aria-pressed="' + (i === 0 ? 'true' : 'false') + '">' +
+            esc(f.label) + '</button>';
+        }).join('') + '</div>';
 
       /* Headline split into per-word .i-word spans, each with an incremental
          transition-delay so they stagger in on load. \n marks the line break. */
@@ -2401,7 +2452,7 @@
             '</div>' +
           '</div>' +
         '</section>' +
-        '<section class="i-body" data-nav-accent="services"><div class="wrap"><div class="svc-grid svc-snap">' + cards + '</div></div></section>';
+        '<section class="i-body" data-nav-accent="services"><div class="wrap">' + filterHTML + '<div class="svc-grid svc-snap">' + cards + '</div></div></section>';
 
       document.title = 'Services — HPE Solutions Sdn Bhd';
 
@@ -2412,6 +2463,99 @@
       if (titleEl) {
         void titleEl.offsetWidth;
         requestAnimationFrame(function () { titleEl.classList.add('in'); });
+      }
+
+      setupFilter();
+    }
+
+    /* Lightweight category filter for the service cards. Plain JS: toggles a
+       per-card match by data-cat, then plays a fade-out (leavers) + FLIP
+       reorder (stayers slide, entrants fade in) — no reload, no library. */
+    function setupFilter() {
+      var grid = document.querySelector('.svc-grid');
+      var bar = document.querySelector('.svc-filter');
+      if (!grid || !bar) return;
+      var cards = [].slice.call(grid.querySelectorAll('.svc-card'));
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var tFlip, tClean;
+
+      bar.addEventListener('click', function (e) {
+        var btn = e.target.closest('.svc-fbtn');
+        if (!btn || btn.classList.contains('is-active')) return;
+        bar.querySelectorAll('.svc-fbtn').forEach(function (b) {
+          var on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        applyFilter(btn.getAttribute('data-cat'));
+      });
+
+      function resetInline() {
+        clearTimeout(tFlip); clearTimeout(tClean);
+        cards.forEach(function (c) {
+          c.classList.remove('svc-leaving', 'svc-anim');
+          c.style.transition = ''; c.style.transform = ''; c.style.opacity = '';
+        });
+      }
+
+      function applyFilter(cat) {
+        resetInline(); // restart cleanly if a previous transition is mid-flight
+        cards.forEach(function (c) { c._match = (cat === 'all' || c.getAttribute('data-cat') === cat); });
+
+        if (reduce) {
+          cards.forEach(function (c) { c.classList.toggle('is-hidden', !c._match); c.classList.add('in'); });
+          return;
+        }
+
+        var leavers = cards.filter(function (c) { return !c.classList.contains('is-hidden') && !c._match; });
+        if (leavers.length) {
+          leavers.forEach(function (c) { c.classList.add('svc-leaving'); });
+          tFlip = setTimeout(flip, 240); // let leavers fade before collapsing
+        } else {
+          flip();
+        }
+
+        function flip() {
+          // FIRST: positions before the layout collapses (fade didn't move them)
+          var wasVisible = cards.map(function (c) { return !c.classList.contains('is-hidden'); });
+          var first = cards.map(function (c, i) { return wasVisible[i] ? c.getBoundingClientRect() : null; });
+
+          // LAST: commit final visibility
+          cards.forEach(function (c) {
+            c.classList.remove('svc-leaving');
+            c.classList.toggle('is-hidden', !c._match);
+            if (c._match) c.classList.add('in'); // guard against reveal's opacity:0
+          });
+
+          // INVERT: move each visible card back to where it was (or pre-fade entrants)
+          cards.forEach(function (c, i) {
+            if (c.classList.contains('is-hidden')) return;
+            c.style.transition = 'none';
+            if (!wasVisible[i]) { c.style.opacity = '0'; c.style.transform = 'scale(.96)'; }
+            else {
+              var last = c.getBoundingClientRect();
+              c.style.transform = 'translate(' + (first[i].left - last.left) + 'px,' + (first[i].top - last.top) + 'px)';
+            }
+          });
+
+          // PLAY: next frame, transition to the natural position/opacity
+          void grid.offsetWidth;
+          requestAnimationFrame(function () {
+            cards.forEach(function (c) {
+              if (c.classList.contains('is-hidden')) return;
+              c.classList.add('svc-anim');
+              c.style.transition = ''; c.style.transform = ''; c.style.opacity = '';
+            });
+          });
+
+          // cleanup so hover-tilt transitions return to normal afterwards
+          tClean = setTimeout(function () {
+            cards.forEach(function (c) {
+              c.classList.remove('svc-anim');
+              c.style.transition = ''; c.style.transform = ''; c.style.opacity = '';
+            });
+          }, 560);
+        }
       }
     }
 
