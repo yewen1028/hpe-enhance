@@ -11106,7 +11106,9 @@
          downward tail) — the assistant "saying" the greeting. The secondary
          FABs tuck aside while it shows so it never collides with them. */
       right: 18px;
-      bottom: 94px;
+      /* the chat launcher sits above the call + WhatsApp FABs (2 slots up from
+         the bottom), so the bubble is raised to match: 28 + 2×(52+10) + gap */
+      bottom: 218px;
       z-index: 195;
       width: max-content;
       max-width: min(276px, calc(100vw - 40px));
@@ -17922,19 +17924,6 @@
 
     </button>
 
-    <a class="fab fab-call" href="tel:+60358889817" title="Call us" style="position:relative;">
-
-      <i class="fa-solid fa-phone"></i>
-
-    </a>
-
-    <a class="fab fab-wa" href="https://wa.me/60358889817" target="_blank" rel="noopener" title="WhatsApp"
-      style="position:relative;">
-
-      <i class="fa-brands fa-whatsapp"></i>
-
-    </a>
-
     <button class="fab fab-chat" id="chatFab" onclick="toggleChat()" title="Chat with us"
       aria-label="Open chat assistant" style="position:relative;">
 
@@ -17947,6 +17936,20 @@
       <span class="chat-dot" id="chatDot"></span>
 
     </button>
+
+    <!-- Call + WhatsApp sit below the chat launcher so the chatbot is the top of the contact FABs -->
+    <a class="fab fab-call" href="tel:+60358889817" title="Call us" style="position:relative;">
+
+      <i class="fa-solid fa-phone"></i>
+
+    </a>
+
+    <a class="fab fab-wa" href="https://wa.me/60358889817" target="_blank" rel="noopener" title="WhatsApp"
+      style="position:relative;">
+
+      <i class="fa-brands fa-whatsapp"></i>
+
+    </a>
 
   </div>
 
