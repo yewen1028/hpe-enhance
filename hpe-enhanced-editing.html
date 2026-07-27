@@ -2806,7 +2806,12 @@
 
     .service-card:hover {
 
-      transform: translateY(-6px) scale(1.015);
+      /* !important beats the reveal engine's inline transform; the fast
+         transition keeps the cursor-driven tilt responsive. */
+
+      transform: perspective(760px) rotateX(var(--tiltX, 0deg)) rotateY(var(--tiltY, 0deg)) translateY(-6px) scale(1.015) !important;
+
+      transition: transform .1s ease-out, box-shadow .25s !important;
 
       box-shadow: 0 20px 56px rgba(0, 0, 0, .11);
 
@@ -3335,7 +3340,12 @@
 
     .industry-card:hover {
 
-      transform: translateY(-8px);
+      /* !important beats the reveal engine's inline transform; the fast
+         transition keeps the cursor-driven tilt responsive. */
+
+      transform: perspective(760px) rotateX(var(--tiltX, 0deg)) rotateY(var(--tiltY, 0deg)) translateY(-8px) !important;
+
+      transition: transform .1s ease-out, box-shadow .4s ease !important;
 
       box-shadow: 0 22px 46px rgba(13, 27, 42, .30);
 
@@ -12328,8 +12338,9 @@
       }
 
       .about-point:hover,
-      .service-card:hover {
-        transform: none;
+      .service-card:hover,
+      .industry-card:hover {
+        transform: none !important;
       }
 
       .cs-home-card:hover .cs-accent {
@@ -20812,6 +20823,61 @@
         card.appendChild(g);
 
       });
+
+    })();
+
+  </script>
+
+
+
+  <!-- Subtle 3D tilt-on-hover for service & industry cards. Reads the cursor's
+       position within the card and drives --tiltX/--tiltY (consumed by the
+       cards' :hover transform). Delegated so dynamically-added cards work too.
+       Skipped on touch / coarse-pointer devices and under reduced motion. -->
+
+  <script>
+
+    (function () {
+
+      var mm = window.matchMedia;
+
+      if (!mm || !mm('(hover: hover) and (pointer: fine)').matches) return;
+
+      if (mm('(prefers-reduced-motion: reduce)').matches) return;
+
+      var SEL = '.service-card, .industry-card', MAX = 6;
+
+      document.addEventListener('pointermove', function (e) {
+
+        var card = e.target.closest && e.target.closest(SEL);
+
+        if (!card) return;
+
+        var r = card.getBoundingClientRect();
+
+        if (!r.width || !r.height) return;
+
+        var px = (e.clientX - r.left) / r.width - 0.5;
+
+        var py = (e.clientY - r.top) / r.height - 0.5;
+
+        card.style.setProperty('--tiltY', (px * 2 * MAX).toFixed(2) + 'deg');
+
+        card.style.setProperty('--tiltX', (-py * 2 * MAX).toFixed(2) + 'deg');
+
+      }, { passive: true });
+
+      document.addEventListener('pointerout', function (e) {
+
+        var card = e.target.closest && e.target.closest(SEL);
+
+        if (!card || card.contains(e.relatedTarget)) return;
+
+        card.style.setProperty('--tiltX', '0deg');
+
+        card.style.setProperty('--tiltY', '0deg');
+
+      }, { passive: true });
 
     })();
 

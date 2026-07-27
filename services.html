@@ -256,7 +256,7 @@
       background: var(--surface); border: 1px solid var(--border); box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .5);
       transition: transform .22s cubic-bezier(.22, 1, .36, 1), box-shadow .22s, border-color .22s;
     }
-    .svc-card:hover { transform: translateY(-5px); box-shadow: 0 26px 50px -22px rgba(13, 27, 42, .42); border-color: rgba(244, 121, 32, .4); }
+    .svc-card:hover { transform: perspective(760px) rotateX(var(--tiltX, 0deg)) rotateY(var(--tiltY, 0deg)) translateY(-5px); box-shadow: 0 26px 50px -22px rgba(13, 27, 42, .42); border-color: rgba(244, 121, 32, .4); }
     .svc-thumb { position: relative; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
     .svc-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 12, 20, .1), rgba(7, 12, 20, .72)); }
     .svc-thumb .ico { position: absolute; left: 14px; bottom: 14px; z-index: 1; width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; background: #101c2e; color: var(--orange); font-size: 17px; box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .6); }
@@ -2947,6 +2947,35 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNavSearch);
     else initNavSearch();
+  </script>
+
+  <!-- Subtle 3D tilt-on-hover for the service cards (.svc-card). Reads the
+       cursor's position within the card and drives --tiltX/--tiltY (consumed by
+       .svc-card:hover). Delegated so JS-rendered cards work. Skipped on touch /
+       coarse-pointer devices and under reduced motion. -->
+  <script>
+    (function () {
+      var mm = window.matchMedia;
+      if (!mm || !mm('(hover: hover) and (pointer: fine)').matches) return;
+      if (mm('(prefers-reduced-motion: reduce)').matches) return;
+      var SEL = '.svc-card', MAX = 6;
+      document.addEventListener('pointermove', function (e) {
+        var card = e.target.closest && e.target.closest(SEL);
+        if (!card) return;
+        var r = card.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        var px = (e.clientX - r.left) / r.width - 0.5;
+        var py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--tiltY', (px * 2 * MAX).toFixed(2) + 'deg');
+        card.style.setProperty('--tiltX', (-py * 2 * MAX).toFixed(2) + 'deg');
+      }, { passive: true });
+      document.addEventListener('pointerout', function (e) {
+        var card = e.target.closest && e.target.closest(SEL);
+        if (!card || card.contains(e.relatedTarget)) return;
+        card.style.setProperty('--tiltX', '0deg');
+        card.style.setProperty('--tiltY', '0deg');
+      }, { passive: true });
+    })();
   </script>
 
 </body>
