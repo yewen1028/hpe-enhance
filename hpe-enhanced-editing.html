@@ -10523,9 +10523,15 @@
       overflow: hidden;
       transform-origin: bottom right;
       opacity: 0;
-      transform: translateY(16px) scale(.94);
+      /* collapsed toward the launcher icon (shared bottom-right corner) so the
+         panel reads as morphing OUT of the FAB, not just fading in */
+      transform: translateY(22px) scale(.28);
       pointer-events: none;
-      transition: opacity .28s ease, transform .28s cubic-bezier(.22,1,.36,1);
+      /* spring "morph" ported from the ai-chat-input prompt: the same
+         cubic-bezier(.175,.885,.32,1.275) overshoot + .4s size feel */
+      transition:
+        opacity .22s ease-out,
+        transform .42s cubic-bezier(.175, .885, .32, 1.275);
     }
 
     /* the liquid warble — a specular sheen distorted by the SVG displacement
