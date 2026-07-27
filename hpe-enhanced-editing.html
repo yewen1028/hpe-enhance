@@ -10566,6 +10566,32 @@
       position: relative;
     }
 
+    /* Animated chatbot (robot) icon on the launcher. Shown when the panel is
+       closed; while open, the .is-open class swaps in the × (close) icon. */
+    .fab-chat .chat-bot-ico {
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+    .fab-chat .chat-bot-ico svg {
+      width: 28px;
+      height: 28px;
+      animation: cbBotBob 2.6s ease-in-out infinite;
+    }
+    .fab-chat .chat-bot-ico .cb-eye {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: cbBotBlink 3.4s infinite;
+    }
+    .fab-chat .chat-bot-ico .cb-antenna { animation: cbBotAntenna 2.1s ease-in-out infinite; }
+    .fab-chat #chatFabIcon { display: none; }
+    .fab-chat.is-open .chat-bot-ico { display: none; }
+    .fab-chat.is-open #chatFabIcon { display: block; }
+
+    @keyframes cbBotBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes cbBotBlink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.12); } }
+    @keyframes cbBotAntenna { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+
     /* unread / attention pulse dot on the launcher */
     .fab-chat .chat-dot {
       position: absolute;
@@ -10680,6 +10706,7 @@
       font-size: 19px;
       flex-shrink: 0;
     }
+    .cb-head .cb-avatar svg { width: 24px; height: 24px; color: #fff; }
 
     .cb-head .cb-title { font-weight: 700; font-size: 15px; letter-spacing: -.01em; line-height: 1.15; }
 
@@ -10733,8 +10760,40 @@
     .cb-body::-webkit-scrollbar { width: 7px; }
     .cb-body::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
 
+    /* Each turn is a row: a sender avatar + a column holding the sender's name
+       and the message bubble — so the reader can see who said what. */
+    .cb-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 90%;
+    }
+    .cb-row.bot { align-self: flex-start; }
+    .cb-row.user { align-self: flex-end; flex-direction: row-reverse; }
+
+    .cb-ava {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12.5px;
+      margin-bottom: 2px;
+    }
+    .cb-ava.bot { background: linear-gradient(145deg, var(--orange), var(--orange-d)); color: #fff; }
+    .cb-ava.bot svg { width: 18px; height: 18px; }
+    .cb-ava.user { background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); }
+
+    .cb-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .cb-row.user .cb-col { align-items: flex-end; }
+    .cb-name {
+      font-size: 10.5px; font-weight: 700; color: var(--muted);
+      letter-spacing: .02em; padding: 0 4px;
+    }
+
     .cb-msg {
-      max-width: 84%;
+      max-width: 100%;
       padding: 10px 13px;
       font-size: 13.5px;
       line-height: 1.5;
@@ -10746,13 +10805,11 @@
     .cb-msg strong { color: var(--heading); }
 
     .cb-msg.bot {
-      align-self: flex-start;
       background: var(--surface-2);
       color: var(--text);
       border-bottom-left-radius: 5px;
     }
     .cb-msg.user {
-      align-self: flex-end;
       background: linear-gradient(135deg, var(--orange), var(--orange-d));
       color: #fff;
       border-bottom-right-radius: 5px;
@@ -17361,7 +17418,11 @@
     <button class="fab fab-chat" id="chatFab" onclick="toggleChat()" title="Chat with us"
       aria-label="Open chat assistant" style="position:relative;">
 
-      <i class="fa-solid fa-comment-dots" id="chatFabIcon"></i>
+      <!-- Self-contained animated chatbot (robot) icon — shown when the panel
+           is closed; the × icon replaces it while chatting. -->
+      <span class="chat-bot-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="cb-antenna" cx="12" cy="3" r="1.5" fill="currentColor"/><path d="M12 4.6V6.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="3.5" y="6.5" width="17" height="12.5" rx="4.4" fill="currentColor"/><circle class="cb-eye" cx="8.9" cy="12.5" r="1.8" fill="#0d1b2a"/><circle class="cb-eye" cx="15.1" cy="12.5" r="1.8" fill="#0d1b2a"/><rect x="9.3" y="15.4" width="5.4" height="1.5" rx="0.75" fill="#0d1b2a"/></svg></span>
+
+      <i class="fa-solid fa-xmark" id="chatFabIcon" aria-hidden="true"></i>
 
       <span class="chat-dot" id="chatDot"></span>
 
@@ -17377,7 +17438,7 @@
 
     <div class="cb-head">
 
-      <div class="cb-avatar"><i class="fa-solid fa-headset"></i></div>
+      <div class="cb-avatar"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="3" r="1.5" fill="currentColor"/><path d="M12 4.6V6.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="3.5" y="6.5" width="17" height="12.5" rx="4.4" fill="currentColor"/><circle cx="8.9" cy="12.5" r="1.8" fill="#0d1b2a"/><circle cx="15.1" cy="12.5" r="1.8" fill="#0d1b2a"/><rect x="9.3" y="15.4" width="5.4" height="1.5" rx="0.75" fill="#0d1b2a"/></svg></div>
 
       <div>
 
@@ -17519,23 +17580,50 @@
         return best ? best.a : FALLBACK;
       }
 
+      /* Robot icon reused as the bot's avatar inside the dialogue. */
+      var BOT_ICON = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="3" r="1.5" fill="currentColor"/><path d="M12 4.6V6.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="3.5" y="6.5" width="17" height="12.5" rx="4.4" fill="currentColor"/><circle cx="8.9" cy="12.5" r="1.8" fill="#0d1b2a"/><circle cx="15.1" cy="12.5" r="1.8" fill="#0d1b2a"/><rect x="9.3" y="15.4" width="5.4" height="1.5" rx="0.75" fill="#0d1b2a"/></svg>';
+
+      /* Build a message row: [avatar] + [sender name + bubble], so the reader
+         can see who is speaking. Returns the column the bubble goes into. */
+      function makeRow(who) {
+        var row = document.createElement('div');
+        row.className = 'cb-row ' + who;
+        var ava = document.createElement('span');
+        ava.className = 'cb-ava ' + who;
+        ava.setAttribute('aria-hidden', 'true');
+        ava.innerHTML = who === 'user' ? '<i class="fa-solid fa-user"></i>' : BOT_ICON;
+        var col = document.createElement('div');
+        col.className = 'cb-col';
+        var name = document.createElement('span');
+        name.className = 'cb-name';
+        name.textContent = who === 'user' ? 'You' : 'HPE Assistant';
+        col.appendChild(name);
+        row.appendChild(ava);
+        row.appendChild(col);
+        return { row: row, col: col };
+      }
+
       function addMsg(html, who) {
+        var r = makeRow(who);
         var m = document.createElement('div');
         m.className = 'cb-msg ' + who;
         m.innerHTML = html;
-        bodyEl.appendChild(m);
+        r.col.appendChild(m);
+        bodyEl.appendChild(r.row);
         bodyEl.scrollTop = bodyEl.scrollHeight;
         return m;
       }
 
       function botReply(text) {
+        var r = makeRow('bot');
         var typing = document.createElement('div');
         typing.className = 'cb-msg bot cb-typing';
         typing.innerHTML = '<span></span><span></span><span></span>';
-        bodyEl.appendChild(typing);
+        r.col.appendChild(typing);
+        bodyEl.appendChild(r.row);
         bodyEl.scrollTop = bodyEl.scrollHeight;
         setTimeout(function () {
-          typing.remove();
+          r.row.remove();
           addMsg(matchReply(text), 'bot');
         }, 550 + Math.min(text.length * 12, 700));
       }
@@ -17563,7 +17651,8 @@
       window.toggleChat = function () {
         var open = panelEl.classList.toggle('open');
         panelEl.setAttribute('aria-hidden', open ? 'false' : 'true');
-        fabIconEl.className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-comment-dots';
+        // .is-open hides the robot icon so the × (close) icon shows while chatting
+        fabEl.classList.toggle('is-open', open);
         if (open) {
           dotEl.style.display = 'none';
           if (!greeted) {
