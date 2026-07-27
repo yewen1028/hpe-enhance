@@ -438,6 +438,13 @@
     .cs-card:hover { transform: translateY(-5px); box-shadow: 0 26px 50px -22px rgba(13, 27, 42, .42); border-color: rgba(244, 121, 32, .4); }
     .cs-thumb { position: relative; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
     .cs-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13, 27, 42, .05), rgba(13, 27, 42, .5)); }
+    /* Index thumbnails reveal with a diagonal clip-path wipe (left→right, with a
+       slanted leading edge) instead of the plain fade/translate. Driven by the
+       card's .reveal → .in state — i.e. the same IntersectionObserver that
+       reveals everything else, so no extra JS. The 135% top-right overshoot
+       makes the leading edge diagonal and guarantees full coverage at the end. */
+    .cs-card .cs-thumb { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); transition: clip-path .85s cubic-bezier(.22, 1, .36, 1); }
+    .cs-card.in .cs-thumb { clip-path: polygon(0 0, 135% 0, 100% 100%, 0 100%); }
     .cs-thumb .ico {
       position: absolute; left: 14px; bottom: 14px; z-index: 1;
       width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center;
@@ -509,6 +516,7 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .cs-card .cs-thumb, .cs-card.in .cs-thumb { clip-path: none !important; transition: none !important; }
       .hero-bg { transform: translate3d(0, 0, 0) scale(1.16); }
       .hero-glow, .hero .wrap { transform: none; }
     }
