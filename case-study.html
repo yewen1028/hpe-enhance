@@ -1412,7 +1412,9 @@
     /* AnimatedList (Magic UI) port: a single vertical column of notification-style
        cards. The cascade is driven from JS (each card gets .mi-in one after the
        other) so it reliably plays one by one every time the menu opens. */
-    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; }
+    /* vertical scroll only — overflow-x:hidden keeps the service list from
+       scrolling sideways (matches hpe-enhanced-editing.html) */
+    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; overflow-x: hidden; }
     .mega .mega-item {
       display: flex; align-items: center; gap: 12px;
       padding: 11px 13px; border-radius: 13px;

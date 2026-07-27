@@ -8107,6 +8107,77 @@
       }
     }
 
+    /* ── Secondary jump-nav ──────────────────────────────────────────────
+       Slim sticky strip that fades + slides in once the hero is scrolled past.
+       Sits directly under the main navbar (top:var(--nav-h)); deliberately
+       lighter than it — thin, translucent, no logo/CTA — so it complements
+       rather than duplicates the main nav. z-index below nav (200) so the
+       nav's search/mega-menu still overlay it. .show is toggled from JS. */
+    #subnav {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      right: 0;
+      z-index: 190;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 5%;
+      background: rgba(10, 17, 29, .72);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 12px 30px -20px rgba(0, 0, 0, .85);
+      opacity: 0;
+      transform: translateY(-100%);
+      pointer-events: none;
+      transition: opacity .35s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    #subnav::-webkit-scrollbar { display: none; }
+    #subnav.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+    .subnav-link {
+      position: relative;
+      flex-shrink: 0;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+      transition: color .2s, background .2s;
+    }
+    .subnav-link:hover { color: var(--heading); }
+    .subnav-link::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 3px;
+      width: 0;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--orange);
+      transform: translateX(-50%);
+      transition: width .25s ease;
+    }
+    .subnav-link.active { color: var(--heading); background: rgba(255, 125, 26, .12); }
+    .subnav-link.active::after { width: 18px; }
+
+    @media (max-width: 640px) {
+      #subnav { justify-content: flex-start; gap: 2px; padding: 0 12px; }
+      .subnav-link { font-size: 12px; padding: 6px 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #subnav { transform: none; transition: opacity .2s ease; }
+      .subnav-link::after { transition: none; }
+    }
+
 
 
     /* ─── RIPPLE EFFECT ─── */
@@ -10907,6 +10978,78 @@
       transition: transform .18s, filter .18s;
     }
     .cb-send:hover { transform: scale(1.06); filter: brightness(1.08); }
+
+    /* ── Chatbot composer "star" border light ──
+       Ported from the StarButton React component (its signature offset-path
+       traveling light). A radial HPE-orange glow rides a rectangular
+       offset-path around the input's rim. --path is measured in JS (see the
+       ResizeObserver after the markup) because offset-path needs real pixel
+       dimensions and the chat panel starts hidden. */
+    .cb-star-field {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      isolation: isolate;
+      border-radius: 12px;
+      padding: 2px;
+      overflow: hidden;
+      background: var(--border-2);
+      --duration: 3;          /* seconds per loop */
+      --light-width: 90px;
+      transition: background .25s, box-shadow .25s;
+    }
+    /* Two distinct states:
+       • Idle (before the box is clicked) → the traveling star-light runs.
+       • Focused (after the user clicks in) → swap to a different effect: the
+         2px rim turns solid HPE-orange and breathes with a soft glow, while the
+         traveling dot is hidden.
+       Blurring — clicking anywhere else — drops :focus-within, so the box
+       automatically returns to the star-light it had before. */
+    .cb-star-field:focus-within {
+      background: var(--orange);
+      animation: cbFocusGlow 1.8s ease-in-out infinite;
+    }
+    .cb-star-field:focus-within .cb-star-light { opacity: 0; }
+    @keyframes cbFocusGlow {
+      0%, 100% { box-shadow: 0 0 0 1px var(--orange), 0 0 9px -2px rgba(255, 125, 26, .55); }
+      50%      { box-shadow: 0 0 0 1px var(--orange), 0 0 22px 2px rgba(255, 125, 26, .85); }
+    }
+    .cb-star-light {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: var(--light-width);
+      aspect-ratio: 1 / 1;
+      pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, var(--orange), transparent 60%);
+      offset-path: var(--path);
+      offset-distance: 0%;
+      transition: opacity .25s;
+      animation: cbStarLight calc(var(--duration) * 1s) linear infinite;
+    }
+    @keyframes cbStarLight {
+      0%   { offset-distance: 0%; }
+      100% { offset-distance: 100%; }
+    }
+    /* input now sits inside the star field: drop its own border (the glowing
+       ring provides it) and inset its corners inside the 2px track */
+    .cb-star-field input {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: var(--surface);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cb-star-light { animation: none; opacity: 0; }
+      /* no pulse — keep a static orange rim so the focused state is still distinct */
+      .cb-star-field:focus-within {
+        animation: none;
+        box-shadow: 0 0 0 1px var(--orange), 0 0 14px -2px rgba(255, 125, 26, .7);
+      }
+    }
 
     @media (max-width: 480px) {
       .chatbot {
@@ -13902,6 +14045,17 @@
 
     </button>
 
+  </nav>
+
+  <!-- SECONDARY JUMP-NAV — slim sticky strip that fades in past the hero.
+       Condensed, section-oriented links (distinct from the main nav) with the
+       active section highlighted. Toggled via .show from the scroll handler. -->
+  <nav id="subnav" aria-label="Section navigation">
+    <a href="#services" class="subnav-link">Services</a>
+    <a href="#why" class="subnav-link">Why Us</a>
+    <a href="#process" class="subnav-link">Process</a>
+    <a href="#casestudy" class="subnav-link">Case Studies</a>
+    <a href="#contact" class="subnav-link">Contact</a>
   </nav>
 
 
@@ -17848,13 +18002,40 @@
 
     <form class="cb-input" id="chatForm" autocomplete="off">
 
-      <input type="text" id="chatInput" placeholder="Ask about services, support, locations…" aria-label="Type your message" />
+      <div class="cb-star-field" id="cbStarField">
+
+        <span class="cb-star-light" aria-hidden="true"></span>
+
+        <input type="text" id="chatInput" placeholder="Ask about services, support, locations…" aria-label="Type your message" />
+
+      </div>
 
       <button class="cb-send" type="submit" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
 
     </form>
 
   </div>
+
+  <script>
+    /* Give the composer's star-light a real rectangular offset-path. offset-path
+       needs pixel dimensions, so we measure the field and rebuild --path on every
+       size change — including the 0→visible jump when the chat panel opens, and
+       responsive width changes. Mirrors the StarButton component's useEffect. */
+    (function () {
+      var field = document.getElementById('cbStarField');
+      if (!field) return;
+      function setPath() {
+        var w = field.offsetWidth, h = field.offsetHeight;
+        if (w && h) field.style.setProperty('--path', "path('M 0 0 H " + w + " V " + h + " H 0 V 0')");
+      }
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(setPath).observe(field);
+      } else {
+        window.addEventListener('resize', setPath);
+        setPath();
+      }
+    })();
+  </script>
 
 
 
@@ -20058,7 +20239,7 @@
 
         fadeObsEls.push(el);
 
-      }); dz
+      });
 
     });
 
@@ -20238,6 +20419,72 @@
       window.addEventListener('resize', () => { measure(); update(); }, { passive: true });
       window.addEventListener('load', () => { measure(); update(); });
       // catch late layout shifts from lazy images / web-font swaps
+      [600, 1600, 3600].forEach(t => setTimeout(() => { measure(); update(); }, t));
+
+    })();
+
+
+
+    /* Secondary jump-nav: reveal it once the hero is scrolled past, and mirror
+       the main scroll-spy to highlight the section you're currently in. Uses the
+       same sticky-aware sectionFlowTop() and rAF-throttled passive scroll as the
+       primary spy. Smooth-scroll on click is already handled by the global
+       a[href^="#"] handler, so the links need no extra JS. */
+    (function () {
+
+      const bar = document.getElementById('subnav');
+
+      if (!bar) return;
+
+      const links = [...bar.querySelectorAll('a[href^="#"]')]
+        .map(a => {
+          const el = document.getElementById(a.getAttribute('href').slice(1));
+          return el ? { a: a, el: el, top: 0 } : null;
+        })
+        .filter(Boolean);
+
+      if (!links.length) return;
+
+      const navH = parseInt(getComputedStyle(document.documentElement)
+        .getPropertyValue('--nav-h')) || 76;
+      // reveal once we've scrolled into the first section after the hero
+      const heroGate = document.getElementById('keyfacts') || links[0].el;
+
+      let showAt = 0, ticking = false;
+
+      function measure() {
+        links.forEach(l => { l.top = sectionFlowTop(l.el); });
+        links.sort((a, b) => a.top - b.top);
+        showAt = sectionFlowTop(heroGate) - navH - 10;
+      }
+
+      function update() {
+        ticking = false;
+        const y = window.scrollY;
+        bar.classList.toggle('show', y >= showAt);
+
+        const docH = document.documentElement.scrollHeight;
+        const atBottom = window.innerHeight + y >= docH - 2;
+        // reference line just below both bars (nav + this 46px strip)
+        const ref = y + navH + 46 + 20;
+
+        let current = null;
+        if (atBottom) {
+          current = links[links.length - 1];
+        } else {
+          for (const l of links) { if (l.top - 4 <= ref) current = l; else break; }
+        }
+
+        links.forEach(l => l.a.classList.toggle('active', l === current));
+      }
+
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+      measure();
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => { measure(); update(); }, { passive: true });
+      window.addEventListener('load', () => { measure(); update(); });
       [600, 1600, 3600].forEach(t => setTimeout(() => { measure(); update(); }, t));
 
     })();
