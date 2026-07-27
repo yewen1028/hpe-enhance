@@ -84,6 +84,10 @@
 
       --muted: #6b7280;
 
+      --form-err: #d64550;
+
+      --form-err-ring: 0 0 0 3px rgba(214, 69, 80, .14);
+
       --light: #f7f8fb;
 
       --border: #e5e8ef;
@@ -11196,6 +11200,10 @@
       --radius: 14px;
       --shadow: 0 22px 55px -18px rgba(0, 0, 0, .72);
       --ring: 0 0 0 3px rgba(255, 125, 26, .28);
+
+      /* form validation — muted red for error, orange handles success */
+      --form-err: #e0636e;
+      --form-err-ring: 0 0 0 3px rgba(224, 99, 110, .18);
     }
 
     body {
@@ -11823,6 +11831,132 @@
       background: var(--surface-2);
       border-color: var(--orange);
       box-shadow: var(--ring);
+    }
+
+    /* ── Contact form: real-time inline validation ──
+       .form-group gains .is-valid / .is-error as the user types or blurs.
+       Success reuses --orange (the form's own accent); errors use a muted
+       red token so the navy/orange language still reads as dominant. */
+    .form-group {
+      position: relative;
+    }
+
+    .field-msg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+      /* collapsed until a state is set, so layout doesn't jump */
+      max-height: 0;
+      margin-top: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform: translateY(-4px);
+      transition: max-height .28s ease, opacity .2s ease,
+        transform .28s ease, margin-top .28s ease;
+    }
+
+    .form-group.is-valid .field-msg,
+    .form-group.is-error .field-msg {
+      max-height: 44px;
+      margin-top: 3px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .form-group.is-valid .field-msg {
+      color: var(--orange);
+    }
+
+    .form-group.is-error .field-msg {
+      color: var(--form-err);
+    }
+
+    /* Input border/ring echoes the state (wins over :focus rules above) */
+    .form-group.is-valid input,
+    .form-group.is-valid select,
+    .form-group.is-valid textarea,
+    .form-group.is-valid input:focus,
+    .form-group.is-valid select:focus,
+    .form-group.is-valid textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(244, 121, 32, .16);
+    }
+
+    .form-group.is-error input,
+    .form-group.is-error select,
+    .form-group.is-error textarea,
+    .form-group.is-error input:focus,
+    .form-group.is-error select:focus,
+    .form-group.is-error textarea:focus {
+      border-color: var(--form-err);
+      box-shadow: var(--form-err-ring);
+    }
+
+    /* Animated checkmark — the SVG is re-created on each success, so the
+       stroke draw-in replays every time the field becomes valid. */
+    .fm-check {
+      width: 15px;
+      height: 15px;
+      flex: none;
+      fill: none;
+      stroke: var(--orange);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .fm-check path {
+      stroke-dasharray: 22;
+      stroke-dashoffset: 22;
+      animation: fmDraw .4s ease .02s forwards;
+    }
+
+    @keyframes fmDraw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .field-msg .fm-err-icon {
+      font-size: 12px;
+      flex: none;
+      animation: fmShake .38s ease;
+    }
+
+    @keyframes fmShake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-2px);
+      }
+
+      75% {
+        transform: translateX(2px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .field-msg {
+        transition: opacity .2s ease;
+        transform: none;
+      }
+
+      .fm-check path {
+        animation: none;
+        stroke-dashoffset: 0;
+      }
+
+      .field-msg .fm-err-icon {
+        animation: none;
+      }
     }
 
     /* ── FOOTER ── */
@@ -16107,6 +16241,8 @@
 
               <input type="text" id="fname" placeholder="e.g. Ahmad Hafiz" required />
 
+              <span class="field-msg" id="fname-msg" aria-live="polite"></span>
+
             </div>
 
             <div class="form-group">
@@ -16114,6 +16250,8 @@
               <label for="fcompany">Company Name *</label>
 
               <input type="text" id="fcompany" placeholder="e.g. ABC Sdn Bhd" required />
+
+              <span class="field-msg" id="fcompany-msg" aria-live="polite"></span>
 
             </div>
 
@@ -16127,6 +16265,8 @@
 
               <input type="email" id="femail" placeholder="you@company.com" required />
 
+              <span class="field-msg" id="femail-msg" aria-live="polite"></span>
+
             </div>
 
             <div class="form-group">
@@ -16134,6 +16274,8 @@
               <label for="fphone">Phone Number</label>
 
               <input type="tel" id="fphone" placeholder="+60 12-345 6789" />
+
+              <span class="field-msg" id="fphone-msg" aria-live="polite"></span>
 
             </div>
 
@@ -16174,6 +16316,8 @@
             <textarea id="fmsg"
               placeholder="Tell us about your IT needs, number of users, locations, or any specific requirements..."
               required></textarea>
+
+            <span class="field-msg" id="fmsg-msg" aria-live="polite"></span>
 
           </div>
 
@@ -19805,9 +19949,112 @@
 
     ════════════════════════════════════════════ */
 
+    /* ── Real-time inline validation ──
+       Each field shows an animated checkmark (success) or a muted-red
+       message (error) under itself as the user types/blurs, instead of
+       only alerting on submit. validateInline() (attached to the form)
+       is the single source of truth the submit handler reuses. */
+    (function () {
+
+      const form = document.getElementById('contactForm');
+
+      if (!form) return;
+
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      const phoneRe = /^[+()\d][\d\s().\-]{6,}$/;
+
+      const fields = {
+        fname:    { req: true,  ok: 'Looks good',              bad: 'Please enter your full name',            test: v => v.length >= 2 },
+        fcompany: { req: true,  ok: 'Looks good',              bad: 'Please enter your company name',         test: v => v.length >= 2 },
+        femail:   { req: true,  ok: 'Valid email address',     bad: 'Please enter a valid email address',      test: v => emailRe.test(v) },
+        fphone:   { req: false, ok: 'Looks good',              bad: 'Please enter a valid phone number',       test: v => phoneRe.test(v) },
+        fmsg:     { req: true,  ok: "Thanks — that's clear",   bad: 'Please tell us a little more (10+ characters)', test: v => v.length >= 10 }
+      };
+
+      // Reuse the span already in the HTML, or create one if missing.
+      function msgEl(group) {
+        let m = group.querySelector('.field-msg');
+        if (!m) {
+          m = document.createElement('span');
+          m.className = 'field-msg';
+          m.setAttribute('aria-live', 'polite');
+          group.appendChild(m);
+        }
+        return m;
+      }
+
+      function setState(el, state, text) {
+        const group = el.closest('.form-group');
+        if (!group) return;
+        const m = msgEl(group);
+        group.classList.remove('is-valid', 'is-error');
+        if (state === 'valid') {
+          group.classList.add('is-valid');
+          el.setAttribute('aria-invalid', 'false');
+          m.innerHTML = '<svg class="fm-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg><span>' + text + '</span>';
+        } else if (state === 'error') {
+          group.classList.add('is-error');
+          el.setAttribute('aria-invalid', 'true');
+          m.innerHTML = '<i class="fa-solid fa-circle-exclamation fm-err-icon" aria-hidden="true"></i><span>' + text + '</span>';
+        } else {
+          el.removeAttribute('aria-invalid');
+          m.textContent = '';
+        }
+      }
+
+      // force=true surfaces the "required" error on empty fields (blur/submit);
+      // while typing an untouched empty field we stay neutral so we don't nag.
+      function validate(id, force) {
+        const el = document.getElementById(id);
+        const cfg = fields[id];
+        if (!el || !cfg) return true;
+        const v = el.value.trim();
+        if (!v) {
+          if (cfg.req) { setState(el, force ? 'error' : 'none', cfg.bad); return false; }
+          setState(el, 'none');
+          return true;
+        }
+        if (cfg.test(v)) { setState(el, 'valid', cfg.ok); return true; }
+        setState(el, 'error', cfg.bad);
+        return false;
+      }
+
+      Object.keys(fields).forEach(function (id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        let touched = false;
+        el.addEventListener('blur', function () { touched = true; validate(id, true); });
+        el.addEventListener('input', function () { validate(id, touched); });
+      });
+
+      // Validate everything; focus the first invalid field. Used on submit.
+      form.validateInline = function () {
+        let firstBad = null;
+        Object.keys(fields).forEach(function (id) {
+          if (!validate(id, true) && !firstBad) firstBad = document.getElementById(id);
+        });
+        if (firstBad) firstBad.focus();
+        return !firstBad;
+      };
+
+      // Clear all inline states (called after a successful send + reset).
+      form.clearInline = function () {
+        form.querySelectorAll('.form-group').forEach(function (g) {
+          g.classList.remove('is-valid', 'is-error');
+          const m = g.querySelector('.field-msg');
+          if (m) m.textContent = '';
+        });
+        form.querySelectorAll('[aria-invalid]').forEach(function (el) { el.removeAttribute('aria-invalid'); });
+      };
+
+    })();
+
     document.getElementById('contactForm').addEventListener('submit', function (e) {
 
       e.preventDefault();
+
+      if (typeof this.validateInline === 'function' && !this.validateInline()) { return; }
 
       const name = document.getElementById('fname').value.trim();
 
@@ -19816,10 +20063,6 @@
       const email = document.getElementById('femail').value.trim();
 
       const msg = document.getElementById('fmsg').value.trim();
-
-      if (!name || !company || !email || !msg) { alert('Please fill in all required fields.'); return; }
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email address.'); return; }
 
       const subject = encodeURIComponent('Website Enquiry from ' + name + ' (' + company + ')');
 
@@ -19838,6 +20081,8 @@
       window.location.href = 'mailto:sales@hpe.com.my?subject=' + subject + '&body=' + body;
 
       this.reset();
+
+      if (typeof this.clearInline === 'function') { this.clearInline(); }
 
       const toast = document.getElementById('toast');
 
