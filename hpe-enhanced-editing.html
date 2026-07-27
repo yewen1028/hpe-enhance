@@ -10761,8 +10761,18 @@
       gap: 12px;
       scroll-behavior: smooth;
     }
+    .cb-body { scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .cb-body::-webkit-scrollbar { width: 7px; }
-    .cb-body::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+    .cb-body::-webkit-scrollbar-track { background: transparent; }
+    /* orange thumb — matches the site's top scroll-progress bar (#scroll-bar) */
+    .cb-body::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--orange) 0%, #ff8e2b 55%, #ffab52 100%);
+      border-radius: 4px;
+      box-shadow: 0 0 6px rgba(255, 138, 43, .5);
+    }
+    .cb-body::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, var(--orange-d) 0%, var(--orange) 60%, #ff8e2b 100%);
+    }
 
     /* Each turn is a row: a sender avatar + a column holding the sender's name
        and the message bubble — so the reader can see who said what. */
@@ -18052,8 +18062,8 @@
         if (teaserEl) {
           var greetings = [
             "Hi there! 👋 How can I help you today?",
-            "Need a hand finding the right IT support?",
-            "Questions about our services or SLAs? Ask away."
+            "Hello! 👋 Do you need any help?",
+            "Need a hand finding the right IT support?"
           ];
           if (teaserTextEl) teaserTextEl.textContent = greetings[Math.floor(Math.random() * greetings.length)];
           document.getElementById('cbTeaserOpen').addEventListener('click', function () {
@@ -18064,7 +18074,24 @@
             e.stopPropagation();
             hideTeaser();
           });
-          teaserTimer = setTimeout(showTeaser, 4200);
+
+          /* Reveal the greeting once the visitor starts scrolling, so they
+             notice the assistant is there to help; time-based fallback in case
+             they never scroll. { passive:true } and one-shot (self-removing). */
+          var teaserShown = false;
+          var fallbackTimer;
+          function revealTeaserOnce() {
+            if (teaserShown) return;
+            teaserShown = true;
+            window.removeEventListener('scroll', onScrollReveal);
+            clearTimeout(fallbackTimer);
+            showTeaser();
+          }
+          function onScrollReveal() {
+            if (window.pageYOffset > 300) revealTeaserOnce();
+          }
+          window.addEventListener('scroll', onScrollReveal, { passive: true });
+          fallbackTimer = setTimeout(revealTeaserOnce, 6000);
         }
 
         /* Scroll lock: while the cursor is anywhere over the panel, the wheel
