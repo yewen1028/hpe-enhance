@@ -10959,20 +10959,20 @@
     /* ── Proactive greeting teaser (liquid glass, points at the launcher) ── */
     .cb-teaser {
       position: fixed;
-      /* sits to the left of the chat launcher, vertically centred on it, so it
-         never collides with the WhatsApp / call FABs stacked above */
-      right: 92px;
-      bottom: 24px;
+      /* sits directly ABOVE the chat launcher as a speech bubble (with a
+         downward tail) — the assistant "saying" the greeting. The secondary
+         FABs tuck aside while it shows so it never collides with them. */
+      right: 18px;
+      bottom: 94px;
       z-index: 195;
       width: max-content;
-      max-width: min(272px, calc(100vw - 108px));
+      max-width: min(276px, calc(100vw - 40px));
       transform-origin: bottom right;
       background: rgba(12, 20, 34, .62);
       -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.05);
       backdrop-filter: blur(22px) saturate(180%) brightness(1.05);
       border: 1px solid rgba(255, 255, 255, .16);
-      /* sharp bottom-right corner "notches" toward the launcher below it */
-      border-radius: 18px 18px 5px 18px;
+      border-radius: 18px;
       box-shadow:
         0 18px 44px -14px rgba(0, 0, 0, .6),
         inset 1px 1px 1px -.5px rgba(255, 255, 255, .5),
@@ -10990,6 +10990,32 @@
       opacity: 1;
       transform: translateY(0) scale(1);
       pointer-events: auto;
+    }
+    /* downward tail pointing at the chat launcher below */
+    .cb-teaser::after {
+      content: "";
+      position: absolute;
+      right: 40px;
+      bottom: -6px;
+      width: 14px;
+      height: 14px;
+      background: rgba(14, 23, 38, .82);
+      border-right: 1px solid rgba(255, 255, 255, .16);
+      border-bottom: 1px solid rgba(255, 255, 255, .16);
+      border-bottom-right-radius: 3px;
+      transform: rotate(45deg);
+      pointer-events: none;
+    }
+
+    /* while the assistant is "speaking", tuck the secondary FABs aside so the
+       bubble sits cleanly above the chat launcher (restored on hide) */
+    .fab-group.cb-greeting .fab-top,
+    .fab-group.cb-greeting .fab-call,
+    .fab-group.cb-greeting .fab-wa {
+      opacity: 0;
+      transform: translateX(12px) scale(.7);
+      pointer-events: none;
+      transition: opacity .22s ease, transform .22s ease;
     }
 
     .cb-teaser-body {
@@ -11080,6 +11106,7 @@
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
       }
+      .cb-teaser::after { background: rgba(12, 20, 34, .97); }
     }
     @media (prefers-reduced-motion: reduce) {
       .cb-teaser { transform: none; transition: opacity .2s ease; }
@@ -17839,7 +17866,7 @@
   <script>
     (function () {
       var bodyEl, inputEl, chipsEl, panelEl, fabEl, dotEl, fabIconEl, greeted = false;
-      var teaserEl, teaserTextEl, teaserTimer;
+      var teaserEl, teaserTextEl, teaserTimer, fabGroupEl;
 
       /* Proactive greeting bubble that floats by the launcher. Shown once per
          session after a short pause, unless the visitor has already opened or
@@ -17848,6 +17875,7 @@
         if (!teaserEl) return;
         clearTimeout(teaserTimer);
         teaserEl.classList.remove('show');
+        if (fabGroupEl) fabGroupEl.classList.remove('cb-greeting'); // restore FABs
         setTimeout(function () { teaserEl.hidden = true; }, 320);
         if (persist !== false) { try { sessionStorage.setItem('hpeChatTeaser', 'off'); } catch (e) {} }
       }
@@ -17858,8 +17886,9 @@
         teaserEl.hidden = false;
         void teaserEl.offsetWidth; // reflow so the entrance transition plays
         teaserEl.classList.add('show');
-        // fade out on its own if the visitor ignores it (does not persist)
-        teaserTimer = setTimeout(function () { hideTeaser(false); }, 14000);
+        if (fabGroupEl) fabGroupEl.classList.add('cb-greeting'); // tuck secondary FABs aside
+        // fade out on its own if the visitor ignores it (restores the FABs)
+        teaserTimer = setTimeout(function () { hideTeaser(false); }, 9000);
       }
 
       /* Knowledge base — ordered by priority. First rule whose keywords match wins.
@@ -18059,6 +18088,7 @@
         /* Wire up the proactive greeting teaser */
         teaserEl = document.getElementById('cbTeaser');
         teaserTextEl = document.getElementById('cbTeaserText');
+        fabGroupEl = document.querySelector('.fab-group');
         if (teaserEl) {
           var greetings = [
             "Hi there! 👋 How can I help you today?",
@@ -18091,7 +18121,7 @@
             if (window.pageYOffset > 300) revealTeaserOnce();
           }
           window.addEventListener('scroll', onScrollReveal, { passive: true });
-          fallbackTimer = setTimeout(revealTeaserOnce, 6000);
+          fallbackTimer = setTimeout(revealTeaserOnce, 3500);
         }
 
         /* Scroll lock: while the cursor is anywhere over the panel, the wheel
