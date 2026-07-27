@@ -3493,23 +3493,50 @@
 
 
 
-    .steps::before {
-
-      content: '';
+    /* Self-drawing SVG connector — replaces the old static dashed ::before
+       track. A single stroke links all five step circles and draws itself
+       (stroke-dashoffset 1→0) as the section scrolls through the viewport
+       (driven by JS). Pinned to the circles' vertical centre (y=30px), behind
+       them (z-index 0). pathLength="1" normalises the geometry so the JS only
+       maps scroll progress → dashoffset. Fully drawn by default → graceful
+       fallback when JS is off. */
+    .steps-connector {
 
       position: absolute;
 
-      top: 30px;
+      top: 0;
 
-      left: 10%;
+      left: 0;
 
-      right: 10%;
+      width: 100%;
 
-      height: 2px;
-
-      border-top: 2px dashed rgba(255, 255, 255, .2);
+      height: 60px;
 
       z-index: 0;
+
+      pointer-events: none;
+
+      overflow: visible;
+
+    }
+
+    .steps-connector path {
+
+      fill: none;
+
+      stroke: rgba(255, 255, 255, .22);
+
+      stroke-width: 2;
+
+      stroke-linecap: round;
+
+      stroke-dasharray: 1;
+
+      stroke-dashoffset: 0;
+
+      vector-effect: non-scaling-stroke;
+
+      transition: stroke-dashoffset .12s linear;
 
     }
 
@@ -10836,7 +10863,7 @@
 
 
 
-      .steps::before,
+      .steps-connector,
 
       .steps::after {
 
@@ -14391,6 +14418,12 @@
     </div>
 
     <div class="steps" data-parallax="0.3">
+
+      <svg class="steps-connector" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true">
+
+        <path d="M 10 2 L 90 2" pathLength="1" />
+
+      </svg>
 
       <div class="step">
 
@@ -19106,6 +19139,62 @@
       // doesn't pre-reveal off-screen and break the sync); run() is idempotent
 
       setTimeout(run, 12000);
+
+    })();
+
+
+
+    /* ── Self-drawing process connector ──────────────────────────────────
+       Maps scroll progress of the .steps row through the viewport onto the
+       SVG stroke-dashoffset (1 = undrawn → 0 = fully drawn), so the line
+       between the step circles draws itself as the user scrolls through the
+       #process section. rAF-throttled + passive, per the shared scroll rules.
+       Bails to a fully-drawn line under reduced motion; the CSS default (offset
+       0) covers the no-JS case. */
+
+    (function () {
+
+      var steps = document.querySelector('.process .steps');
+
+      var path = steps && steps.querySelector('.steps-connector path');
+
+      if (!path) return;
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduce) { path.style.strokeDashoffset = '0'; return; }
+
+      path.style.strokeDashoffset = '1';   // JS present → start undrawn
+
+      var ticking = false;
+
+      function update() {
+
+        ticking = false;
+
+        var r = steps.getBoundingClientRect();
+
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+
+        // draw as the row travels from 82% up to 38% of the viewport height
+
+        var startY = vh * 0.82, endY = vh * 0.38;
+
+        var p = (startY - r.top) / (startY - endY);
+
+        if (p < 0) p = 0; else if (p > 1) p = 1;
+
+        path.style.strokeDashoffset = (1 - p).toFixed(4);
+
+      }
+
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      window.addEventListener('resize', onScroll, { passive: true });
+
+      update();
 
     })();
 
