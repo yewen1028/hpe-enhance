@@ -3532,12 +3532,13 @@
 
       stroke: rgba(255, 255, 255, .28);
 
-      /* small, tightly-spaced round dots (compressed dotted connector) */
+      /* short dashes — a bit longer than dots, still compact (self-draw via
+         clip-path is unaffected by the dash pattern) */
       stroke-width: 2.4;
 
       stroke-linecap: round;
 
-      stroke-dasharray: 0.1 6;
+      stroke-dasharray: 7 6;
 
       vector-effect: non-scaling-stroke;
 
