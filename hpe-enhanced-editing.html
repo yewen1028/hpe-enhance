@@ -6801,19 +6801,51 @@
       stroke-dashoffset: 0;
     }
 
-    .cli-bldg {
+    /* Service-coverage radius: one steady dashed orange ring centred on the pin,
+       representing the branch's coverage area around its real coordinates. The
+       orange matches the pin + the "Live" accent under the map, so it reads as a
+       real coverage overlay tied to the lat/lng, not decoration. It sits over the
+       real map (not grouped with the .cli-hasmap placeholder fade), and stays
+       steady — no looping radar sweep. Its diameter is a fixed px so it stays a
+       true circle regardless of the canvas's (non-square) aspect ratio. */
+    .cli-cov {
       position: absolute;
-      background: rgba(244, 121, 32, .16);
-      border: 1px solid rgba(244, 121, 32, .3);
-      border-radius: 2px;
+      top: 46%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      margin: -50px 0 0 -50px;
+      border-radius: 50%;
+      border: 1.6px dashed rgba(244, 121, 32, .5);
+      background: radial-gradient(circle at center, rgba(244, 121, 32, .1), rgba(244, 121, 32, 0) 68%);
       opacity: 0;
-      transform: translateY(6px) scale(.72);
-      transition: opacity .45s ease, transform .55s cubic-bezier(.34, 1.45, .5, 1);
+      transform: scale(.35);
+      transform-origin: center center;
+      pointer-events: none;
     }
 
-    .center-list-item.cli-play .cli-bldg {
-      opacity: 1;
-      transform: none;
+    /* On reveal, a single ping: the ring expands out from the pin (in step with
+       the pin drop, .5s delay), peaks bright, then settles once into its steady
+       dashed state. forwards holds that end state — it never loops. */
+    .center-list-item.cli-play .cli-cov {
+      animation: cliCov .72s cubic-bezier(.22, 1, .36, 1) .5s forwards;
+    }
+
+    @keyframes cliCov {
+      0% {
+        opacity: 0;
+        transform: scale(.35);
+      }
+
+      50% {
+        opacity: .9;
+        transform: scale(1.12);
+      }
+
+      100% {
+        opacity: .5;
+        transform: scale(1);
+      }
     }
 
     /* ── Real per-branch map (Carto dark raster tiles, lazy-loaded on expand;
@@ -6845,13 +6877,12 @@
       opacity: 1;
     }
 
-    /* Real map present → retire the placeholder roads + buildings. !important
-       is needed so this also wins under prefers-reduced-motion, whose block
-       force-restores .cli-bldg to opacity:1 — the real map has superseded the
-       placeholder regardless of motion preference. Higher specificity here
-       (0,3,0) beats that block's .cli-bldg (0,1,0) even with both !important. */
-    .cli-mapcanvas.cli-hasmap svg.cli-grid,
-    .cli-mapcanvas.cli-hasmap .cli-bldg {
+    /* Real map present → retire the placeholder roads. !important is needed so
+       this also wins under prefers-reduced-motion, whose block force-restores
+       these to opacity:1 — the real map has superseded the placeholder roads
+       regardless of motion preference. The coverage ring (.cli-cov) is NOT in
+       here: it's a real overlay tied to the coordinates and stays over the map. */
+    .cli-mapcanvas.cli-hasmap svg.cli-grid {
       opacity: 0 !important;
       transition: opacity .5s ease;
     }
@@ -6964,7 +6995,6 @@
       .cli-map,
       .cli-mapcanvas,
       .cli-tiles,
-      .cli-bldg,
       .cli-pin,
       .cli-coords,
       .cli-road {
@@ -6972,7 +7002,6 @@
       }
 
       .cli-mapcanvas,
-      .cli-bldg,
       .cli-pin,
       .cli-coords {
         opacity: 1 !important;
@@ -6981,6 +7010,13 @@
 
       .cli-road {
         stroke-dashoffset: 0 !important;
+      }
+
+      /* skip the coverage-ring ping — show it in its final steady state at once */
+      .cli-cov {
+        animation: none !important;
+        opacity: .5 !important;
+        transform: scale(1) !important;
       }
 
       .cli-ring,
@@ -21821,10 +21857,7 @@
             '<line class="cli-road" style="stroke:rgba(255,255,255,.16);transition-delay:.4s" x1="50" y1="0" x2="50" y2="60" stroke-width="1"/>' +
             '<line class="cli-road" style="stroke:rgba(255,255,255,.16);transition-delay:.44s" x1="85" y1="0" x2="85" y2="60" stroke-width="1"/>' +
             '</svg>' +
-            '<span class="cli-bldg" style="top:44%;left:10%;width:14%;height:22%;transition-delay:.42s"></span>' +
-            '<span class="cli-bldg" style="top:15%;left:34%;width:12%;height:16%;transition-delay:.50s"></span>' +
-            '<span class="cli-bldg" style="top:60%;left:74%;width:16%;height:20%;transition-delay:.58s"></span>' +
-            '<span class="cli-bldg" style="top:18%;right:8%;width:10%;height:24%;transition-delay:.46s"></span>' +
+            '<span class="cli-cov" aria-hidden="true"></span>' +
             '<span class="cli-ring"></span>' +
             '<svg class="cli-pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="transition-delay:.5s">' +
             '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>' +
