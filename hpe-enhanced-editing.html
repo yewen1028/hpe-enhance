@@ -6906,32 +6906,38 @@
       transform: none;
     }
 
-    /* ripple pulsing out from the pin's base */
+    /* Live-signal pulse on the pin — the same orange ring effect the HQ marker
+       broadcasts on the Leaflet map (ported from .hq-marker .pulse-ring /
+       @keyframes hq-center-glow), applied to every branch card's map. It rides
+       inside the static dashed coverage ring (.cli-cov): a glowing orange ring
+       that keeps expanding out from the pin and fading, so each card reads as a
+       live location, matching HQ. */
     .cli-ring {
       position: absolute;
       top: 46%;
       left: 50%;
-      width: 16px;
-      height: 16px;
-      margin: -8px 0 0 -8px;
+      width: 26px;
+      height: 26px;
+      margin: -13px 0 0 -13px;
       border-radius: 50%;
-      border: 2px solid rgba(244, 121, 32, .6);
+      border: 2px solid rgba(244, 121, 32, .55);
+      box-shadow: 0 0 12px rgba(244, 121, 32, .45);
       opacity: 0;
       pointer-events: none;
     }
 
     .center-list-item.cli-play .cli-ring {
-      animation: cliRing 2.2s ease-out .55s infinite;
+      animation: cliRing 2s ease-out .55s infinite;
     }
 
     @keyframes cliRing {
       0% {
-        transform: scale(.4);
-        opacity: .7;
+        transform: scale(.7);
+        opacity: .55;
       }
 
       100% {
-        transform: scale(2.8);
+        transform: scale(3.2);
         opacity: 0;
       }
     }
