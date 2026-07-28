@@ -6816,6 +6816,46 @@
       transform: none;
     }
 
+    /* ── Real per-branch map (Carto dark raster tiles, lazy-loaded on expand;
+       same basemap the Leaflet map uses, so it matches the dark theme).
+       Mounted UNDER the procedural roads/buildings as the base layer. Once a
+       tile actually loads, the real map fades in and the procedural drawing
+       (only ever a placeholder) is retired — while the pin drop + ripple keep
+       playing on top exactly as before. If every tile fails (API down/offline)
+       .cli-hasmap is never set, so the procedural map stays as the fallback. ── */
+    .cli-tiles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity .5s ease;
+      pointer-events: none;
+    }
+
+    .cli-tile {
+      position: absolute;
+      width: 256px;
+      height: 256px;
+      max-width: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .cli-mapcanvas.cli-hasmap .cli-tiles {
+      opacity: 1;
+    }
+
+    /* Real map present → retire the placeholder roads + buildings. !important
+       is needed so this also wins under prefers-reduced-motion, whose block
+       force-restores .cli-bldg to opacity:1 — the real map has superseded the
+       placeholder regardless of motion preference. Higher specificity here
+       (0,3,0) beats that block's .cli-bldg (0,1,0) even with both !important. */
+    .cli-mapcanvas.cli-hasmap svg.cli-grid,
+    .cli-mapcanvas.cli-hasmap .cli-bldg {
+      opacity: 0 !important;
+      transition: opacity .5s ease;
+    }
+
     .cli-pin {
       position: absolute;
       top: 46%;
@@ -6923,6 +6963,7 @@
 
       .cli-map,
       .cli-mapcanvas,
+      .cli-tiles,
       .cli-bldg,
       .cli-pin,
       .cli-coords,
@@ -21709,11 +21750,67 @@
           return Math.abs(v).toFixed(4) + '° ' + (v >= 0 ? pos : neg);
         }
 
+        // ── Real static map for a card, built from Carto dark raster tiles
+        //    (the same basemap the Leaflet map uses — keyless, dark-themed).
+        //    Web-Mercator tile math centres the branch's real lat/lng in the
+        //    canvas; only the handful of tiles that cover the small canvas are
+        //    requested, and only the first time a card is opened (lazy + cached
+        //    via the card._mapReq guard). Any tile that fails is dropped so the
+        //    dark backdrop shows through; if none load, .cli-hasmap is never set
+        //    and the procedural placeholder remains as the graceful fallback.
+        var TILE_Z = 13, TILE_PX = 256, TILE_SUB = ['a', 'b', 'c'];
+
+        function lonToTile(lon, z) { return (lon + 180) / 360 * Math.pow(2, z); }
+
+        function latToTile(lat, z) {
+          var r = lat * Math.PI / 180;
+          return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+        }
+
+        function loadTiles(card, c) {
+          if (card._mapReq) return;                 // cache: build once per card
+          var canvas = card.querySelector('.cli-mapcanvas');
+          var host = card.querySelector('.cli-tiles');
+          if (!canvas || !host) return;
+          card._mapReq = true;
+
+          var W = canvas.clientWidth || 260, H = canvas.clientHeight || 134;
+          var max = Math.pow(2, TILE_Z);
+          // world-pixel centre for the branch, then the canvas top-left origin
+          var cx = lonToTile(c.lng, TILE_Z) * TILE_PX;
+          var cy = latToTile(c.lat, TILE_Z) * TILE_PX;
+          var ox = cx - W / 2, oy = cy - H / 2;
+          var x0 = Math.floor(ox / TILE_PX), x1 = Math.floor((ox + W - 1) / TILE_PX);
+          var y0 = Math.floor(oy / TILE_PX), y1 = Math.floor((oy + H - 1) / TILE_PX);
+          var landed = false, s = 0;
+
+          for (var tx = x0; tx <= x1; tx++) {
+            for (var ty = y0; ty <= y1; ty++) {
+              if (ty < 0 || ty >= max) continue;    // off the top/bottom of the world
+              var wx = ((tx % max) + max) % max;     // wrap x around the date line
+              var img = new Image();
+              img.className = 'cli-tile';
+              img.alt = '';
+              img.decoding = 'async';
+              img.style.left = (tx * TILE_PX - ox) + 'px';
+              img.style.top = (ty * TILE_PX - oy) + 'px';
+              img.onload = function () {
+                if (!landed) { landed = true; canvas.classList.add('cli-hasmap'); }
+              };
+              img.onerror = function () { if (this.parentNode) this.parentNode.removeChild(this); };
+              img.src = 'https://' + TILE_SUB[s++ % 3] + '.basemaps.cartocdn.com/dark_all/' +
+                TILE_Z + '/' + wx + '/' + ty + '@2x.png';
+              host.appendChild(img);
+            }
+          }
+        }
+
         function buildMap(c) {
           var wrap = document.createElement('div');
           wrap.className = 'cli-map';
           wrap.innerHTML =
             '<div class="cli-mapcanvas">' +
+            '<div class="cli-tiles" aria-hidden="true"></div>' +
             '<svg class="cli-grid" preserveAspectRatio="none" viewBox="0 0 100 60">' +
             '<line class="cli-road" style="transition-delay:.06s" x1="0" y1="22" x2="100" y2="22" stroke-width="2.4"/>' +
             '<line class="cli-road" style="transition-delay:.13s" x1="0" y1="40" x2="100" y2="40" stroke-width="2.4"/>' +
@@ -21768,6 +21865,9 @@
         // ── open / close ──
         function expand(card) {
           card.classList.add('expanded');
+          // lazy-load the real map as soon as the card opens (request starts in
+          // parallel with the panel animation; it fades in whenever it arrives)
+          if (card._center) loadTiles(card, card._center);
           clearTimeout(card._playT);
           card._playT = setTimeout(function () {
             if (card.classList.contains('expanded')) card.classList.add('cli-play');
@@ -21786,6 +21886,7 @@
 
           var c = CENTERS.find(function (x) { return x.id === card.dataset.id; });
           if (!c) return;
+          card._center = c;   // used by expand() to lazy-load this branch's map
 
           var chev = document.createElement('i');
           chev.className = 'fa-solid fa-chevron-down cli-chev';
