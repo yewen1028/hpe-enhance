@@ -1772,14 +1772,19 @@
        ?service (detail) pages an inline classifier adds .view-detail to <html>
        so the body skeleton matches the detail layout instead of a card grid. */
     .app-skel .sk {
-      background: linear-gradient(100deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.11) 45%, rgba(255,255,255,.05) 65%);
+      /* solid gray block (always visible) + a moving highlight sweep on top */
+      background-color: rgba(255, 255, 255, .07);
+      background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,.09) 45%, rgba(255,255,255,0) 70%);
+      background-repeat: no-repeat;
       background-size: 220% 100%;
       border-radius: 8px;
       animation: skShimmer 1.3s linear infinite;
     }
     @keyframes skShimmer { from { background-position: 220% 0; } to { background-position: -120% 0; } }
-    .app-skel .sk-hero { background: var(--navy); padding: clamp(70px, 9vw, 120px) 0; }
-    .app-skel .sk-body { background: var(--light); padding: clamp(64px, 8vw, 110px) 0 60px; }
+    /* No section background — the loaders float on the page base so they never
+       show as a solid dark-blue block over where the hero image will paint. */
+    .app-skel .sk-hero { padding: clamp(70px, 9vw, 120px) 0; }
+    .app-skel .sk-body { padding: clamp(64px, 8vw, 110px) 0 60px; }
     .app-skel .sk-eyebrow { width: 150px; height: 14px; margin-bottom: 24px; border-radius: 6px; }
     .app-skel .sk-title { width: min(560px, 82%); height: 46px; margin-bottom: 16px; }
     .app-skel .sk-title.short { width: min(360px, 55%); }
