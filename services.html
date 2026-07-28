@@ -3261,6 +3261,23 @@
     })();
   </script>
 
+  <script>
+    /* Tab-title easter egg: when the visitor switches away, nudge them with a
+       friendly message; restore the real title the moment they come back. */
+    (function () {
+      var realTitle = document.title;
+      var awayTitle = "We're still here →";
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          realTitle = document.title;
+          document.title = awayTitle;
+        } else {
+          document.title = realTitle;
+        }
+      });
+    })();
+  </script>
+
 </body>
 
 </html>

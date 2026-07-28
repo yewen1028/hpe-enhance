@@ -11705,6 +11705,14 @@
     :root[data-theme="light"] .px-photo .card {
       --heading: #0d1b2a; --text: #26313f; --muted: #59677a; --border: #e2e7ef;
     }
+    /* The Service Centers section stays dark navy in light mode (theme lock),
+       so its ink is forced light above. Its region panels (var(--surface)) and
+       branch cards (var(--surface-2)) are token-driven, though, so without this
+       they flip to white while the ink stays light — turning the whole branch
+       list invisible. Restore the dark surface ladder so the cards stay dark. */
+    :root[data-theme="light"] .centers {
+      --surface: #111c2e; --surface-2: #16233a; --orange-l: rgba(255, 125, 26, .13);
+    }
     /* case-study accordion pills (dark --navy2 bg) → light in light mode */
     :root[data-theme="light"] .cs-home-cat-label {
       background: #ffffff; color: var(--heading); border-color: var(--border);
@@ -22156,6 +22164,23 @@
       }
       document.querySelectorAll('.theme-btn').forEach(function (btn) {
         btn.addEventListener('click', function () { apply(current() === 'light' ? 'dark' : 'light'); });
+      });
+    })();
+  </script>
+
+  <script>
+    /* Tab-title easter egg: when the visitor switches away, nudge them with a
+       friendly message; restore the real title the moment they come back. */
+    (function () {
+      var realTitle = document.title;
+      var awayTitle = "We're still here →";
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          realTitle = document.title;
+          document.title = awayTitle;
+        } else {
+          document.title = realTitle;
+        }
       });
     })();
   </script>
