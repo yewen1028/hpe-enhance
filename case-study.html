@@ -4,6 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    /* Apply the saved theme before first paint (no flash). Dark is the default. */
+    (function () {
+      try {
+        var t = localStorage.getItem('hpe-theme');
+        document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+      } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+    })();
+  </script>
   <title>Case Studies — HPE Solutions Sdn Bhd</title>
   <meta name="description"
     content="Real-world IT outcomes delivered by HPE Solutions Sdn Bhd for clients across Malaysia — managed services, deployments, helpdesk, staffing, warranty and sourcing." />
@@ -59,6 +68,43 @@
       --shadow: 0 24px 60px -22px rgba(13, 27, 42, .28);
       --nav-h: 68px;
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LIGHT / DARK THEME SYSTEM
+       Toggle sets data-theme="light|dark" on <html> (persisted in
+       localStorage, applied pre-paint by the inline script in <head>). The
+       page's effective default is DARK (the dark :root override further down).
+       Light re-defines the token VALUES so token-driven surfaces flip; the
+       hard-coded dark chrome (nav, mobile menu) gets explicit light overrides.
+       Hero + footer intentionally stay dark in both themes.
+       ═══════════════════════════════════════════════════════════════ */
+    :root[data-theme="light"] {
+      --base: #ffffff;
+      --navy: #0d1b2a; --navy-2: #16283e;
+      --text: #26313f; --muted: #59677a; --heading: #0d1b2a;
+      --light: #f4f6fa; --surface: #ffffff; --surface-2: #eef2f7;
+      --border: #e2e7ef;
+      --orange: #ea6a12; --orange-d: #cf5c0c; --orange-l: #fdeee2;
+      --shadow: 0 24px 55px -26px rgba(13, 27, 42, .2);
+    }
+    :root[data-theme="light"] #navbar { background: rgba(255, 255, 255, .85); box-shadow: 0 1px 0 rgba(13, 27, 42, .06); }
+    :root[data-theme="light"] #navbar.scrolled { background: rgba(255, 255, 255, .92); box-shadow: 0 10px 30px -14px rgba(13, 27, 42, .16); }
+    :root[data-theme="light"] .mobile-menu { background: rgba(255, 255, 255, .97); }
+    :root[data-theme="light"] .nav-links > li > a:hover { background: rgba(13, 27, 42, .05); }
+    :root[data-theme="light"] .cs-thumb .ico { background: #ffffff; }
+    :root[data-theme="light"] ::selection { background: rgba(234, 106, 18, .25); color: #0d1b2a; }
+
+    /* Theme toggle button — sun in dark mode, moon in light mode */
+    .theme-btn .th-moon { display: none; }
+    :root[data-theme="light"] .theme-btn .th-sun { display: none; }
+    :root[data-theme="light"] .theme-btn .th-moon { display: inline-block; }
+    .nav-theme-toggle {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1px solid var(--border); background: transparent; color: var(--text);
+      cursor: pointer; display: grid; place-items: center; font-size: 15px;
+      transition: background .2s, color .2s, border-color .2s, transform .15s;
+    }
+    .nav-theme-toggle:hover { background: var(--surface-2); color: var(--orange); border-color: var(--orange); transform: translateY(-1px); }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -2119,6 +2165,7 @@
       <li><a href="hpe-enhanced-editing.html#casestudy"><i class="fa-solid fa-file-lines fa-sm" style="color:var(--orange);margin-right:2px;"></i> Case Study</a></li>
       <li><a href="hpe-enhanced-editing.html#centers"><i class="fa-solid fa-map-location-dot fa-sm" style="color:var(--orange);margin-right:2px;"></i> Service Centers</a></li>
       <li><a href="hpe-enhanced-editing.html#bizpartners"><i class="fa-solid fa-handshake fa-sm" style="color:var(--orange);margin-right:2px;"></i> Business Partners</a></li>
+      <li><button type="button" class="nav-theme-toggle theme-btn" id="themeToggle" aria-label="Toggle light and dark theme" title="Toggle light / dark theme"><i class="fa-solid fa-sun th-sun" aria-hidden="true"></i><i class="fa-solid fa-moon th-moon" aria-hidden="true"></i></button></li>
       <li><a href="hpe-enhanced-editing.html#contact" class="nav-cta am-cta"><span class="am-plane-box" aria-hidden="true"><i class="am-plane fa-solid fa-paper-plane"></i></span><span class="am-label">Contact Us</span></a></li>
     </ul>
 
@@ -2144,6 +2191,7 @@
     <a href="hpe-enhanced-editing.html#centers" class="mob-link"><i class="fa-solid fa-map-location-dot"></i> Service Centers</a>
     <a href="hpe-enhanced-editing.html#bizpartners" class="mob-link"><i class="fa-solid fa-handshake"></i> Business Partners</a>
     <a href="hpe-enhanced-editing.html#contact" class="mob-link m-cta"><i class="fa-solid fa-paper-plane"></i> Contact Us</a>
+    <button type="button" class="mob-link theme-btn" id="themeToggleMob" style="width:100%;background:none;border:none;text-align:left;cursor:pointer;font:inherit;"><i class="fa-solid fa-sun th-sun"></i><i class="fa-solid fa-moon th-moon"></i> <span class="th-sun">Switch to light</span><span class="th-moon">Switch to dark</span></button>
   </div>
 
 
@@ -3095,6 +3143,20 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNavSearch);
     else initNavSearch();
+  </script>
+
+  <!-- LIGHT / DARK THEME TOGGLE -->
+  <script>
+    (function () {
+      function current() { return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+      function apply(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        try { localStorage.setItem('hpe-theme', t); } catch (e) {}
+      }
+      document.querySelectorAll('.theme-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { apply(current() === 'light' ? 'dark' : 'light'); });
+      });
+    })();
   </script>
 
 </body>
