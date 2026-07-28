@@ -1764,6 +1764,47 @@
       .ns-r-ico, .ns-result::before, .ns-r-go { transition: none; }
     }
     @media (max-width: 1080px) { .nav-search.open .nav-search-field { width: 180px; } }
+
+    /* ── Skeleton placeholder ───────────────────────────────────────────
+       Shown inside #app until renderIndex()/renderDetail() replaces it, so a
+       slow connection sees the hero + card shapes shimmer in rather than a
+       blank flash. Removed automatically when JS sets app.innerHTML. On
+       ?service (detail) pages an inline classifier adds .view-detail to <html>
+       so the body skeleton matches the detail layout instead of a card grid. */
+    .app-skel .sk {
+      background: linear-gradient(100deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.11) 45%, rgba(255,255,255,.05) 65%);
+      background-size: 220% 100%;
+      border-radius: 8px;
+      animation: skShimmer 1.3s linear infinite;
+    }
+    @keyframes skShimmer { from { background-position: 220% 0; } to { background-position: -120% 0; } }
+    .app-skel .sk-hero { background: var(--navy); padding: clamp(70px, 9vw, 120px) 0; }
+    .app-skel .sk-body { background: var(--light); padding: clamp(64px, 8vw, 110px) 0 60px; }
+    .app-skel .sk-eyebrow { width: 150px; height: 14px; margin-bottom: 24px; border-radius: 6px; }
+    .app-skel .sk-title { width: min(560px, 82%); height: 46px; margin-bottom: 16px; }
+    .app-skel .sk-title.short { width: min(360px, 55%); }
+    .app-skel .sk-sub { width: min(460px, 72%); height: 16px; margin-top: 24px; }
+    .app-skel .sk-row { display: flex; gap: 18px; flex-wrap: wrap; }
+    .app-skel .sk-stats { margin-top: 44px; }
+    .app-skel .sk-stat { width: 120px; height: 46px; border-radius: 10px; }
+    .app-skel .sk-filter { margin-bottom: 46px; }
+    .app-skel .sk-chip { width: 94px; height: 36px; border-radius: 999px; }
+    .app-skel .sk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+    .app-skel .sk-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface); }
+    .app-skel .sk-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: 0; }
+    .app-skel .sk-card-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+    .app-skel .sk-line { height: 13px; border-radius: 6px; }
+    .app-skel .sk-line.w40 { width: 40%; }
+    .app-skel .sk-line.w60 { width: 60%; }
+    .app-skel .sk-line.w90 { width: 90%; }
+    .app-skel .sk-panels { display: none; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: clamp(28px, 4vw, 60px); align-items: start; }
+    .app-skel .sk-panel-media { aspect-ratio: 4 / 3; border-radius: 14px; }
+    .app-skel .sk-stack { display: flex; flex-direction: column; gap: 16px; }
+    .app-skel .sk-block { height: 148px; border-radius: 14px; }
+    html.view-detail .app-skel .sk-filter, html.view-detail .app-skel .sk-grid { display: none; }
+    html.view-detail .app-skel .sk-panels { display: grid; }
+    @media (max-width: 860px) { .app-skel .sk-panels { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { .app-skel .sk { animation: none; } }
   </style>
 </head>
 
@@ -1863,7 +1904,35 @@
   </div>
 
 
-  <main id="app"><!-- rendered by JS --></main>
+  <script>if (new URLSearchParams(location.search).get('service')) document.documentElement.classList.add('view-detail');</script>
+
+  <main id="app">
+    <div class="app-skel" aria-hidden="true">
+      <div class="sk-hero"><div class="wrap">
+        <div class="sk sk-eyebrow"></div>
+        <div class="sk sk-title"></div>
+        <div class="sk sk-title short"></div>
+        <div class="sk sk-sub"></div>
+        <div class="sk-row sk-stats"><div class="sk sk-stat"></div><div class="sk sk-stat"></div><div class="sk sk-stat"></div></div>
+      </div></div>
+      <div class="sk-body"><div class="wrap">
+        <div class="sk-row sk-filter"><div class="sk sk-chip"></div><div class="sk sk-chip"></div><div class="sk sk-chip"></div><div class="sk sk-chip"></div><div class="sk sk-chip"></div><div class="sk sk-chip"></div></div>
+        <div class="sk-grid">
+          <div class="sk-card"><div class="sk sk-thumb"></div><div class="sk-card-body"><div class="sk sk-line w60"></div><div class="sk sk-line w90"></div><div class="sk sk-line w40"></div></div></div>
+          <div class="sk-card"><div class="sk sk-thumb"></div><div class="sk-card-body"><div class="sk sk-line w60"></div><div class="sk sk-line w90"></div><div class="sk sk-line w40"></div></div></div>
+          <div class="sk-card"><div class="sk sk-thumb"></div><div class="sk-card-body"><div class="sk sk-line w60"></div><div class="sk sk-line w90"></div><div class="sk sk-line w40"></div></div></div>
+          <div class="sk-card"><div class="sk sk-thumb"></div><div class="sk-card-body"><div class="sk sk-line w60"></div><div class="sk sk-line w90"></div><div class="sk sk-line w40"></div></div></div>
+          <div class="sk-card"><div class="sk sk-thumb"></div><div class="sk-card-body"><div class="sk sk-line w60"></div><div class="sk sk-line w90"></div><div class="sk sk-line w40"></div></div></div>
+          <div class="sk-card"><div class="sk sk-thumb"></div><div class="sk-card-body"><div class="sk sk-line w60"></div><div class="sk sk-line w90"></div><div class="sk sk-line w40"></div></div></div>
+        </div>
+        <div class="sk-panels">
+          <div class="sk sk-panel-media"></div>
+          <div class="sk-stack"><div class="sk sk-block"></div><div class="sk sk-block"></div><div class="sk sk-block"></div></div>
+        </div>
+      </div></div>
+    </div>
+    <!-- rendered by JS -->
+  </main>
 
   <footer>
     <div class="footer-grid">
