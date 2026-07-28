@@ -18474,6 +18474,7 @@
     (function () {
       var bodyEl, inputEl, chipsEl, panelEl, fabEl, dotEl, fabIconEl, greeted = false;
       var teaserEl, teaserTextEl, teaserTimer, fabGroupEl, teaserDismissed = false;
+      var chipsH = 72; // live chip-row height; the top fade length mirrors it
 
       /* Proactive greeting bubble that floats by the launcher. Shown once per
          PAGE LOAD after a short pause, unless the visitor has already opened or
@@ -18693,7 +18694,7 @@
         if (!chipsEl || !bodyEl) return;
         requestAnimationFrame(function () {
           var h = chipsEl.offsetHeight;
-          if (h > 0) bodyEl.style.setProperty('--cb-chips-h', h + 'px');
+          if (h > 0) { chipsH = h; bodyEl.style.setProperty('--cb-chips-h', h + 'px'); }
           updateChipsTuck();
         });
       }
@@ -18704,9 +18705,11 @@
         if (!bodyEl || !chipsEl) return;
         var fromBottom = bodyEl.scrollHeight - bodyEl.clientHeight - bodyEl.scrollTop;
         chipsEl.classList.toggle('is-tucked', fromBottom > 48);
-        // top edge fades in only as content scrolls up under the header —
-        // grows 0→28px over the first 28px of scroll, so there's no fade at rest
-        var topFade = Math.min(Math.max(bodyEl.scrollTop, 0), 28);
+        // top edge fades in only as content scrolls up under the header, and
+        // its fade LENGTH mirrors the bottom (the full chip-row height) so both
+        // edges dissolve identically — grows 0→chipsH over the first chipsH px
+        // of scroll, so there's no fade at rest
+        var topFade = Math.min(Math.max(bodyEl.scrollTop, 0), chipsH);
         bodyEl.style.setProperty('--cb-fade-top', topFade + 'px');
       }
 
