@@ -83,6 +83,21 @@
     :root[data-theme="light"] #navbar { background: rgba(255, 255, 255, .85); box-shadow: 0 1px 0 rgba(13, 27, 42, .06); }
     :root[data-theme="light"] #navbar.scrolled { background: rgba(255, 255, 255, .92); box-shadow: 0 10px 30px -14px rgba(13, 27, 42, .16); }
     :root[data-theme="light"] .mobile-menu { background: rgba(255, 255, 255, .97); }
+    /* The navbar & mobile menu force a fixed dark-glass token palette (see the
+       "nav, .mobile-menu, .dropdown, .nav-search-results" block below) so their
+       text is light. In light mode their bars turn white (rules above), so flip
+       their local tokens to the light palette — otherwise light text sits on a
+       white bar and disappears. The two dark popovers (.dropdown &
+       .nav-search-results) keep their own dark tokens and stay dark glass. */
+    :root[data-theme="light"] nav,
+    :root[data-theme="light"] .mobile-menu {
+      --base:#ffffff; --navy:#0d1b2a; --navy2:#16283e; --navy-2:#16283e; --light:#f4f6fa;
+      --surface:#ffffff; --surface-2:#eef2f7;
+      --text:#26313f; --muted:#59677a; --heading:#0d1b2a;
+      --border:#e2e7ef; --border-2:#d5dce6;
+      --orange:#ea6a12; --orange-d:#cf5c0c; --orange-l:#fdeee2;
+      --shadow:0 24px 55px -26px rgba(13, 27, 42, .2);
+    }
     :root[data-theme="light"] .nav-links > li > a:hover { background: rgba(13, 27, 42, .05); }
     :root[data-theme="light"] ::selection { background: rgba(234, 106, 18, .25); color: #0d1b2a; }
 
@@ -92,6 +107,7 @@
     :root[data-theme="light"] .theme-btn .th-moon { display: inline-block; }
     .nav-theme-toggle {
       width: 38px; height: 38px; border-radius: 50%;
+      margin-left: 14px;
       border: 1px solid var(--border); background: transparent; color: var(--text);
       cursor: pointer; display: grid; place-items: center; font-size: 15px;
       transition: background .2s, color .2s, border-color .2s, transform .15s;
@@ -454,7 +470,7 @@
        design tokens the nav relies on are re-scoped to the nav + mobile
        menu only (via inheritance) — the rest of the page is untouched.
        ═══════════════════════════════════════════════════════════════ */
-    nav, .mobile-menu, .dropdown {
+    nav, .mobile-menu, .dropdown, .nav-search-results {
       --base:#070c14; --navy:#0a111d; --navy2:#0e1726; --light:#0d1626;
       --surface:#111c2e; --surface-2:#16233a;
       --text:#dbe3ee; --muted:#93a2b8; --heading:#f3f7fc;
@@ -2039,8 +2055,8 @@
       <li><a href="hpe-enhanced-editing.html#casestudy"><i class="fa-solid fa-file-lines fa-sm" style="color:var(--orange);margin-right:2px;"></i> Case Study</a></li>
       <li><a href="hpe-enhanced-editing.html#centers"><i class="fa-solid fa-map-location-dot fa-sm" style="color:var(--orange);margin-right:2px;"></i> Service Centers</a></li>
       <li><a href="hpe-enhanced-editing.html#bizpartners"><i class="fa-solid fa-handshake fa-sm" style="color:var(--orange);margin-right:2px;"></i> Business Partners</a></li>
-      <li><button type="button" class="nav-theme-toggle theme-btn" id="themeToggle" aria-label="Toggle light and dark theme" title="Toggle light / dark theme"><i class="fa-solid fa-sun th-sun" aria-hidden="true"></i><i class="fa-solid fa-moon th-moon" aria-hidden="true"></i></button></li>
       <li><a href="hpe-enhanced-editing.html#contact" class="nav-cta am-cta"><span class="am-plane-box" aria-hidden="true"><i class="am-plane fa-solid fa-paper-plane"></i></span><span class="am-label">Contact Us</span></a></li>
+      <li><button type="button" class="nav-theme-toggle theme-btn" id="themeToggle" aria-label="Toggle light and dark theme" title="Toggle light / dark theme"><i class="fa-solid fa-sun th-sun" aria-hidden="true"></i><i class="fa-solid fa-moon th-moon" aria-hidden="true"></i></button></li>
     </ul>
 
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
