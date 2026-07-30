@@ -3005,7 +3005,349 @@
 
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       SERVICES STACKED CAROUSEL — vanilla port of the motion/react
+       "carousel-07" component. Each existing .service-card is wrapped
+       (at boot, by JS) in a .svcc-slide that the engine drifts / rotates /
+       scales from a single shared drag "progress" value. The card's own
+       hover / tilt / reveal transforms stay on the inner .service-card, so
+       they compose cleanly with the slide's transform. The reference's
+       text Badge ("Adventure", "Extreme", …) is replaced by each service's
+       own Font Awesome icon — the existing .svc-ico chip, re-anchored to
+       the reference's top-right pill position. Falls back to the original
+       static responsive grid under prefers-reduced-motion. */
+    .svc-carousel {
+      position: relative;
+      width: 100%;
+      max-width: 1340px;
+      margin: 0 auto;
+      /* card box, consumed by .svcc-slide; shrinks on smaller screens */
+      --svcc-w: 316px;
+      --svcc-h: 416px;
+    }
+    .svcc-stage {
+      position: relative;
+      height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: pan-y;               /* keep vertical page scroll on touch */
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .svcc-stage.is-dragging { cursor: grabbing; }
+    /* Floating floor — a soft blurred shadow ellipse sits behind/below the stack
+       (z-index 0, under the cards at z 90–100) so the cards look like they hover
+       above a surface. A faint orange core ties it to the brand. */
+    .svcc-stage::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      width: min(70%, 720px);
+      height: 66px;
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, rgba(255, 125, 26, .22) 0%, transparent 58%),
+        radial-gradient(ellipse at center, rgba(2, 6, 12, .78) 0%, rgba(2, 6, 12, .42) 46%, transparent 74%);
+      filter: blur(19px);
+    }
+    .svcc-slide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--svcc-w);
+      height: var(--svcc-h);
+      margin-left: calc(var(--svcc-w) / -2);
+      margin-top: calc(var(--svcc-h) / -2);
+      opacity: 0;                        /* JS sets the real per-frame opacity */
+      will-change: transform, opacity;
+    }
+    /* Reference card = ONE full-bleed image tile (rounded-2xl, overflow-hidden)
+       with the title/description overlaid at the bottom over a gradient scrim —
+       NOT the site's image-on-top + solid-body-below card. These overrides
+       (scoped to .svcc-slide only) reshape it to match; the inline width/height/
+       position on .service-card-img force !important. */
+    .svcc-slide .service-card {
+      margin: 0;
+      height: 100%;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: none;
+      box-shadow: 0 24px 60px -22px rgba(13, 27, 42, .55);
+    }
+    /* image fills the whole tile */
+    .svcc-slide .service-card-img {
+      position: absolute !important;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .svcc-slide .service-card-img img {
+      height: 100%;
+      /* Stop the browser's native image drag from hijacking the pointer stream
+         (otherwise mousedown-drag on a photo starts a ghost-drag and no
+         pointermove reaches the stage, so the cards never follow the cursor). */
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      user-select: none;
+      pointer-events: none;
+    }
+    /* bottom-up scrim for overlaid-text legibility (reference: from-black/80) */
+    .svcc-slide .service-card-img::after {
+      background: linear-gradient(to top, rgba(3, 8, 15, .88) 0%, rgba(3, 8, 15, .22) 46%, transparent 72%);
+      transition: background .4s ease;
+    }
+    /* title + description overlaid at the bottom, over the image */
+    .svcc-slide .service-card-body {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 3;
+      padding: 20px 18px;
+      background: none;
+    }
+    .svcc-slide .service-card-body h3 {
+      color: var(--orange);
+      font-size: 18px;
+      margin-bottom: 5px;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, .55);
+    }
+    /* Title stays orange by default; it flips to white only while the SELECTED
+       card is being clicked (see the .svcc-center …:active rule further down). */
 
+    /* Liquid glass on every carousel card — always visible (reuses the site's
+       injected .lg-glass overlay + #glass-distortion sheen, not just on hover),
+       so each card reads as a pane of glass. Brightened + a diagonal gloss band
+       so the material is clearly present on the dark photo tiles. */
+    .svcc-slide .lg-card > .lg-glass { opacity: 1; }
+    .svcc-slide .lg-card > .lg-glass::before { opacity: .92; }
+    .svcc-slide .lg-card > .lg-glass::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(125deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .05) 26%, transparent 46%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .svcc-slide .service-card-body h3 i { display: none; }   /* icon now lives in the top-right badge */
+    .svcc-slide .service-card-body p {
+      color: rgba(255, 255, 255, .74);
+      font-style: italic;
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin-bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .svcc-slide .service-link { display: none; }   /* reference card has no CTA button */
+
+    /* Distance dim — the reference darkens off-center cards so the centered
+       one reads as spotlit (its opacity ramp [-2,-.5,0,.5,2]→[.5,.2,0,.2,.5]
+       is driven per-frame by JS). */
+    .svcc-dim {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      background: #060d16;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    /* Badge = the service's own icon, moved to the reference's top-right pill. */
+    .svcc-slide .service-card-img .svc-ico {
+      left: auto;
+      right: 14px;
+      top: 14px;
+      bottom: auto;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .92);
+      border-color: rgba(255, 255, 255, .7);
+      color: var(--navy);
+      font-size: 16px;
+      box-shadow: 0 6px 18px rgba(13, 27, 42, .28);
+    }
+    /* SELECTED (centred) card: it lifts + floats to mark it as the current
+       selection, with a NEUTRAL shadow — NO orange at rest. JS tags the centred
+       slide .svcc-center; :not(.is-dragging) stops cards popping while dragging. */
+    .svcc-slide.svcc-center .service-card { cursor: pointer; }
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card {
+      transform: translateY(-16px) scale(1.03) !important;
+      transition: transform .5s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease !important;
+      box-shadow: 0 52px 92px -26px rgba(0, 0, 0, .74) !important;
+    }
+
+    /* The ORANGE effect appears when the user HOVERS or CLICKS the selected
+       (middle) card — an orange ring + scrim + icon + white title. */
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:hover,
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:active {
+      box-shadow: 0 56px 96px -26px rgba(0, 0, 0, .78), 0 0 0 2px rgba(244, 121, 32, .85) !important;
+    }
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:hover .service-card-img::after,
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:active .service-card-img::after {
+      background: linear-gradient(to top, rgba(244, 121, 32, .92) 0%, rgba(3, 8, 15, .5) 55%, rgba(3, 8, 15, .1) 100%);
+    }
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:hover .svc-ico,
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:active .svc-ico { background: var(--orange); color: #fff; }
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:hover .service-card-body h3,
+    .svcc-stage:not(.is-dragging) .svcc-slide.svcc-center .service-card:active .service-card-body h3 { color: #fff; }
+
+    /* Pointer feedback on a NON-selected card: it lifts, brightens (the
+       distance-dim eases off) and reveals its title — a clear hover effect, with
+       NO orange. It does NOT get a raised z-index, so it stays in its stacked
+       place (behind the card in front of it) and never covers the others. */
+    .svcc-slide:not(.svcc-center) .service-card {
+      transition: transform .4s cubic-bezier(.22, 1, .36, 1), box-shadow .4s ease;
+    }
+    .svcc-slide:not(.svcc-center):hover .service-card {
+      transform: translateY(-10px) scale(1.035) !important;
+      box-shadow: 0 44px 78px -26px rgba(0, 0, 0, .72), 0 0 0 1px rgba(255, 255, 255, .42) !important;
+    }
+    .svcc-slide:not(.svcc-center):hover .svcc-dim { opacity: 0 !important; }
+    .svcc-slide:not(.svcc-center):hover .service-card-body { opacity: 1 !important; }
+
+    /* Keep the icon chip neutral (white glass) on hover — orange stays reserved
+       for the selected-card click above; this overrides the site's global orange. */
+    .svcc-slide .service-card:hover .svc-ico {
+      background: rgba(255, 255, 255, .92); color: var(--navy); transform: none;
+    }
+
+    /* Arrows */
+    .svcc-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 130;   /* above the cards (center card z-index maxes at 100) */
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .9);
+      border: 1px solid var(--border);
+      color: var(--navy);
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(13, 27, 42, .16);
+      transition: background .2s, color .2s, transform .2s;
+    }
+    .svcc-arrow:hover { background: var(--orange); color: #fff; }
+    .svcc-arrow:active { transform: translateY(-50%) scale(.94); }
+    .svcc-prev { left: 2px; }
+    .svcc-next { right: 2px; }
+    @media (min-width: 1024px) { .svcc-prev { left: -6px; } .svcc-next { right: -6px; } }
+
+    /* Dots + hint */
+    .svcc-dots { display: flex; justify-content: center; gap: 9px; margin-top: 22px; }
+    .svcc-dots button {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: rgba(13, 27, 42, .22);
+      cursor: pointer;
+      transition: width .3s, background .3s;
+    }
+    .svcc-dots button.on { width: 26px; background: var(--orange); }
+    .svcc-hint {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .svcc-hint i { color: var(--orange); margin-right: 4px; }
+
+    /* ── Sliding orange glow accent. The container is just a positioning track
+       with NO background / NO pill shape; only the feathered orange glow streak
+       inside it is visible, and it slides horizontally with the cards (its `left`
+       is set from the carousel `progress` in render()). ── */
+    .svcc-rail {
+      position: relative;
+      width: min(60%, 620px);
+      height: 3px;
+      margin: 24px auto 0;
+      /* deliberately no background and no border-radius — the pill is removed */
+    }
+    .svcc-rail-glow {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 30%;
+      height: 3px;
+      transform: translateY(-50%);
+      background: linear-gradient(90deg, transparent, var(--orange) 35%, #ffb066 50%, var(--orange) 65%, transparent);
+      box-shadow: 0 0 14px 2px rgba(244, 121, 32, .6);
+      will-change: left;
+    }
+
+    /* Visually-hidden live region (screen-reader only). */
+    .svcc-live {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* Keyboard focus affordance for the carousel controls + the stage. */
+    .svcc-arrow:focus-visible,
+    .svcc-dots button:focus-visible,
+    .svcc-stage:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 3px;
+    }
+
+    /* ── Section-title reveal (rise from below + fade). Reuses the site's reveal
+       conventions — the same translateY distance as .reveal (32px) and the same
+       cubic-bezier(.22,1,.36,1)/~.6s easing as the title word-anim — toggled by an
+       IntersectionObserver (see the carousel engine). This title is excluded from
+       the word-by-word .title-anim so there's exactly one clean reveal. ── */
+    .svcc-rise {
+      opacity: 0;
+      transform: translateY(34px);
+      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
+      will-change: opacity, transform;
+    }
+    .svcc-rise.svcc-rise-in { opacity: 1; transform: none; }
+    /* Reduced motion → simple opacity fade, no translation. */
+    @media (prefers-reduced-motion: reduce) {
+      .svcc-rise { transform: none; transition: opacity .6s ease; }
+    }
+
+    /* Responsive card box */
+    @media (max-width: 1023px) {
+      .svc-carousel { --svcc-w: 276px; --svcc-h: 366px; }
+      .svcc-stage { height: 528px; }
+    }
+    @media (max-width: 639px) {
+      .svc-carousel { --svcc-w: 220px; --svcc-h: 300px; }
+      .svcc-stage { height: 430px; }
+      .svcc-slide .service-card-body { padding: 14px; }
+      .svcc-slide .service-card-body h3 { font-size: 15px; }
+    }
+
+    /* Like the reference component, the stacked carousel renders in ALL motion
+       modes — there is no grid fallback (that flattened the signature stacked
+       "effect"). Under prefers-reduced-motion the JS simply suppresses the idle
+       autoplay; drag / arrows / dots still position the same stack. */
 
     /* ─── WHY US ─── */
 
@@ -15084,13 +15426,18 @@
 
       <div class="section-tag" style="justify-content:center;">What We Offer</div>
 
-      <h2 class="section-title">What We Do</h2>
+      <h2 class="section-title svcc-rise" data-no-tw>What We Do</h2>
 
       <p class="section-sub" style="margin: 0 auto;">IT support and services for corporate and SME clients.</p>
 
     </div>
 
-    <div class="services-grid" data-parallax="0.05">
+    <div class="svc-carousel" role="group" aria-roledescription="carousel" aria-label="What we do — our services. Use the left and right arrow keys to browse.">
+
+      <!-- Visually-hidden live region: announces the centred service to screen readers. -->
+      <p class="svcc-live" aria-live="polite" aria-atomic="true"></p>
+
+      <div class="svcc-stage" id="svccStage">
 
 
 
@@ -15274,9 +15621,21 @@
 
       </div>
 
+      </div><!-- /svcc-stage -->
 
+      <button class="svcc-arrow svcc-prev" type="button" aria-label="Previous service"><i class="fa-solid fa-chevron-left"></i></button>
 
-    </div>
+      <button class="svcc-arrow svcc-next" type="button" aria-label="Next service"><i class="fa-solid fa-chevron-right"></i></button>
+
+      <!-- Sliding orange glow accent (no track/pill behind it): its horizontal
+           position is driven by the carousel's `progress` in render(). -->
+      <div class="svcc-rail" aria-hidden="true"><span class="svcc-rail-glow"></span></div>
+
+      <div class="svcc-dots" id="svccDots" role="tablist" aria-label="Choose a service"></div>
+
+      <p class="svcc-hint"><i class="fa-solid fa-hand-pointer"></i> Drag or use the arrows — tap a card to select it, tap again to open</p>
+
+    </div><!-- /svc-carousel -->
 
   </section>
 
@@ -20524,7 +20883,10 @@
 
       /* .center-list-item is intentionally NOT here — the branch cards get their
          own slow one-by-one cascade below (SERVICE-CENTRE BRANCHES). */
-      var sel = '.section-tag, .section-sub, .about-media, .service-card, .industry-card, .why-point, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
+      /* NOTE: .service-card is intentionally NOT here — the carousel cards get
+         their own staggered slide-in-from-the-right entrance in the carousel
+         engine below, so the generic reveal must not also hide them. */
+      var sel = '.section-tag, .section-sub, .about-media, .industry-card, .why-point, .testimonial-card, .contact-info-item, .footer-brand, .footer-heading';
 
       var els = Array.prototype.slice.call(document.querySelectorAll(sel));
 
@@ -20616,7 +20978,9 @@
 
     (function () {
 
-      var titles = Array.prototype.slice.call(document.querySelectorAll('h2.section-title'));
+      /* [data-no-tw] opts a title out of the word-by-word reveal (the #services
+         "What We Do" title uses the simpler .svcc-rise translateY+fade instead). */
+      var titles = Array.prototype.slice.call(document.querySelectorAll('h2.section-title:not([data-no-tw])'));
 
       if (!titles.length) return;
 
@@ -22816,6 +23180,306 @@
           document.title = realTitle;
         }
       });
+    })();
+  </script>
+
+  <!-- Services stacked carousel engine — vanilla port of motion/react "carousel-07".
+       Wraps each existing .service-card in a .svcc-slide and drives the stacked
+       drag / rotate / scale physics from one shared "progress" value. -->
+  <script>
+    (function () {
+      var stage = document.getElementById('svccStage');
+      if (!stage) return;
+
+      // Wrap each existing .service-card in a .svcc-slide the engine can drive
+      // (leaves the card itself — click-through, tilt, reveal — untouched).
+      var cards = [].slice.call(stage.querySelectorAll(':scope > .service-card'));
+      if (!cards.length) return;
+      var slides = cards.map(function (card) {
+        var slide = document.createElement('div');
+        slide.className = 'svcc-slide';
+        stage.insertBefore(slide, card);
+        slide.appendChild(card);
+        // Per-card dark overlay (dims off-center cards, like the reference).
+        var dim = document.createElement('div');
+        dim.className = 'svcc-dim';
+        dim.setAttribute('aria-hidden', 'true');
+        slide.appendChild(dim);
+        slide._dim = dim;
+        slide._body = card.querySelector('.service-card-body');
+        slide._enter = 0;   // first-run entrance (0 = off-screen right + faded, 1 = in place)
+        return slide;
+      });
+      var total = slides.length;
+
+      var carousel = stage.closest('.svc-carousel');
+      var dotsWrap = carousel.querySelector('#svccDots');
+      var prevBtn = carousel.querySelector('.svcc-prev');
+      var nextBtn = carousel.querySelector('.svcc-next');
+      var railGlow = carousel.querySelector('.svcc-rail-glow');
+      var live = carousel.querySelector('.svcc-live');
+      var lastAct = -1;
+      function announce(i) {
+        if (!live) return;
+        var h = slides[i].querySelector('h3');
+        live.textContent = (h ? h.textContent.trim() : ('Slide ' + (i + 1))) + ', ' + (i + 1) + ' of ' + total;
+      }
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Dots (built for both modes; hidden by CSS under reduced motion).
+      var dots = slides.map(function (_, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('role', 'tab');
+        b.setAttribute('aria-label', 'Service ' + (i + 1));
+        b.addEventListener('click', function () { goTo(i); });
+        dotsWrap.appendChild(b);
+        return b;
+      });
+
+      // Note: no reduced-motion bail-out — the reference always shows the
+      // stacked carousel. Under reduced motion we only skip the idle autoplay
+      // (see scheduleAuto); the stack, drag, arrows and dots still run.
+
+      // ── Responsive physics config (mirrors the component's getCarouselConfig) ──
+      function makeConfig(w) {
+        if (w < 640)  return { x: 78,  y: 14, rot: 8,  scale: 0.06, sens: 180 };
+        if (w < 1024) return { x: 112, y: 20, rot: 10, scale: 0.09, sens: 220 };
+        return                { x: 138, y: 26, rot: 12, scale: 0.12, sens: 250 };
+      }
+      var C = makeConfig(window.innerWidth);
+
+      var progress = 0, target = 0, vel = 0, raf = null;
+      var dragging = false, startX = 0, startProgress = 0, moved = 0, pid = null;
+
+      // Shortest signed distance from index i to progress p on the ring.
+      function wrapDiff(i, p) {
+        var d = (i - p) % total;
+        if (d > total / 2) d -= total;
+        if (d < -total / 2) d += total;
+        return d;
+      }
+
+      // ── First-run entrance: cards slide in from the RIGHT, one by one, the
+      //    first time the section scrolls into view. Reduced motion → a plain
+      //    opacity fade with no travel and no stagger (see ENTER_* below). ──
+      var ENTER_DX = reduce ? 0 : 480;        // px each card starts to the right
+      var ENTER_STAGGER = reduce ? 0 : 95;    // ms delay between successive cards
+      var ENTER_DUR = reduce ? 480 : 720;     // ms per card
+      var enterStarted = false, enterT0 = 0;
+      function nowMs() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }   // easeOutCubic
+      function enterTick() {
+        var t = nowMs() - enterT0, done = true;
+        for (var i = 0; i < total; i++) {
+          var d = t - i * ENTER_STAGGER;
+          var e = d <= 0 ? 0 : (d >= ENTER_DUR ? 1 : easeOut(d / ENTER_DUR));
+          slides[i]._enter = e;
+          if (e < 1) done = false;
+        }
+        render();
+        if (!done) requestAnimationFrame(enterTick);
+      }
+      function startEntrance() {
+        if (enterStarted) return; enterStarted = true;
+        enterT0 = nowMs();
+        requestAnimationFrame(enterTick);
+      }
+
+      function render() {
+        var half = total / 2;
+        for (var i = 0; i < total; i++) {
+          var o = wrapDiff(i, progress), ao = Math.abs(o);
+          var x = o * C.x;
+          var y = ao < 0.05 ? 0 : ao * C.y;
+          var rot = ao < 0.05 ? 0 : o * C.rot;
+          var sc = 1 - ao * C.scale;
+          var op = ao >= half ? 0 : (ao > half - 0.5 ? (half - ao) / 0.5 : 1);
+          // First-run entrance: offset to the right + faded until _enter reaches 1.
+          var e = slides[i]._enter; if (e == null) e = 1;
+          var ex = (1 - e) * ENTER_DX;
+          var s = slides[i].style;
+          s.transform = 'translate3d(' + (x + ex).toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
+          s.opacity = (op * e).toFixed(3);
+          s.zIndex = Math.round(100 - ao * 10);
+          // Reference "spotlight" dim: 0 at center, ramping to .5 by distance 2.
+          var dim = ao <= 0.5 ? 0.4 * ao : (ao <= 2 ? 0.2 + (ao - 0.5) / 1.5 * 0.3 : 0.5);
+          slides[i]._dim.style.opacity = dim.toFixed(3);
+          // Reference center-focus: card text is crisp only on the centered card.
+          if (slides[i]._body) slides[i]._body.style.opacity = Math.max(0, 1 - ao * 2).toFixed(3);
+          // Tag the centered card so only it gets the floating hover.
+          slides[i].classList.toggle('svcc-center', ao < 0.5);
+        }
+        var act = ((Math.round(progress) % total) + total) % total;
+        for (var j = 0; j < dots.length; j++) dots[j].classList.toggle('on', j === act);
+        // Sliding orange glow accent: position tracks `progress` (glow 30% wide → 0–70%).
+        if (railGlow) {
+          var frac = (((progress % total) + total) % total) / total;
+          railGlow.style.left = (frac * 70).toFixed(2) + '%';
+        }
+        // Announce the centred service, but only while focus is inside the carousel
+        // (so passive autoplay doesn't spam a screen reader that's elsewhere).
+        if (act !== lastAct) {
+          lastAct = act;
+          if (live && carousel.contains(document.activeElement)) announce(act);
+        }
+      }
+
+      // Critically-damped-ish spring toward the integer target (stiffness/damping
+      // echo the component's spring: stiffness 200, damping 30, mass 1).
+      function loop() {
+        var stiff = 200, damp = 30, dt = 1 / 60;
+        var a = -stiff * (progress - target) - damp * vel;
+        vel += a * dt;
+        progress += vel * dt;
+        if (Math.abs(vel) < 0.002 && Math.abs(progress - target) < 0.002) {
+          progress = target; vel = 0; render(); raf = null; return;
+        }
+        render();
+        raf = requestAnimationFrame(loop);
+      }
+      function kick() { if (raf == null) raf = requestAnimationFrame(loop); }
+
+      function goDelta(d) { target = Math.round(progress) + d; stopAuto(); kick(); scheduleAuto(); }
+      function goTo(i) { target = Math.round(progress) + wrapDiff(i, Math.round(progress)); stopAuto(); kick(); scheduleAuto(); }
+
+      // ── Drag (LAZY pointer capture) ──
+      // We do NOT capture the pointer on pointerdown — capturing there would
+      // retarget the ensuing `click` to the stage, so a tap on a card would
+      // never reach the card's navigation handler. Instead we only capture once
+      // the pointer has actually moved past a small threshold (a real drag); a
+      // clean tap never captures, so its click reaches the card and navigates.
+      var pending = false;
+      stage.addEventListener('pointerdown', function (e) {
+        if (e.button != null && e.button !== 0) return;   // left button / touch only
+        pending = true; dragging = false; moved = 0;
+        startX = e.clientX; startProgress = progress; vel = 0;
+        pid = e.pointerId;
+        stopAuto();
+        if (raf != null) { cancelAnimationFrame(raf); raf = null; }
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!pending && !dragging) return;
+        var dx = e.clientX - startX;
+        if (Math.abs(dx) > moved) moved = Math.abs(dx);
+        if (!dragging && Math.abs(dx) > 4) {
+          dragging = true;
+          stage.classList.add('is-dragging');
+          try { stage.setPointerCapture(pid); } catch (_) {}
+        }
+        if (dragging) { progress = startProgress - dx / C.sens; render(); }
+      });
+      function endDrag() {
+        var wasDragging = dragging;
+        pending = false; dragging = false;
+        stage.classList.remove('is-dragging');
+        try { stage.releasePointerCapture(pid); } catch (_) {}
+        if (wasDragging) {
+          var shift = Math.max(-3, Math.min(3, Math.round(progress - startProgress)));
+          target = Math.round(startProgress) + shift;
+          kick();
+        }
+        scheduleAuto();   // resume idle autoplay after a drag or a (non-nav) tap
+      }
+      stage.addEventListener('pointerup', endDrag);
+      stage.addEventListener('pointercancel', endDrag);
+      // Belt-and-braces: cancel any native drag so the pointer stream survives.
+      stage.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+      // Click behaviour (capture phase, so it runs before the card's own
+      // navigation handler): a drag is never a click; a tap on a NON-centered
+      // card just selects it (brings it to the middle) and is swallowed; a tap
+      // on the already-centered card falls through to the card's navigation
+      // handler → services.html?service=… . So: first tap selects, second tap
+      // (on the now-centered card) opens the sub-page.
+      stage.addEventListener('click', function (e) {
+        if (moved > 6) { e.preventDefault(); e.stopPropagation(); return; }
+        var slide = e.target.closest ? e.target.closest('.svcc-slide') : null;
+        if (!slide) return;
+        var idx = slides.indexOf(slide);
+        if (idx < 0) return;
+        if (!slide.classList.contains('svcc-center')) {
+          e.preventDefault();
+          e.stopPropagation();
+          goTo(idx);            // first tap → select / centre this card
+        }
+        // else: already centred → let the click reach the card and navigate.
+      }, true);
+
+      // Arrows + keyboard. The Arrow-key handler is bound to the WHOLE
+      // .svc-carousel (not just the stage), so it fires whenever focus is
+      // anywhere inside the carousel — including after Tabbing to the prev/next
+      // buttons or dots — WITHOUT needing a mouse click on the stage first.
+      if (prevBtn) prevBtn.addEventListener('click', function () { goDelta(-1); });
+      if (nextBtn) nextBtn.addEventListener('click', function () { goDelta(1); });
+      stage.setAttribute('tabindex', '0');
+      stage.setAttribute('role', 'group');
+      stage.setAttribute('aria-label', 'Service cards — press Left/Right arrow keys to browse, Enter to open the centred service');
+      carousel.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); goDelta(-1); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); goDelta(1); }
+        else if ((e.key === 'Enter' || e.key === ' ') && e.target === stage) {
+          // Open the centred card when the stage itself holds keyboard focus
+          // (navigate directly so the drag/tap click-guard can't swallow it).
+          e.preventDefault();
+          var c = slides.filter(function (s) { return s.classList.contains('svcc-center'); })[0];
+          var card = c && c.querySelector('.service-card[data-service]');
+          if (card) location.href = 'services.html?service=' + card.getAttribute('data-service');
+        }
+      });
+      // Pause autoplay while a keyboard user is interacting (focus inside the
+      // carousel), resume when focus leaves — mirrors the existing hover pause.
+      carousel.addEventListener('focusin', function () {
+        stopAuto();
+        announce(((Math.round(progress) % total) + total) % total);
+      });
+      carousel.addEventListener('focusout', function (e) {
+        if (!carousel.contains(e.relatedTarget) && !dragging) scheduleAuto();
+      });
+
+      // ── Autoplay: only while in view, paused on hover / interaction ──
+      var autoT = null, inView = false;
+      function scheduleAuto() {
+        stopAuto();
+        if (!inView || reduce) return;   // no idle auto-motion under reduced motion
+        autoT = setTimeout(function () { target = Math.round(progress) + 1; kick(); scheduleAuto(); }, 4200);
+      }
+      function stopAuto() { if (autoT) { clearTimeout(autoT); autoT = null; } }
+      stage.addEventListener('pointerenter', stopAuto);
+      stage.addEventListener('pointerleave', function () { if (!dragging) scheduleAuto(); });
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            inView = en.isIntersecting;
+            if (inView) { startEntrance(); scheduleAuto(); } else stopAuto();
+          });
+        }, { threshold: 0.2 }).observe(stage);
+      } else { inView = true; startEntrance(); scheduleAuto(); }
+      // Safety net (matches the srObs pattern): run the entrance regardless after 4.5s.
+      setTimeout(startEntrance, 4500);
+
+      // ── Section-title rise reveal — reuses the site's IntersectionObserver
+      //    reveal pattern (same threshold/rootMargin as the title word-anim). ──
+      var title = document.querySelector('#services .section-title.svcc-rise');
+      if (title) {
+        if ('IntersectionObserver' in window) {
+          var tio = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) { title.classList.add('svcc-rise-in'); tio.unobserve(en.target); }
+            });
+          }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
+          tio.observe(title);
+          setTimeout(function () { title.classList.add('svcc-rise-in'); }, 4500);
+        } else {
+          title.classList.add('svcc-rise-in');
+        }
+      }
+
+      window.addEventListener('resize', function () { C = makeConfig(window.innerWidth); render(); }, { passive: true });
+
+      render();
     })();
   </script>
 
