@@ -4297,7 +4297,7 @@
       transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease, background .3s ease, border-color .3s ease;
     }
 
-    /* the liquid-glass sheen (reuses the #radio-glass filter) */
+    /* the liquid-glass sheen (reuses the #glass-distortion filter) */
     .ns-glass {
       position: absolute;
       inset: 0;
@@ -4305,7 +4305,7 @@
       border-radius: inherit;
       pointer-events: none;
       background: radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, .22), transparent 60%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen;
       opacity: .7;
     }
@@ -4586,7 +4586,7 @@
       transform: none;
     }
 
-    /* ONE frosted #radio-glass pill (the same liquid glass the Services mega-menu
+    /* ONE frosted #glass-distortion pill (the same liquid glass the Services mega-menu
        items use) that GLIDES between rows as the pointer/keyboard moves — it
        flows from the previous option to the next instead of each row fading its
        own glass. JS translates + resizes it to the hovered/active row; the CSS
@@ -4632,7 +4632,7 @@
       background:
         radial-gradient(120% 85% at 28% 0%, rgba(255, 255, 255, .28), transparent 60%),
         linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 55%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen;
       opacity: .75;
     }
@@ -4891,7 +4891,7 @@
        "Network Map" shows by default, the "Interactive Map" (Leaflet) is the
        other option. Both render centered, one at a time. The control is a
        liquid-glass segmented toggle (originui "liquid-radio" look, reusing the
-       #radio-glass SVG filter). data-parallax gives it a subtle scroll drift. */
+       #glass-distortion SVG filter). data-parallax gives it a subtle scroll drift. */
     .map-switch-wrap {
       display: flex;
       justify-content: center;
@@ -4953,7 +4953,7 @@
       inset: 0;
       border-radius: inherit;
       background: radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, .25), transparent 60%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen;
       opacity: .7;
     }
@@ -10793,7 +10793,7 @@
       flex-direction: column;
       isolation: isolate;
       /* liquid glass: translucent frost + heavy blur/saturation, reusing the
-         same #radio-glass system as the nav search & service cards */
+         same #glass-distortion system as the nav search & service cards */
       background: rgba(12, 20, 34, .58);
       -webkit-backdrop-filter: blur(30px) saturate(185%) brightness(1.06);
       backdrop-filter: blur(30px) saturate(185%) brightness(1.06);
@@ -10832,7 +10832,7 @@
       background:
         radial-gradient(130% 80% at 18% -12%, rgba(255, 255, 255, .26), transparent 55%),
         linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 28%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen;
       opacity: .6;
     }
@@ -12442,7 +12442,7 @@
 
     /* ═══ BRANCHES LIST — design pass (2026) ═══
        Liquid-glass frost is added to every branch card via CARD_SEL (the same
-       #radio-glass system as the service cards / mega-menu). On top of that:
+       #glass-distortion system as the service cards / mega-menu). On top of that:
        the bare pin is promoted to an orange icon-chip so the branch cards match
        the site's card language, and resting cards get a faint top-highlight so
        the grid reads as crafted glass tiles rather than flat slabs. */
@@ -13500,22 +13500,17 @@
          the service list scroll sideways too */
       overflow-y: auto;
       overflow-x: hidden;
+      /* the service list still scrolls (wheel + keyboard arrows) but its
+         scrollbar is hidden — no visible progress/scroll bar on the list */
+      scrollbar-width: none;        /* Firefox */
+      -ms-overflow-style: none;     /* legacy Edge */
     }
 
+    /* hide the WebKit scrollbar entirely (Chrome/Safari/Edge) */
     .mega .mega-grid::-webkit-scrollbar {
-      width: 9px;
-    }
-
-    .mega .mega-grid::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, .12);
-      border-radius: 9px;
-      border: 3px solid transparent;
-      background-clip: padding-box;
-    }
-
-    .mega .mega-grid::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 125, 26, .45);
-      background-clip: padding-box;
+      width: 0;
+      height: 0;
+      display: none;
     }
 
     /* navigation guide pinned to the bottom of the service list — same treatment
@@ -13674,7 +13669,7 @@
     }
 
     /* ═══ Liquid-glass hover on each Services item ═══════════════════════
-       Ported from the originui "liquid-radio" component: the #radio-glass
+       Ported from the originui "liquid-radio" component: the #glass-distortion
        SVG displacement filter (feTurbulence + feDisplacementMap) plus the
        component's dark "glass" layered box-shadow. A .mi-glass layer is
        injected into every .mega-item by JS and revealed on hover, giving the
@@ -13717,7 +13712,7 @@
       background:
         radial-gradient(120% 85% at 28% 0%, rgba(255, 255, 255, .28), transparent 60%),
         linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 55%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen;
       opacity: .75;
     }
@@ -13747,10 +13742,10 @@
       }
     }
 
-    /* ═══ Liquid-glass hover on every card (same #radio-glass system as the
+    /* ═══ Liquid-glass hover on every card (same #glass-distortion system as the
        Services nav). A .lg-glass overlay is injected into each card by JS and
        fades in on hover: the component's glass bevel box-shadow + a highlight
-       sheen distorted by #radio-glass. pointer-events:none keeps cards fully
+       sheen distorted by #glass-distortion. pointer-events:none keeps cards fully
        clickable. Falls back to a plain bevel under reduced transparency. */
     .lg-card {
       position: relative;
@@ -13780,7 +13775,7 @@
       inset: 0;
       border-radius: inherit;
       background: radial-gradient(135% 60% at 22% -12%, rgba(255, 255, 255, .28), transparent 55%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen;
       opacity: .5;
     }
@@ -16300,7 +16295,7 @@
     <!-- Map switch: the visitor chooses which map to view. The left "Network
          Map" shows by default; "Interactive Map" (Leaflet) is the other option.
          Liquid-glass segmented control (originui "liquid-radio" look, reusing
-         the #radio-glass filter); data-parallax gives it a subtle drift. -->
+         the #glass-distortion filter); data-parallax gives it a subtle drift. -->
     <div class="map-switch-wrap" data-parallax="0.05">
       <div class="map-switch" role="radiogroup" aria-label="Choose which map to view" id="mapSwitch" data-map="network">
         <span class="map-switch-thumb" aria-hidden="true"></span>
@@ -22645,26 +22640,44 @@
 
 
 
-  <!-- GlassFilter — ported verbatim from the originui "liquid-radio" component.
-       Provides the #radio-glass SVG displacement filter used by the Services
-       mega-menu items' liquid-glass hover. -->
+  <!-- GlassFilter — the Apple-style "liquid glass" distortion filter (from the
+       liquid-glass component: fractal turbulence → gamma component-transfer →
+       blur → specular lighting → displacement of the backdrop). Shared #glass-distortion
+       is referenced by every liquid-glass surface (nav search, Services mega-menu
+       items, card hovers, the centers map toggle, pills). baseFrequency + the
+       displacement scale are dialed down from the component's full-screen-dock
+       defaults (0.001/scale 200) so the refraction reads well on the site's small
+       surfaces instead of smearing. -->
 
   <svg class="hidden" aria-hidden="true" style="position:absolute;width:0;height:0">
 
     <defs>
 
-      <filter id="radio-glass" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
 
-        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="1" seed="17" result="turbulence" />
 
-        <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise" />
+        <feComponentTransfer in="turbulence" result="mapped">
 
-        <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="30" xChannelSelector="R" yChannelSelector="B"
-          result="displaced" />
+          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
 
-        <feGaussianBlur in="displaced" stdDeviation="2" result="finalBlur" />
+          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
 
-        <feComposite in="finalBlur" in2="finalBlur" operator="over" />
+          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+
+        </feComponentTransfer>
+
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+
+        <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white" result="specLight">
+
+          <fePointLight x="-200" y="-200" z="300" />
+
+        </feSpecularLighting>
+
+        <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+
+        <feDisplacementMap in="SourceGraphic" in2="softMap" scale="70" xChannelSelector="R" yChannelSelector="G" />
 
       </filter>
 

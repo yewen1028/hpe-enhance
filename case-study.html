@@ -393,7 +393,18 @@
     .cs-progress {
       position: fixed; left: 28px; top: 50%; transform: translateY(-50%);
       z-index: 55; display: flex; flex-direction: column; gap: 26px; padding: 4px 0;
+      /* This rail is a <nav>, so it was inheriting the site navbar's dark frosted
+         chrome (background + backdrop blur + border + shadow) — a translucent box
+         that dimmed the artwork behind it and covered the footer at page-bottom.
+         Strip all of it; the rail is just dots, a hairline and labels. */
+      background: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+      border: 0; box-shadow: none;
+      transition: opacity .3s ease, visibility .3s ease;
     }
+    /* fade the rail out once the footer scrolls into view so its dots/labels
+       never sit on top of the footer content */
+    .cs-progress.rail-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .cs-progress::before {
       content: ''; position: absolute; left: 7px; top: 9px; bottom: 9px;
       width: 2px; border-radius: 2px; background: rgba(255, 255, 255, .16);
@@ -1531,7 +1542,9 @@
        other) so it reliably plays one by one every time the menu opens. */
     /* vertical scroll only — overflow-x:hidden keeps the service list from
        scrolling sideways (matches hpe-enhanced-editing.html) */
-    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; overflow-x: hidden; }
+    .mega .mega-grid { display: flex; flex-direction: column; gap: 8px; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+    /* no visible scrollbar on the services list (matches the main page) */
+    .mega .mega-grid::-webkit-scrollbar { width: 0; height: 0; display: none; }
     .mega .mega-item {
       display: flex; align-items: center; gap: 12px;
       padding: 11px 13px; border-radius: 13px;
@@ -1716,7 +1729,7 @@
     }
 
     /* ═══ Liquid-glass hover on each Services item (originui "liquid-radio"
-       port): #radio-glass SVG displacement filter + the component's dark glass
+       port): #glass-distortion SVG displacement filter + the component's dark glass
        box-shadow. .mi-glass is injected into every .mega-item by JS and
        revealed on hover. Placed last so it wins over the nav's base hover. ═══ */
     .mega .mega-item { position: relative; isolation: isolate; }
@@ -1743,7 +1756,7 @@
       background:
         radial-gradient(120% 85% at 28% 0%, rgba(255, 255, 255, .28), transparent 60%),
         linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 55%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen; opacity: .75;
     }
     .mega .mega-item:hover .mi-glass,
@@ -1762,9 +1775,9 @@
       .mega .mega-item .mi-glass::before { display: none; }
     }
 
-    /* ═══ Liquid-glass hover on every card (same #radio-glass system as the
+    /* ═══ Liquid-glass hover on every card (same #glass-distortion system as the
        Services nav). A .lg-glass overlay is injected into each card by JS and
-       fades in on hover: the glass bevel box-shadow + a #radio-glass-distorted
+       fades in on hover: the glass bevel box-shadow + a #glass-distortion-distorted
        sheen. pointer-events:none keeps cards clickable. ═══ */
     .lg-card { position: relative; }
     .lg-card > .lg-glass {
@@ -1782,7 +1795,7 @@
     .lg-card > .lg-glass::before {
       content: ''; position: absolute; inset: 0; border-radius: inherit;
       background: radial-gradient(135% 60% at 22% -12%, rgba(255, 255, 255, .28), transparent 55%);
-      filter: url("#radio-glass");
+      filter: url("#glass-distortion");
       mix-blend-mode: screen; opacity: .5;
     }
     .lg-card:hover > .lg-glass { opacity: 1; }
@@ -1793,7 +1806,7 @@
   
     /* ═══ NAV SEARCH — ported from hpe-enhanced-editing.html so the sub-pages
        carry the same live site search. Dark tokens come from :root / the nav
-       token re-scope; #radio-glass filter already present on the page. ═══ */
+       token re-scope; #glass-distortion filter already present on the page. ═══ */
 .nav-search-li { display: flex; align-items: center; margin-right: 10px; }
     .nav-search { position: relative; display: flex; align-items: center; }
     .nav-search-toggle {
@@ -1812,11 +1825,11 @@
         inset 0 0 6px 6px rgba(255, 255, 255, .1);
       transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease, background .3s ease, border-color .3s ease;
     }
-    /* the liquid-glass sheen (reuses the #radio-glass filter) */
+    /* the liquid-glass sheen (reuses the #glass-distortion filter) */
     .ns-glass {
       position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
       background: radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, .22), transparent 60%);
-      filter: url("#radio-glass"); mix-blend-mode: screen; opacity: .7;
+      filter: url("#glass-distortion"); mix-blend-mode: screen; opacity: .7;
     }
     .ns-ico { position: relative; z-index: 1; font-size: 15px; color: var(--heading); }
     /* Point at the icon → HPE-orange glow + the icon springs/blurs in. */
@@ -1946,7 +1959,7 @@
         background .18s ease;
     }
     .ns-result.ns-in { opacity: 1; transform: none; }
-    /* ONE frosted #radio-glass pill (the same liquid glass the Services mega-menu
+    /* ONE frosted #glass-distortion pill (the same liquid glass the Services mega-menu
        items use) that GLIDES between rows as the pointer/keyboard moves — it
        flows from the previous option to the next instead of each row fading its
        own glass. JS translates + resizes it to the hovered/active row; the CSS
@@ -1980,7 +1993,7 @@
       background:
         radial-gradient(120% 85% at 28% 0%, rgba(255, 255, 255, .28), transparent 60%),
         linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 55%);
-      filter: url("#radio-glass"); mix-blend-mode: screen; opacity: .75;
+      filter: url("#glass-distortion"); mix-blend-mode: screen; opacity: .75;
     }
     @media (prefers-reduced-transparency: reduce) {
       .ns-glide { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 125, 26, .22); }
@@ -2726,6 +2739,15 @@
         }, { passive: true });
         window.addEventListener('resize', updateRail, { passive: true });
         updateRail();
+
+        /* Hide the fixed rail whenever the footer is on screen so its dots and
+           labels never overlap the footer content at the bottom of the page. */
+        var railFooter = document.querySelector('footer');
+        if (railFooter && 'IntersectionObserver' in window) {
+          new IntersectionObserver(function (entries) {
+            prog.classList.toggle('rail-hidden', entries[0].isIntersecting);
+          }, { rootMargin: '0px 0px -8% 0px' }).observe(railFooter);
+        }
       }
     })();
   </script>
@@ -2905,16 +2927,23 @@
     })();
   </script>
 
-  <!-- GlassFilter (originui "liquid-radio"): #radio-glass SVG displacement
+  <!-- GlassFilter (originui "liquid-radio"): #glass-distortion SVG displacement
        filter used by the Services mega-menu items' liquid-glass hover. -->
   <svg class="hidden" aria-hidden="true" style="position:absolute;width:0;height:0">
     <defs>
-      <filter id="radio-glass" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence" />
-        <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise" />
-        <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="30" xChannelSelector="R" yChannelSelector="B" result="displaced" />
-        <feGaussianBlur in="displaced" stdDeviation="2" result="finalBlur" />
-        <feComposite in="finalBlur" in2="finalBlur" operator="over" />
+      <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="1" seed="17" result="turbulence" />
+        <feComponentTransfer in="turbulence" result="mapped">
+          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+        </feComponentTransfer>
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+        <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white" result="specLight">
+          <fePointLight x="-200" y="-200" z="300" />
+        </feSpecularLighting>
+        <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+        <feDisplacementMap in="SourceGraphic" in2="softMap" scale="70" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
