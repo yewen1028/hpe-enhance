@@ -10850,15 +10850,6 @@
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
       }
-      /* solid scrim instead of the blur so chips stay legible without glass */
-      .cb-chips {
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-        background: linear-gradient(180deg,
-          rgba(12, 20, 34, 0) 0%,
-          rgba(12, 20, 34, .85) 45%,
-          rgba(12, 20, 34, .97) 100%);
-      }
       .chatbot::after { display: none; }
       /* collapsed bar: solid orange instead of frosted glass */
       .chatbot.minimized .cb-head {
@@ -11045,27 +11036,29 @@
       min-height: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
-      /* live chip-row height (set by syncChipsMetrics in JS); the fallback
-         covers ~two wrapped rows before measurement runs */
-      --cb-chips-h: 72px;
-      /* extra bottom room so the newest message can rest cleanly ABOVE the
-         frosted chip overlay instead of behind it */
-      padding: 16px 16px calc(var(--cb-chips-h) + 8px);
+      /* Suggestions now live as ghost text inside the composer input (see
+         .cb-ghost), so the message area reclaims the full height the old
+         frosted chip overlay used to occupy — just even padding all round. */
+      padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 14px;
       scroll-behavior: smooth;
-      /* soft fade at the bottom edge so a message sliding under the chips
-         dissolves instead of being hard-cut by the chip row. The top edge
-         fades the same way, but ONLY once scrolled down (--cb-fade-top grows
-         from 0 as content moves up under the header — see updateChipsTuck). */
+      /* Soft edge fades so the dialogue dissolves at both ends while scrolling
+         instead of hard-cutting against the header / composer. Both bands are
+         driven by updateBodyFade: --cb-fade-top grows 0→FADE as you scroll DOWN
+         (no fade when pinned to the top), --cb-fade-bot shrinks FADE→0 as you
+         reach the BOTTOM (no fade on the last message at rest). Mid-scroll both
+         edges are feathered. When the messages don't overflow, both collapse to
+         0 so nothing is dimmed. */
       --cb-fade-top: 0px;
+      --cb-fade-bot: 32px;
       -webkit-mask-image: linear-gradient(to bottom,
         transparent 0, #000 var(--cb-fade-top),
-        #000 calc(100% - var(--cb-chips-h) - 6px), transparent calc(100% - 6px));
+        #000 calc(100% - var(--cb-fade-bot)), transparent 100%);
       mask-image: linear-gradient(to bottom,
         transparent 0, #000 var(--cb-fade-top),
-        #000 calc(100% - var(--cb-chips-h) - 6px), transparent calc(100% - 6px));
+        #000 calc(100% - var(--cb-fade-bot)), transparent 100%);
     }
     .cb-body { scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .cb-body::-webkit-scrollbar { width: 7px; }
@@ -11160,52 +11153,97 @@
       30% { transform: translateY(-5px); opacity: 1; }
     }
 
-    /* Frosted overlay pinned to the bottom of the message viewport. A blurred
-       gradient scrim (same liquid-glass language as .cb-teaser / the panel)
-       lets messages read as scrolling underneath it rather than dead-ending. */
-    .cb-chips {
+    /* ── Inline suggestion "ghost" text (replaces the old .cb-chips row) ──
+       Suggested questions surface as faint autocomplete-style hint text laid
+       OVER the composer input — never written into its value, so there is
+       nothing for the visitor to delete. It sits behind the caret layer and
+       ignores the pointer, so clicking anywhere in the field just focuses the
+       real input for typing your own message. A small "Tab" keycap to the
+       right is the explicit accept affordance (Tab key does the same). */
+    .cb-ghost {
       position: absolute;
-      left: 0;
-      right: 0;
+      left: 16px;                 /* 2px field pad + 14px input pad — aligns with typed text */
+      right: 46px;                /* clear the Tab keycap */
+      top: 0;
       bottom: 0;
+      z-index: 2;                 /* above the input's own background, below its text/caret */
+      display: flex;
+      align-items: center;
+      pointer-events: none;       /* clicks fall through to the input */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 13.5px;
+      line-height: 1.2;
+      /* clearly a hint, not real input: dimmer + italic, matching the native
+         placeholder colour token so it reads as "placeholder", not content */
+      color: var(--muted);
+      font-style: italic;
+      opacity: 0;
+      transition: opacity .28s cubic-bezier(.22, 1, .36, 1);
+    }
+    .cb-ghost.show { opacity: .78; }
+    .cb-ghost .cb-ghost-txt {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity .22s ease;
+    }
+    /* the small leading "e.g." tag makes the intent unmistakable */
+    .cb-ghost .cb-ghost-tag {
+      flex-shrink: 0;
+      margin-right: 6px;
+      font-style: normal;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--orange);
+      opacity: .85;
+    }
+
+    /* explicit "Tab to accept" affordance — a real button (mouse + AT), kept
+       out of the natural tab order so the input's own Tab-to-accept handler
+       stays in charge for keyboard users */
+    .cb-ghost-accept {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
       z-index: 3;
       display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      padding: 16px 16px 12px;
-      background: linear-gradient(180deg,
-        rgba(12, 20, 34, 0) 0%,
-        rgba(12, 20, 34, .5) 42%,
-        rgba(12, 20, 34, .82) 100%);
-      -webkit-backdrop-filter: blur(9px) saturate(150%);
-      backdrop-filter: blur(9px) saturate(150%);
-      transform-origin: bottom center;
-      /* reuse the file's standard reveal easing (no bespoke curve) */
-      transition:
-        opacity .4s cubic-bezier(.22, 1, .36, 1),
-        transform .45s cubic-bezier(.22, 1, .36, 1);
-    }
-    /* parallax tuck: slides + fades the chips out of the way while the reader
-       scrolls back through older messages, restored near the latest message */
-    .cb-chips.is-tucked {
-      opacity: 0;
-      transform: translateY(14px);
-      pointer-events: none;
-    }
-    .cb-chip {
-      font: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--orange);
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255, 125, 26, .35);
+      border-radius: 7px;
+      padding: 3px 7px;
       background: var(--orange-l);
-      border: 1px solid rgba(255, 125, 26, .3);
-      border-radius: 999px;
-      padding: 6px 12px;
+      color: var(--orange);
+      font: inherit;
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1;
       cursor: pointer;
-      transition: background .18s, transform .18s;
-      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .28s cubic-bezier(.22, 1, .36, 1), background .18s, transform .18s;
     }
-    .cb-chip:hover { background: rgba(255, 125, 26, .22); transform: translateY(-1px); }
+    .cb-ghost-accept.show { opacity: 1; pointer-events: auto; }
+    .cb-ghost-accept:hover { background: rgba(255, 125, 26, .22); }
+    .cb-ghost-accept .cb-ghost-key {
+      font-variant: small-caps;
+      letter-spacing: .03em;
+    }
+
+    /* screen-reader-only helper text (no global utility exists in this file) */
+    .cb-sr {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     .cb-input {
       display: flex;
@@ -11332,11 +11370,12 @@
         animation: none !important;
         transition: opacity .2s ease !important;
       }
-      /* chip tuck becomes an opacity-only fade — no vertical drift */
-      .cb-chips {
-        transition: opacity .25s ease !important;
+      /* ghost suggestion fades instantly, and auto-rotation is disabled in JS
+         (a single static suggestion is shown instead) */
+      .cb-ghost, .cb-ghost-accept {
+        transition: opacity .12s ease !important;
       }
-      .cb-chips.is-tucked { transform: none; }
+      .cb-ghost .cb-ghost-txt { transition: none !important; }
     }
 
     /* ═══ CHAT ENHANCEMENT LAYER (later-cascade wins) ═══
@@ -11671,7 +11710,7 @@
       box-shadow: 0 6px 16px -8px rgba(244, 121, 32, .7);
       border-bottom-right-radius: 6px;
     }
-    .cb-chip:active { transform: translateY(0) scale(.96); }
+    .cb-ghost-accept:active { transform: translateY(-50%) scale(.94); }
     .cb-send:active { transform: scale(.94); }
 
 
@@ -18483,14 +18522,12 @@
 
     </div>
 
-    <!-- messages + suggestion chips share one positioned viewport so the chips
-         can float as a frosted overlay ABOVE the scrolling messages -->
+    <!-- message viewport (suggestions no longer sit here — they surface as
+         ghost text inside the composer input below, reclaiming this space) -->
 
     <div class="cb-scroll">
 
       <div class="cb-body" id="chatBody"></div>
-
-      <div class="cb-chips" id="chatChips"></div>
 
     </div>
 
@@ -18500,13 +18537,28 @@
 
         <span class="cb-star-light" aria-hidden="true"></span>
 
-        <input type="text" id="chatInput" placeholder="Ask about services, support, locations…" aria-label="Type your message" />
+        <!-- real input. The ghost hint below is purely visual and is NEVER
+             written into this field's value. -->
+
+        <input type="text" id="chatInput" placeholder="Ask about services, support, locations…" aria-label="Type your message" aria-describedby="chatGhostHint" />
+
+        <!-- faint autocomplete-style suggestion overlay (visual only) -->
+
+        <span class="cb-ghost" id="chatGhost" aria-hidden="true"><span class="cb-ghost-tag">e.g.</span><span class="cb-ghost-txt"></span></span>
+
+        <!-- explicit accept affordance; label is kept in sync with the shown suggestion for AT -->
+
+        <button type="button" class="cb-ghost-accept" id="chatGhostAccept" tabindex="-1" hidden aria-label="Use the suggested question"><span class="cb-ghost-key">Tab</span></button>
 
       </div>
 
       <button class="cb-send" type="submit" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
 
     </form>
+
+    <!-- SR-only description for #chatInput: explains the ghost-suggestion Tab affordance -->
+
+    <span id="chatGhostHint" class="cb-sr">A suggested question is shown as faint hint text in the box. Press Tab, or activate the Tab button, to fill it in for editing — it is not sent automatically.</span>
 
   </div>
 
@@ -18639,9 +18691,11 @@
 
   <script>
     (function () {
-      var bodyEl, inputEl, chipsEl, panelEl, fabEl, dotEl, fabIconEl, statusEl, headEl, greeted = false;
+      var bodyEl, inputEl, panelEl, fabEl, dotEl, fabIconEl, statusEl, headEl, greeted = false;
       var teaserEl, teaserTextEl, teaserTimer, fabGroupEl, teaserDismissed = false;
-      var chipsH = 72; // live chip-row height; the top fade length mirrors it
+      // inline ghost-suggestion state (replaces the old .cb-chips row)
+      var ghostEl, ghostTxtEl, acceptEl, ghostIdx = 0, ghostTimer = 0, ghostActive = false;
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       /* Proactive greeting bubble that floats by the launcher. Shown once per
          PAGE LOAD after a short pause, unless the visitor has already opened or
@@ -18765,7 +18819,17 @@
 
       var FALLBACK = "I'm not totally sure about that one, but our team is happy to help directly.<br>📞 <strong>+603 5888 9817</strong> · ✉️ <a href='mailto:sales@hpe.com.my'>sales@hpe.com.my</a><br>You can also ask me about <strong>services</strong>, <strong>support</strong>, <strong>locations</strong> or <strong>contact</strong>.";
 
-      var CHIPS = ['Our services', 'Support & SLA', 'Locations', 'Contact us', 'Careers'];
+      /* Suggested questions surfaced one-at-a-time as ghost text in the composer
+         (rotating every few seconds). Phrased as full questions so accepting one
+         drops a ready-to-send message into the input, and so each hits a KB rule
+         in matchReply. */
+      var SUGGESTIONS = [
+        'What services do you offer?',
+        'What are your support SLAs?',
+        'Where are your service centres?',
+        'How do I contact your team?',
+        'Do you have careers open?'
+      ];
 
       function matchReply(text) {
         var q = ' ' + text.toLowerCase().replace(/[^a-z0-9\s']/g, ' ').replace(/\s+/g, ' ') + ' ';
@@ -18829,6 +18893,7 @@
         r.col.appendChild(m);
         bodyEl.appendChild(r.row);
         bodyEl.scrollTop = bodyEl.scrollHeight;
+        updateBodyFade(); // new content may overflow → refresh both edge fades
         return m;
       }
 
@@ -18864,46 +18929,93 @@
         addMsg(text.replace(/</g, '&lt;'), 'user');
         inputEl.value = '';
         botReply(text);
+        // programmatic value clear doesn't fire 'input', so bring the ghost back
+        refreshGhost();
       }
 
-      function renderChips() {
-        chipsEl.innerHTML = '';
-        CHIPS.forEach(function (c) {
-          var b = document.createElement('button');
-          b.className = 'cb-chip';
-          b.type = 'button';
-          b.textContent = c;
-          b.onclick = function () { send(c); };
-          chipsEl.appendChild(b);
-        });
-        syncChipsMetrics();
+      /* ── Inline ghost-suggestion engine ──
+         Shows ONE suggested question at a time as faint hint text overlaid on
+         the composer. It is NEVER written into the input's value — accepting it
+         (Tab / clicking the Tab button) copies it in for the visitor to review
+         and edit before sending. While the input has real typed text, the ghost
+         is hidden so it can't be mistaken for content or interfere with typing. */
+
+      // true only when the field is empty (so a suggestion may be shown)
+      function ghostAllowed() {
+        return !!(panelEl && panelEl.classList.contains('open') &&
+                  inputEl && inputEl.value.trim() === '');
       }
 
-      /* Feed the live chip-row height into the message viewport so its bottom
-         padding + fade-mask always clear the (possibly wrapped) chip overlay.
-         offsetHeight is valid even while the panel is closed (it's laid out,
-         not display:none), but we re-measure on open/resize just in case. */
-      function syncChipsMetrics() {
-        if (!chipsEl || !bodyEl) return;
-        requestAnimationFrame(function () {
-          var h = chipsEl.offsetHeight;
-          if (h > 0) { chipsH = h; bodyEl.style.setProperty('--cb-chips-h', h + 'px'); }
-          updateChipsTuck();
-        });
+      // paint the current suggestion into the overlay + keep the accept button's
+      // accessible label in sync (AT users reach it and hear the live suggestion)
+      function paintGhost() {
+        var s = SUGGESTIONS[ghostIdx % SUGGESTIONS.length];
+        if (ghostTxtEl) ghostTxtEl.textContent = s;
+        if (acceptEl) acceptEl.setAttribute('aria-label', 'Use suggested question: ' + s);
       }
 
-      /* Parallax-linked tuck: chips ride with the reader — hidden while they
-         browse older messages, restored as they return to the newest one. */
-      function updateChipsTuck() {
-        if (!bodyEl || !chipsEl) return;
-        var fromBottom = bodyEl.scrollHeight - bodyEl.clientHeight - bodyEl.scrollTop;
-        chipsEl.classList.toggle('is-tucked', fromBottom > 48);
-        // top edge fades in only as content scrolls up under the header, and
-        // its fade LENGTH mirrors the bottom (the full chip-row height) so both
-        // edges dissolve identically — grows 0→chipsH over the first chipsH px
-        // of scroll, so there's no fade at rest
-        var topFade = Math.min(Math.max(bodyEl.scrollTop, 0), chipsH);
-        bodyEl.style.setProperty('--cb-fade-top', topFade + 'px');
+      function showGhost() {
+        if (!ghostEl) return;
+        paintGhost();
+        ghostEl.classList.add('show');
+        if (acceptEl) { acceptEl.hidden = false; acceptEl.classList.add('show'); }
+      }
+
+      function hideGhost() {
+        if (!ghostEl) return;
+        ghostEl.classList.remove('show');
+        if (acceptEl) acceptEl.classList.remove('show');
+      }
+
+      // decide from current state whether the ghost should be visible
+      function refreshGhost() {
+        if (ghostAllowed()) showGhost();
+        else hideGhost();
+      }
+
+      // rotate to the next suggestion with a brief cross-fade (skipped under
+      // reduced motion, where a single static suggestion is shown instead)
+      function rotateGhost() {
+        if (!ghostAllowed()) return;
+        ghostIdx = (ghostIdx + 1) % SUGGESTIONS.length;
+        if (reduceMotion || !ghostTxtEl) { paintGhost(); return; }
+        ghostTxtEl.style.opacity = '0';
+        setTimeout(function () { paintGhost(); ghostTxtEl.style.opacity = ''; }, 200);
+      }
+
+      // start/stop the auto-rotation timer (only runs while the panel is open)
+      function startGhostRotation() {
+        stopGhostRotation();
+        refreshGhost();
+        if (reduceMotion) return; // no rotation — one static suggestion
+        ghostTimer = setInterval(rotateGhost, 3500);
+      }
+      function stopGhostRotation() {
+        if (ghostTimer) { clearInterval(ghostTimer); ghostTimer = 0; }
+      }
+
+      // accept: copy the shown suggestion into the field for review/edit — does
+      // NOT send. Caret goes to the end and the ghost clears.
+      function acceptSuggestion() {
+        if (!ghostAllowed()) return;
+        var s = SUGGESTIONS[ghostIdx % SUGGESTIONS.length];
+        inputEl.value = s;
+        hideGhost();
+        inputEl.focus();
+        try { inputEl.setSelectionRange(s.length, s.length); } catch (e) {}
+      }
+
+      /* Feather BOTH edges of the message viewport from the live scroll position.
+         Top fades in as content scrolls up under the header; bottom fades in when
+         there's more below and dissolves as you reach the last message. Both are
+         0 when the dialogue doesn't overflow (nothing to scroll → nothing dimmed). */
+      var CB_FADE = 32; // px — matches the CSS default --cb-fade-bot
+      function updateBodyFade() {
+        if (!bodyEl) return;
+        var top = bodyEl.scrollTop;
+        var bottom = bodyEl.scrollHeight - bodyEl.clientHeight - top;
+        bodyEl.style.setProperty('--cb-fade-top', Math.min(Math.max(top, 0), CB_FADE) + 'px');
+        bodyEl.style.setProperty('--cb-fade-bot', Math.min(Math.max(bottom, 0), CB_FADE) + 'px');
       }
 
       /* Collapse to just the header bar (conversation preserved), or restore.
@@ -18913,7 +19025,8 @@
         var min = panelEl.classList.toggle('minimized');
         // hide the launcher icon while collapsed so ONLY the bar is in the corner
         if (fabGroupEl) fabGroupEl.classList.toggle('chat-min', min);
-        if (!min) { syncChipsMetrics(); setTimeout(function () { inputEl.focus(); }, 120); }
+        if (min) { stopGhostRotation(); hideGhost(); }
+        else { startGhostRotation(); setTimeout(function () { inputEl.focus(); }, 120); }
       };
 
       window.toggleChat = function () {
@@ -18940,23 +19053,53 @@
               addMsg("Hi there! 👋 I'm the <strong>HPE Solutions</strong> assistant. Ask me about our services, support SLAs, service-centre locations or how to get in touch.", 'bot');
             }, 250);
           }
-          // panel now has real dimensions — re-measure the chip overlay
-          syncChipsMetrics();
+          updateBodyFade();
+          startGhostRotation();      // begin rotating the inline suggestions
           setTimeout(function () { inputEl.focus(); }, 300);
+        } else {
+          stopGhostRotation();       // no work while the panel is closed
+          hideGhost();
         }
       };
 
       document.addEventListener('DOMContentLoaded', function () {
         bodyEl = document.getElementById('chatBody');
         inputEl = document.getElementById('chatInput');
-        chipsEl = document.getElementById('chatChips');
         panelEl = document.getElementById('chatbot');
         fabEl = document.getElementById('chatFab');
         dotEl = document.getElementById('chatDot');
         fabIconEl = document.getElementById('chatFabIcon');
         statusEl = document.getElementById('cbStatus');
         headEl = panelEl.querySelector('.cb-head');
-        renderChips();
+        ghostEl = document.getElementById('chatGhost');
+        ghostTxtEl = ghostEl ? ghostEl.querySelector('.cb-ghost-txt') : null;
+        acceptEl = document.getElementById('chatGhostAccept');
+        // the ghost overlay now supplies the empty-field hint, so drop the native
+        // placeholder (kept in the HTML only as a no-JS fallback) to avoid overlap
+        if (ghostEl && inputEl) inputEl.placeholder = '';
+
+        /* ── Inline suggestion wiring ──
+           Any real typed text hides the ghost immediately so it never interferes
+           with what the visitor is entering; clearing the field brings it back. */
+        if (inputEl) {
+          inputEl.addEventListener('input', refreshGhost);
+          // Tab accepts the shown suggestion (copies it in for review — no send).
+          // Only intercept when a suggestion is actually visible, so Tab still
+          // moves focus normally once the field has text or the ghost is hidden.
+          inputEl.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab' && !e.shiftKey && ghostAllowed() &&
+                ghostEl && ghostEl.classList.contains('show')) {
+              e.preventDefault();
+              acceptSuggestion();
+            }
+          });
+        }
+        if (acceptEl) {
+          acceptEl.addEventListener('click', function (e) {
+            e.preventDefault();
+            acceptSuggestion();
+          });
+        }
 
         /* Clicking the collapsed header bar (anywhere but its buttons) restores it */
         if (headEl) {
@@ -18964,7 +19107,7 @@
             if (!panelEl.classList.contains('minimized')) return;
             if (e.target.closest('.cb-head-actions')) return;
             panelEl.classList.remove('minimized');
-            syncChipsMetrics();
+            startGhostRotation();
             setTimeout(function () { inputEl.focus(); }, 120);
           });
         }
@@ -19021,16 +19164,13 @@
           e.preventDefault(); // always keep the page behind still
         }, { passive: false });
 
-        /* Drive the chip tuck from the message scroll position (rAF-throttled,
+        /* Drive the top-edge fade from the message scroll position (rAF-throttled,
            passive — never blocks scrolling). */
-        var tuckRaf = 0;
+        var fadeRaf = 0;
         bodyEl.addEventListener('scroll', function () {
-          if (tuckRaf) return;
-          tuckRaf = requestAnimationFrame(function () { tuckRaf = 0; updateChipsTuck(); });
+          if (fadeRaf) return;
+          fadeRaf = requestAnimationFrame(function () { fadeRaf = 0; updateBodyFade(); });
         }, { passive: true });
-
-        // chip row can rewrap when the panel resizes → re-measure its height
-        window.addEventListener('resize', syncChipsMetrics, { passive: true });
 
         document.getElementById('chatForm').addEventListener('submit', function (e) {
           e.preventDefault();
