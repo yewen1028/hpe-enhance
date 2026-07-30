@@ -11389,17 +11389,24 @@
       width: max-content;
       max-width: min(276px, calc(100vw - 40px));
       transform-origin: bottom right;
-      /* Solid, near-opaque panel — deliberately NO backdrop-filter. The glass /
-         blur version rendered with invisible text on some GPUs (the copy shared
-         a composited backdrop-filter layer that never painted). A plain opaque
-         background guarantees the text is always legible on every machine. */
-      background: linear-gradient(180deg, rgba(20, 30, 48, .98), rgba(12, 20, 34, .98));
+      /* Liquid glass — same frost language as the chatbot panel & nav search.
+         CRITICAL: the blur/saturate lives on the ::before layer BEHIND the
+         content, never on this container. An earlier version put backdrop-filter
+         here and the copy went invisible on some GPUs (the text shared the
+         composited backdrop-filter layer, which never painted). Keeping the
+         filter on a separate pseudo-element leaves the copy on its own paint
+         layer, so it is always legible while the panel still reads as glass. */
+      isolation: isolate;
+      background: linear-gradient(180deg, rgba(20, 30, 48, .55), rgba(12, 20, 34, .62));
       border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 18px;
       box-shadow:
         0 18px 44px -14px rgba(0, 0, 0, .6),
-        inset 1px 1px 1px -.5px rgba(255, 255, 255, .16),
-        inset -1px -1px 1px -.5px rgba(255, 255, 255, .1);
+        inset 2px 2px .5px -2px rgba(255, 255, 255, .55),
+        inset -1.5px -1.5px .5px -2px rgba(255, 255, 255, .4),
+        inset 1px 1px 1px -.5px rgba(255, 255, 255, .5),
+        inset -1px -1px 1px -.5px rgba(255, 255, 255, .5),
+        inset 0 0 8px 4px rgba(255, 255, 255, .04);
       opacity: 0;
       transform: translateY(10px) scale(.9);
       pointer-events: none;
@@ -11414,6 +11421,25 @@
       transform: translateY(0) scale(1);
       pointer-events: auto;
     }
+    /* frost layer: the actual glass blur sits BEHIND the copy (z-index 0) so the
+       text never shares this composited layer — plus a soft specular sheen on top
+       of the blur so it reads as liquid glass, matching the chatbot panel */
+    .cb-teaser::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 0;
+      pointer-events: none;
+      -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.06);
+      backdrop-filter: blur(22px) saturate(180%) brightness(1.06);
+      background:
+        radial-gradient(130% 90% at 18% -12%, rgba(255, 255, 255, .2), transparent 55%),
+        linear-gradient(180deg, rgba(255, 255, 255, .1), transparent 30%);
+    }
+    /* keep the copy + close button above the frost layer */
+    .cb-teaser-body,
+    .cb-teaser-x { position: relative; z-index: 1; }
     /* downward tail pointing at the chat launcher below */
     .cb-teaser::after {
       content: "";
@@ -11423,7 +11449,9 @@
       bottom: -6px;
       width: 14px;
       height: 14px;
-      background: rgba(13, 21, 35, .98);
+      background: linear-gradient(135deg, rgba(20, 30, 48, .6), rgba(12, 20, 34, .66));
+      -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.06);
+      backdrop-filter: blur(22px) saturate(180%) brightness(1.06);
       border-right: 1px solid rgba(255, 255, 255, .16);
       border-bottom: 1px solid rgba(255, 255, 255, .16);
       border-bottom-right-radius: 3px;
@@ -11534,6 +11562,22 @@
     @media (prefers-reduced-motion: reduce) {
       .cb-teaser { transform: none; transition: opacity .2s ease; }
       .cb-teaser.show .cb-teaser-ava { animation: none; }
+    }
+    /* accessibility: drop the glass to a solid panel on transparency-reduced
+       setups (mirrors the .chatbot fallback) */
+    @media (prefers-reduced-transparency: reduce) {
+      .cb-teaser {
+        background: linear-gradient(180deg, rgba(20, 30, 48, .98), rgba(12, 20, 34, .98));
+      }
+      .cb-teaser::before {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+      }
+      .cb-teaser::after {
+        background: rgba(13, 21, 35, .98);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+      }
     }
 
     /* ── Exit-intent corner card (desktop) ──────────────────────────────
