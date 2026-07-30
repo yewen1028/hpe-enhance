@@ -1984,10 +1984,675 @@
       .pp-layout { grid-template-columns: 1fr; }
       .pp-toc { display: none; }
     }
+  
+    /* ─── INTRO CURTAIN (landonorris.com-style cinematic load reveal) ─── */
+
+    #introCurtain {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(125% 125% at 50% 42%, #172b42 0%, var(--navy) 52%, #08111c 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center 45%;
+      will-change: transform, opacity, filter;
+      transition:
+        transform 1.05s cubic-bezier(.7, 0, .2, 1),
+        opacity .9s ease .08s,
+        filter .9s ease;
+    }
+
+    /* fine film grain over the whole frame for premium depth (static, cheap) */
+    #introCurtain::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .32;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+
+    /* Focus-zoom reveal: the whole splash scales up, blurs and fades away,
+       revealing the main page beneath — reads as passing "through" the logo. */
+    #introCurtain.hide {
+      opacity: 0;
+      transform: scale(1.18);
+      filter: blur(14px);
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #introCurtain {
+        transition: opacity .6s ease;
+      }
+
+      #introCurtain.hide {
+        transform: none;
+        filter: none;
+      }
+
+      .intro-mark.pop {
+        transform: none;
+      }
+    }
+
+    /* soft dual-layer glow behind the mark — brand orange only, calm pulse */
+    .intro-glow {
+      position: absolute;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(244, 121, 32, .30) 0%, rgba(244, 121, 32, 0) 42%),
+        radial-gradient(circle, rgba(244, 121, 32, .12) 0%, rgba(244, 121, 32, 0) 70%);
+      animation: introPulse 3.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes introPulse {
+
+      0%,
+      100% {
+        transform: scale(.86);
+        opacity: .55;
+      }
+
+      50% {
+        transform: scale(1.04);
+        opacity: 1;
+      }
+    }
+
+    /* Aurora field — drifting diagonal light bands behind the splash content.
+       Ported from the Aceternity "Aurora Background" (21st.dev) and recolored to
+       the HPE navy/orange palette, kept low-opacity + blurred so the mark and
+       loader stay readable. */
+    .intro-aurora {
+      position: absolute;
+      inset: -40% -20%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(14px);
+      --aurora: repeating-linear-gradient(100deg,
+          #f47920 8%, #ff9d4d 14%, #ffbe85 20%, #f47920 26%, #d9631a 32%);
+      --stripes: repeating-linear-gradient(100deg,
+          transparent 0%, transparent 6%,
+          rgba(13, 27, 42, .55) 9%, rgba(13, 27, 42, .55) 11%,
+          transparent 15%);
+      background-image: var(--stripes), var(--aurora);
+      background-size: 300% 200%, 220% 180%;
+      background-position: 50% 50%, 50% 50%;
+      mix-blend-mode: screen;
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 72%);
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 72%);
+      animation: introAurora 55s linear infinite, introAuroraIn 1.4s ease .2s both;
+    }
+
+    @keyframes introAurora {
+      from {
+        background-position: 50% 50%, 50% 50%;
+      }
+
+      to {
+        background-position: 350% 50%, 350% 50%;
+      }
+    }
+
+    @keyframes introAuroraIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: .5;
+      }
+    }
+
+    /* mark focuses into existence: fade + rise + de-blur */
+    .intro-logo {
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(14px) scale(.97);
+      filter: blur(9px);
+      transition:
+        opacity .9s cubic-bezier(.22, 1, .36, 1),
+        transform .9s cubic-bezier(.22, 1, .36, 1),
+        filter .9s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .intro-logo img {
+      height: 64px;
+      width: auto;
+      display: block;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .55));
+    }
+
+    .intro-logo.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    /* Stack the animation icon and the logo in one centred grid cell so they
+       cross-fade in place: the icon plays first and, as it fades out, the HPE
+       logo fades in over the exact same spot — no vertical jump between them. */
+    .intro-mark {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      transition: transform .55s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    /* subtle anticipation "breath" the beat before the focus-zoom reveal fires */
+    .intro-mark.pop {
+      transform: scale(1.06);
+    }
+
+    .intro-mark>.intro-logo,
+    .intro-mark>.sev-loader {
+      grid-area: 1 / 1;
+      justify-self: center;
+      align-self: center;
+      margin: 0;
+    }
+
+    /* text fallback if the logo image fails */
+    .intro-fallback {
+      display: none;
+      align-items: center;
+      gap: 9px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .3px;
+    }
+
+    .intro-fallback>span {
+      background: var(--orange);
+      color: #fff;
+      padding: 6px 13px;
+      border-radius: 7px;
+      font-size: 23px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .intro-glow {
+        animation: none;
+      }
+
+      /* keep the aurora static (still visible) but stop the drift */
+      .intro-aurora {
+        animation: none;
+        opacity: .4;
+      }
+
+      /* no blur/scale motion — just a quick fade to the mark */
+      .intro-logo {
+        filter: none;
+        transform: none;
+        transition: opacity .4s ease;
+      }
+
+      .intro-logo.show {
+        filter: none;
+        transform: none;
+      }
+    }
+
+    /* ── Splash SVG loader (ported from the loader-12 styled-components component) ── */
+    .sev-loader {
+      position: relative;
+      z-index: 2;
+      margin-top: 26px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .7s ease .2s, transform .7s ease .2s;
+    }
+
+    .sev-loader.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .sev-loader .container_SevMini {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .sev-loader .Ghost {
+      transform: translate(0px, -25px);
+      z-index: -1;
+      animation: sev-opacidad 4s infinite ease-in-out;
+    }
+
+    @keyframes sev-opacidad {
+      0% {
+        opacity: 1;
+        scale: 1;
+      }
+
+      50% {
+        opacity: .5;
+        scale: .9;
+      }
+
+      100% {
+        opacity: 1;
+        scale: 1;
+      }
+    }
+
+    @keyframes sev-estroboscopico {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+
+      51% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes sev-rebote {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes sev-estroboscopico1 {
+
+      0%,
+      50%,
+      100% {
+        fill: rgb(255, 95, 74);
+      }
+
+      25%,
+      75% {
+        fill: rgb(16, 53, 115);
+      }
+    }
+
+    @keyframes sev-estroboscopico2 {
+
+      0%,
+      50%,
+      100% {
+        fill: #17e300;
+      }
+
+      25%,
+      75% {
+        fill: #17e300b4;
+      }
+    }
+
+    .sev-loader .SevMini {
+      animation: sev-rebote 4s infinite ease-in-out;
+    }
+
+    .sev-loader #strobe_led1 {
+      animation: sev-estroboscopico .5s infinite;
+    }
+
+    .sev-loader #strobe_color1 {
+      animation: sev-estroboscopico2 .8s infinite;
+    }
+
+    .sev-loader #strobe_color3 {
+      animation: sev-estroboscopico1 .8s infinite;
+      animation-delay: 3s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .sev-loader .Ghost,
+      .sev-loader .SevMini,
+      .sev-loader #strobe_led1,
+      .sev-loader #strobe_color1,
+      .sev-loader #strobe_color3 {
+        animation: none;
+      }
+    }
+
+    /* ── Dot-matrix background (ported from the LoaderDotMatrix React component) ──
+       The React component rendered a fixed grid of pulsing dots with per-dot
+       animation delays computed from a "ripple" pattern (delay grows with the
+       distance from the grid centre). Here it's recolored to the HPE orange and
+       stretched to fill the whole splash as a background texture, with the
+       centre masked out so the animation icon reads cleanly on top of it. */
+    .intro-dotmatrix {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      /* above aurora (0) / glow, below the mark (2) */
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s ease .1s;
+      /* keep the very centre clear so the centred icon/logo stays legible */
+      -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, transparent 20%, #000 48%);
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, transparent 20%, #000 48%);
+    }
+
+    .intro-dotmatrix.show {
+      opacity: .55;
+      /* visible enough that the pulse clearly reads while loading */
+    }
+
+    .intro-dotmatrix .dm-grid {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 40px;
+    }
+
+    .intro-dotmatrix .dm-dot {
+      width: 7px;
+      height: 7px;
+      justify-self: center;
+      align-self: center;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 6px rgba(244, 121, 32, .45);
+      will-change: transform, opacity;
+      animation: dot-matrix-pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes dot-matrix-pulse {
+
+      0%,
+      100% {
+        opacity: .15;
+        transform: scale(.3);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .intro-dotmatrix .dm-dot {
+        animation: none;
+        opacity: .5;
+      }
+    }
+
   </style>
 </head>
 
 <body>
+
+  <noscript>
+    <style>#introCurtain { display: none !important; }</style>
+  </noscript>
+
+  <div id="introCurtain">
+
+    <div class="intro-aurora" aria-hidden="true"></div>
+
+    <div class="intro-dotmatrix" id="introDotMatrix" aria-hidden="true">
+      <div class="dm-grid"></div>
+    </div>
+
+    <div class="intro-glow"></div>
+
+    <div class="intro-mark">
+
+      <div class="intro-logo" id="introLogo">
+        <img src="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" alt="HPE Solutions Sdn Bhd"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+        <span class="intro-fallback"><span>hpe</span>solutions</span>
+      </div>
+
+      <div class="sev-loader" id="introLoader" aria-hidden="true">
+        <div class="container_SevMini">
+          <div class="SevMini">
+            <svg width="74" height="90" viewBox="0 0 74 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M40 76.5L72 57V69.8615C72 70.5673 71.628 71.2209 71.0211 71.5812L40 90V76.5Z" fill="#396CAA" />
+              <path d="M34 75.7077L2 57V69.8615C2 70.5673 2.37203 71.2209 2.97892 71.5812L34 90V75.7077Z"
+                fill="#396DAC" />
+              <path d="M34 76.5H40V90H34V76.5Z" fill="#396CAA" />
+              <path
+                d="M3.27905 55.593L35.2806 37.5438C36.3478 36.9419 37.6522 36.9419 38.7194 37.5438L70.721 55.593C71.7294 56.1618 71.7406 57.6102 70.7411 58.1945L39.2712 76.593C37.8682 77.4133 36.1318 77.4133 34.7288 76.593L3.25887 58.1945C2.25937 57.6102 2.27061 56.1618 3.27905 55.593Z"
+                fill="#163C79" stroke="#396CAA" />
+              <path d="M40 79L72 60V70.4001C72 71.1151 71.6183 71.7758 70.9987 72.1329L40 90V79Z" fill="#173D7A" />
+              <path d="M34 79L3 61V71.5751L34 90V79Z" fill="#0665B2" />
+              <path id="strobe_color1" d="M58 72.5L60.5 71V74L58 75.5V72.5Z" fill="#FF715E" />
+              <path id="strobe_color2" d="M63 69.5L65.5 68V71L63 72.5V69.5Z" fill="#17e300b4" />
+              <path d="M68 66.5L70.5 65V68L68 69.5V66.5Z" fill="#FF715E" />
+              <path d="M40 58.5L72 39V51.8615C72 52.5673 71.628 53.2209 71.0211 53.5812L40 72V58.5Z" fill="#396CAA" />
+              <path d="M34 57.7077L2 39V51.8615C2 52.5673 2.37203 53.2209 2.97892 53.5812L34 72V57.7077Z"
+                fill="#396DAC" />
+              <path d="M34 58.5H40V72H34V58.5Z" fill="#396CAA" />
+              <path
+                d="M3.27905 37.593L35.2806 19.5438C36.3478 18.9419 37.6522 18.9419 38.7194 19.5438L70.721 37.593C71.7294 38.1618 71.7406 39.6102 70.7411 40.1945L39.2712 58.593C37.8682 59.4133 36.1318 59.4133 34.7288 58.593L3.25887 40.1945C2.25937 39.6102 2.27061 38.1618 3.27905 37.593Z"
+                fill="#163C79" stroke="#396CAA" />
+              <path d="M40 61L72 42V52.4001C72 53.1151 71.6183 53.7758 70.9987 54.1329L40 72V61Z" fill="#173D7A" />
+              <path d="M34 61L3 43V53.5751L34 72V61Z" fill="#0665B2" />
+              <path d="M58 54.5L60.5 53V56L58 57.5V54.5Z" fill="#FF715E" />
+              <path d="M63 51.5L65.5 50V53L63 54.5V51.5Z" fill="black" />
+              <path d="M63 51.5L65.5 50V53L63 54.5V51.5Z" fill="#FF715E" />
+              <path d="M68 48.5L70.5 47V50L68 51.5V48.5Z" fill="#FF715E" />
+              <path d="M40 40.5L72 21V33.8615C72 34.5673 71.628 35.2209 71.0211 35.5812L40 54V40.5Z" fill="#396CAA" />
+              <path d="M34 39.7077L2 21V33.8615C2 34.5673 2.37203 35.2209 2.97892 35.5812L34 54V39.7077Z"
+                fill="#396DAC" />
+              <path d="M34 40.5H40V54H34V40.5Z" fill="#396CAA" />
+              <path
+                d="M3.27905 19.593L35.2806 1.54381C36.3478 0.941872 37.6522 0.941872 38.7194 1.54381L70.721 19.593C71.7294 20.1618 71.7406 21.6102 70.7411 22.1945L39.2712 40.593C37.8682 41.4133 36.1318 41.4133 34.7288 40.593L3.25887 22.1945C2.25937 21.6102 2.27061 20.1618 3.27905 19.593Z"
+                fill="#124E89" stroke="#396CAA" />
+              <path d="M40 43L72 24V34.4001C72 35.1151 71.6183 35.7758 70.9987 36.1329L40 54V43Z" fill="#173D7A" />
+              <path d="M34 43L3 25V35.5751L34 54V43Z" fill="#0665B2" />
+              <path d="M68 30.5L70.5 29V32L68 33.5V30.5Z" fill="#FF715E" />
+              <path id="strobe_color3" d="M58 36.5L60.5 35V38L58 39.5V36.5Z" fill="#FF715E" />
+              <path d="M63 33.5L65.5 32V35L63 36.5V33.5Z" fill="#FF715E" />
+              <path
+                d="M20.1902 22.0719C18.8101 21.3026 18.8252 19.3119 20.2168 18.5636L36.1054 10.0189C37.2884 9.3827 38.7116 9.3827 39.8946 10.0189L55.7832 18.5636C57.1748 19.3119 57.1899 21.3026 55.8098 22.0719L40.4345 30.6429C38.9211 31.4865 37.0789 31.4865 35.5655 30.6429L20.1902 22.0719Z"
+                fill="#396CAA" />
+              <path
+                d="M11 52.755C11 51.9801 11.8432 51.4997 12.5098 51.8947L23.5196 58.419C24.1273 58.7792 24.5 59.4332 24.5 60.1396V60.245C24.5 61.0199 23.6568 61.5003 22.9902 61.1053L11.9804 54.581C11.3727 54.2208 11 53.5668 11 52.8604V52.755Z"
+                fill="#396CAA" />
+              <mask id="mask0_2_176" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="11" y="51" width="14"
+                height="11">
+                <path
+                  d="M11 52.755C11 51.9801 11.8432 51.4997 12.5098 51.8947L23.5196 58.419C24.1273 58.7792 24.5 59.4332 24.5 60.1396V60.245C24.5 61.0199 23.6568 61.5003 22.9902 61.1053L11.9804 54.581C11.3727 54.2208 11 53.5668 11 52.8604V52.755Z"
+                  fill="#396CAA" />
+              </mask>
+              <g mask="url(#mask0_2_176)">
+                <path
+                  d="M11.5 52.7417C11.5 51.9803 12.3349 51.5138 12.9833 51.9128L23.5482 58.4143C24.1397 58.7783 24.5 59.4231 24.5 60.1176V61.5L12.4598 54.4195C11.8651 54.0698 11.5 53.4315 11.5 52.7417V52.7417Z"
+                  fill="#163874" />
+              </g>
+              <mask id="mask1_2_176" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="19" y="9" width="38"
+                height="23">
+                <path
+                  d="M20.1902 22.0719C18.8101 21.3026 18.8252 19.3119 20.2168 18.5636L36.1054 10.0189C37.2884 9.3827 38.7116 9.3827 39.8946 10.0189L55.7832 18.5636C57.1748 19.3119 57.1899 21.3026 55.8098 22.0719L40.4345 30.6429C38.9211 31.4865 37.0789 31.4865 35.5655 30.6429L20.1902 22.0719Z"
+                  fill="#396CAA" />
+              </mask>
+              <g mask="url(#mask1_2_176)">
+                <path
+                  d="M18 21.3115L36.167 11.9451C37.3171 11.3521 38.6829 11.3521 39.833 11.9451L58 21.3115L40.3567 30.7405C38.8841 31.5275 37.1159 31.5275 35.6433 30.7405L18 21.3115Z"
+                  fill="#173D7A" />
+              </g>
+              <path d="M37.447 21.565L35 19.9799L37.6941 18.66L40.141 20.245L37.447 21.565Z" fill="#FF715E" />
+              <path d="M48.9738 30.8646L47.0741 29.7745L49.1792 28.684L51.0789 29.7741L48.9738 30.8646Z"
+                fill="#173E7B" />
+              <path d="M52.0661 29.0093L50.1635 27.9242L52.2657 26.8282L54.1682 27.9133L52.0661 29.0093Z"
+                fill="#173E7B" />
+              <path id="strobe_led1"
+                d="M55.1521 27.1464L53.2538 26.054L55.3602 24.9661L57.2585 26.0586L55.1521 27.1464Z" fill="#3A6DAB" />
+            </svg>
+          </div>
+          <div class="Ghost">
+            <svg width="60" height="36" viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M1.96545 19.4296C0.643777 18.6484 0.658726 16.7309 1.99242 15.9705L28.0186 1.12982C29.2467 0.429534 30.7533 0.429533 31.9814 1.12982L58.0076 15.9704C59.3413 16.7309 59.3562 18.6484 58.0346 19.4296L32.5442 34.4962C30.9749 35.4238 29.0251 35.4238 27.4558 34.4962L1.96545 19.4296Z"
+                fill="#3C4F6D" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- /intro-mark -->
+
+  </div>
+
+  <script>
+
+    (function () {
+
+      var logo = document.getElementById('introLogo');
+
+      var loader = document.getElementById('introLoader');
+
+      var curtain = document.getElementById('introCurtain');
+
+      if (!curtain) return;
+
+      document.body.style.overflow = 'hidden';
+
+      // Build the HPE-orange dot-matrix background. Ported from the
+      // LoaderDotMatrix "ripple" pattern: each dot's animation delay grows with
+      // its distance from the grid centre, so the pulse radiates outward. The
+      // grid is sized to the viewport so it fills the splash as a background.
+      (function () {
+
+        var host = document.getElementById('introDotMatrix');
+
+        if (!host) return;
+
+        var grid = host.querySelector('.dm-grid');
+
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        var speed = 1.6;   // matches the dot-matrix-pulse duration
+
+        var cell = 44;     // px per dot cell — tune density
+
+        var cols = Math.max(7, Math.ceil(window.innerWidth / cell) + 1);
+
+        var rows = Math.max(5, Math.ceil(window.innerHeight / cell) + 1);
+
+        var centerX = (cols - 1) / 2;
+
+        var centerY = (rows - 1) / 2;
+
+        var maxDist = Math.sqrt(centerX * centerX + centerY * centerY) || 1;
+
+        grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+
+        grid.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+
+        var frag = document.createDocumentFragment();
+
+        for (var r = 0; r < rows; r++) {
+
+          for (var c = 0; c < cols; c++) {
+
+            var dist = Math.sqrt(Math.pow(c - centerX, 2) + Math.pow(r - centerY, 2));
+
+            var delay = (dist / maxDist) * speed;
+
+            var dot = document.createElement('span');
+
+            dot.className = 'dm-dot';
+
+            if (!reduce) dot.style.animationDelay = delay.toFixed(2) + 's';
+
+            frag.appendChild(dot);
+
+          }
+
+        }
+
+        grid.appendChild(frag);
+
+      })();
+
+      var dotmx = document.getElementById('introDotMatrix');
+
+      if (dotmx) setTimeout(function () { dotmx.classList.add('show'); }, 150);
+
+      // Flow: animation icon → HPE logo → main page.
+      // 1) the animation icon fades in and plays on its own,
+      // 2) it then fades out as the HPE logo fades in over the same spot,
+      // 3) once the logo has settled the curtain lifts into the main page.
+
+      if (loader) setTimeout(function () { loader.classList.add('show'); }, 200);
+
+      if (loader) setTimeout(function () { loader.classList.remove('show'); }, 2200);
+
+      setTimeout(function () { logo.classList.add('show'); }, 2450);
+
+      // once the logo has settled, give the mark a subtle anticipation "breath"…
+      var mark = document.querySelector('.intro-mark');
+
+      if (mark) setTimeout(function () { mark.classList.add('pop'); }, 3650);
+
+      // …then fire the focus-zoom reveal into the main page.
+      setTimeout(function () {
+
+        curtain.classList.add('hide');
+
+        document.body.style.overflow = '';
+
+        var hl = document.querySelector('.hero-left');
+
+        var hr = document.querySelector('.hero-right');
+
+        if (hl) hl.classList.add('reveal');
+
+        if (hr) setTimeout(function () { hr.classList.add('reveal'); }, 150);
+
+      }, 4050);
+
+      // remove only after the ~1.05s reveal transition has fully played out
+      setTimeout(function () { curtain.remove(); }, 5250);
+
+      // Safety net: guarantee the hero is visible even if something above fails
+
+      setTimeout(function () {
+
+        var hl = document.querySelector('.hero-left');
+
+        var hr = document.querySelector('.hero-right');
+
+        if (hl) hl.classList.add('reveal');
+
+        if (hr) hr.classList.add('reveal');
+
+      }, 4900);
+
+    })();
+
+  </script>
+
 
   <!-- Scroll progress bar -->
   <div id="scroll-bar"></div>
