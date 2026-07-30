@@ -695,11 +695,26 @@
     /* Soft ambient aurora behind the body so sections sit in open space,
        not on a flat slab. Kept subtle so orange stays the only accent. */
     .d-body, .i-body { position: relative; }
+    /* Ported from the `gradient-background-4` React component: a soft
+       radial "glow-from-above" (its `radial-gradient(125% 125% at 50% -50%,
+       …)`). The component's indigo is retuned to this section's own accent
+       (#7c6cf0, the `casestudy` nav-accent) so the glow reads as intentional —
+       a premium complement to the orange accents that settles into the navy
+       footer — layered over the two pre-existing ambient auroras for depth. */
     .d-body::before, .i-body::before {
       content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
       background:
+        radial-gradient(1300px 900px at 50% 60px, rgba(124, 108, 240, .38) 0%, rgba(124, 108, 240, .14) 42%, transparent 70%),
         radial-gradient(720px 460px at 88% 1%, rgba(255, 125, 26, .07), transparent 60%),
         radial-gradient(820px 560px at 4% 32%, rgba(70, 120, 200, .06), transparent 62%);
+    }
+    /* Light-theme branch mirrors the component's `#c7d2fe` light variant. */
+    :root[data-theme="light"] .d-body::before,
+    :root[data-theme="light"] .i-body::before {
+      background:
+        radial-gradient(1300px 900px at 50% 60px, rgba(199, 210, 254, .98) 0%, rgba(199, 210, 254, .38) 42%, transparent 70%),
+        radial-gradient(720px 460px at 88% 1%, rgba(255, 125, 26, .05), transparent 60%),
+        radial-gradient(820px 560px at 4% 32%, rgba(70, 120, 200, .05), transparent 62%);
     }
     .d-body > .wrap, .i-body > .wrap { position: relative; z-index: 1; }
 
@@ -711,6 +726,50 @@
     }
     .cs-card:hover::after { opacity: 1; }
     @media (prefers-reduced-motion: reduce) { .cs-card::after { display: none; } }
+
+    /* ═══ Hover glass — every info card frosts + lifts under the cursor ═══
+       Companion to the gradient background: on hover the card goes translucent
+       and backdrop-blurred so the indigo glow behind shows through as frost,
+       finished with a white top sheen and a faint indigo edge. Theme-aware. */
+    .d-metric, .panel, .sc-stat, .sc-step, .pager a, .cs-card {
+      transition: background .35s ease, border-color .35s ease,
+                  box-shadow .4s ease, transform .35s cubic-bezier(.22, 1, .36, 1),
+                  -webkit-backdrop-filter .35s ease, backdrop-filter .35s ease;
+    }
+    .d-metric:hover, .panel:hover, .sc-stat:hover, .sc-step:hover,
+    .pager a:hover, .cs-card:hover {
+      background:
+        linear-gradient(150deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 52%),
+        rgba(22, 34, 57, .46);
+      -webkit-backdrop-filter: blur(14px) saturate(1.35);
+      backdrop-filter: blur(14px) saturate(1.35);
+      border-color: rgba(124, 108, 240, .55);
+      box-shadow:
+        0 30px 60px -26px rgba(0, 0, 0, .68),
+        0 0 0 1px rgba(124, 108, 240, .14),
+        inset 0 1px 0 rgba(255, 255, 255, .24),
+        inset 0 0 26px rgba(124, 108, 240, .10);
+      transform: translateY(-4px);
+    }
+    :root[data-theme="light"] .d-metric:hover,
+    :root[data-theme="light"] .panel:hover,
+    :root[data-theme="light"] .sc-stat:hover,
+    :root[data-theme="light"] .sc-step:hover,
+    :root[data-theme="light"] .pager a:hover,
+    :root[data-theme="light"] .cs-card:hover {
+      background:
+        linear-gradient(150deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, .5) 55%),
+        rgba(255, 255, 255, .55);
+      border-color: rgba(124, 108, 240, .45);
+      box-shadow:
+        0 26px 55px -26px rgba(13, 27, 42, .3),
+        inset 0 1px 0 rgba(255, 255, 255, .9),
+        inset 0 0 26px rgba(124, 108, 240, .08);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .d-metric:hover, .panel:hover, .sc-stat:hover, .sc-step:hover,
+      .pager a:hover, .cs-card:hover { transform: none; }
+    }
 
     /* ═══ DARK THEME — locked to match the main HPE site shell ═══ */
     :root {
