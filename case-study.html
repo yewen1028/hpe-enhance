@@ -718,6 +718,65 @@
     }
     .d-body > .wrap, .i-body > .wrap { position: relative; z-index: 1; }
 
+    /* ═══ Animated spotlights (ported from the `spotlight-background`
+       framer-motion component) ═══════════════════════════════════════════
+       Three soft indigo blobs drift + rotate on independent loops in the top
+       band of the body, layered with `screen` over the static gradient glow
+       so that background now visibly *moves* like slow-swinging spotlights
+       under the hero image. Injected by the boot script into .d-body/.i-body.
+       Falls back to the static glow entirely under reduced-motion. */
+    .cs-spotlights {
+      position: absolute; left: 0; right: 0; top: 0; height: 880px;
+      z-index: 0; pointer-events: none; overflow: hidden;
+      mix-blend-mode: screen; opacity: .9;
+    }
+    .cs-spot {
+      position: absolute; width: 52vw; height: 700px; border-radius: 50%;
+      filter: blur(72px); will-change: transform;
+      transform: translateZ(0);
+    }
+    .cs-spot-1 {
+      left: 6%; top: -190px;
+      background: radial-gradient(circle at 50% 50%, rgba(124, 108, 240, .55), rgba(124, 108, 240, 0) 62%);
+      animation: cs-drift-1 12s ease-in-out infinite;
+    }
+    .cs-spot-2 {
+      left: 30%; top: -250px;
+      background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, .5), rgba(99, 102, 241, 0) 62%);
+      animation: cs-drift-2 15s ease-in-out infinite; animation-delay: -3s;
+    }
+    .cs-spot-3 {
+      left: 54%; top: -160px;
+      background: radial-gradient(circle at 50% 50%, rgba(150, 122, 255, .46), rgba(150, 122, 255, 0) 62%);
+      animation: cs-drift-3 18s ease-in-out infinite; animation-delay: -5s;
+    }
+    /* Light theme — mirror the component's soft `#c7d2fe` lavender. */
+    :root[data-theme="light"] .cs-spotlights { mix-blend-mode: normal; opacity: .85; }
+    :root[data-theme="light"] .cs-spot-1 { background: radial-gradient(circle at 50% 50%, rgba(165, 180, 252, .7), rgba(165, 180, 252, 0) 62%); }
+    :root[data-theme="light"] .cs-spot-2 { background: radial-gradient(circle at 50% 50%, rgba(199, 210, 254, .8), rgba(199, 210, 254, 0) 62%); }
+    :root[data-theme="light"] .cs-spot-3 { background: radial-gradient(circle at 50% 50%, rgba(180, 170, 255, .62), rgba(180, 170, 255, 0) 62%); }
+
+    /* Drift keyframes echo the component's x / y / rotate journeys. */
+    @keyframes cs-drift-1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      33%      { transform: translate(14%, -12%) rotate(15deg) scale(1.08); }
+      66%      { transform: translate(-16%, 8%) rotate(-15deg) scale(.96); }
+    }
+    @keyframes cs-drift-2 {
+      0%, 100% { transform: translate(0, 0) rotate(-20deg) scale(1); }
+      33%      { transform: translate(18%, 14%) rotate(0deg) scale(1.1); }
+      66%      { transform: translate(-14%, 6%) rotate(20deg) scale(.95); }
+    }
+    @keyframes cs-drift-3 {
+      0%, 100% { transform: translate(0, 0) rotate(10deg) scale(1); }
+      33%      { transform: translate(-22%, -10%) rotate(-10deg) scale(1.05); }
+      66%      { transform: translate(8%, 14%) rotate(25deg) scale(.98); }
+    }
+    /* No motion → drop the animated layer; the static gradient glow remains. */
+    @media (prefers-reduced-motion: reduce) {
+      .cs-spotlights { display: none; }
+    }
+
     /* Cursor spotlight on interactive cards (JS sets --mx/--my). */
     .cs-card::after {
       content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
@@ -2709,6 +2768,22 @@
     (function () {
       var id = qp('case');
       if (id && CS[id]) renderDetail(id); else renderIndex();
+
+      /* Animated spotlight layer — port of the framer-motion spotlight-background
+         component. Prepended into the body so its drifting indigo blobs sit
+         behind the content (z-index 0) and above the static gradient glow. */
+      (function () {
+        var host = document.querySelector('.d-body, .i-body');
+        if (!host) return;
+        var layer = document.createElement('div');
+        layer.className = 'cs-spotlights';
+        layer.setAttribute('aria-hidden', 'true');
+        layer.innerHTML =
+          '<div class="cs-spot cs-spot-1"></div>' +
+          '<div class="cs-spot cs-spot-2"></div>' +
+          '<div class="cs-spot cs-spot-3"></div>';
+        host.insertBefore(layer, host.firstChild);
+      })();
 
       var yrEl = document.getElementById('yr'); if (yrEl) yrEl.textContent = new Date().getFullYear();
       window.scrollTo(0, 0);
