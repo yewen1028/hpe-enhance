@@ -3333,6 +3333,22 @@
       will-change: left;
     }
 
+    /* ── Sparkle accent strip under the services title. A slim horizontal band
+       hosting the tsParticles canvas, radial-masked so the field fades out at the
+       edges (no hard rectangle). Height kept small so it reads as an accent. ── */
+    .svc-sparkles {
+      position: relative;
+      width: min(560px, 82%);
+      height: 96px;
+      margin: 4px auto 0;
+      pointer-events: none;
+      -webkit-mask-image: radial-gradient(ellipse 62% 100% at 50% 50%, #000 0%, #000 38%, transparent 74%);
+      mask-image: radial-gradient(ellipse 62% 100% at 50% 50%, #000 0%, #000 38%, transparent 74%);
+    }
+    #svcSparkles { position: absolute; inset: 0; }
+    .svc-sparkles canvas { width: 100% !important; height: 100% !important; }
+    @media (max-width: 639px) { .svc-sparkles { height: 76px; } }
+
     /* Visually-hidden live region (screen-reader only). */
     .svcc-live {
       position: absolute;
@@ -15481,6 +15497,10 @@
 
       <h2 class="section-title svcc-rise" data-no-tw>What We Do</h2>
 
+      <!-- Sparkle accent under the title: a slim tsParticles field, radial-masked
+           to soft edges, lazy-loaded only when #services scrolls into view. -->
+      <div class="svc-sparkles" aria-hidden="true"><div id="svcSparkles"></div></div>
+
       <p class="section-sub" style="margin: 0 auto;">IT support and services for corporate and SME clients.</p>
 
     </div>
@@ -23549,6 +23569,81 @@
       window.addEventListener('resize', function () { C = makeConfig(window.innerWidth); render(); }, { passive: true });
 
       render();
+    })();
+  </script>
+
+  <!-- Sparkle accent under the services title — tsParticles (slim vanilla bundle),
+       lazy-loaded from CDN and initialised only when #services scrolls into view
+       (reuses the file's IntersectionObserver reveal pattern). Reduced motion →
+       a static, non-animated field. Decorative only; no text/beams. -->
+  <script>
+    (function () {
+      var host = document.getElementById('svcSparkles');
+      var section = document.getElementById('services');
+      if (!host || !section) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var started = false;
+
+      function options() {
+        return {
+          fullScreen: { enable: false },
+          fpsLimit: 60,
+          detectRetina: true,
+          background: { color: 'transparent' },
+          particles: {
+            number: { value: 70 },
+            color: { value: '#ffffff' },
+            shape: { type: 'circle' },
+            // Twinkle via opacity animation (disabled under reduced motion → static).
+            opacity: {
+              value: { min: 0.12, max: 0.85 },
+              animation: { enable: !reduce, speed: 1.4, sync: false, startValue: 'random' }
+            },
+            size: { value: { min: 0.4, max: 1.4 } },
+            move: {
+              enable: !reduce, speed: 0.25, direction: 'none',
+              random: true, straight: false, outModes: { default: 'out' }
+            },
+            links: { enable: false }
+          },
+          // Ambient only — no pointer interactivity here.
+          interactivity: { events: { onHover: { enable: false }, onClick: { enable: false } } }
+        };
+      }
+
+      function initParticles() {
+        var eng = window.tsParticles;
+        if (!eng || !eng.load) return;
+        var run = function () { eng.load({ id: 'svcSparkles', options: options() }); };
+        // The v3 slim bundle registers its shape/updater plugins via loadSlim();
+        // without that call particles exist but nothing is drawn. Register once,
+        // then load. (Falls back to a direct load if loadSlim isn't exposed.)
+        if (typeof window.loadSlim === 'function') {
+          Promise.resolve(window.loadSlim(eng)).then(run).catch(run);
+        } else {
+          run();
+        }
+      }
+
+      function start() {
+        if (started) return; started = true;
+        if (window.tsParticles) { initParticles(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@tsparticles/slim@3/tsparticles.slim.bundle.min.js';
+        s.async = true;
+        s.onload = initParticles;
+        s.onerror = function () { /* CDN unavailable → the accent just doesn't appear */ };
+        document.head.appendChild(s);
+      }
+
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) { start(); io.unobserve(e.target); } });
+        }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+        io.observe(section);
+      } else {
+        start();
+      }
     })();
   </script>
 
