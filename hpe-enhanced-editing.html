@@ -3307,12 +3307,26 @@
       white-space: nowrap;
     }
 
-    /* Keyboard focus affordance for the carousel controls + the stage. */
+    /* Keyboard focus affordance for the carousel CONTROLS (buttons/dots) — a
+       clear ring, since those are small discrete targets. */
     .svcc-arrow:focus-visible,
-    .svcc-dots button:focus-visible,
-    .svcc-stage:focus-visible {
+    .svcc-dots button:focus-visible {
       outline: 2px solid var(--orange);
       outline-offset: 3px;
+    }
+    /* The stage is a full-width focusable region: the browser's default outline
+       framed the WHOLE carousel, which looked like a big box. Suppress it and
+       instead show only a soft orange glow on the centred card when the stage
+       has keyboard focus — a non-intrusive indicator that doesn't frame the
+       component. (id specificity + !important keeps the drop-shadow and beats
+       the selected-card box-shadow rule.) */
+    #svccStage:focus,
+    #svccStage:focus-visible { outline: none; }
+    #svccStage:focus-visible .svcc-slide.svcc-center .service-card {
+      box-shadow:
+        0 52px 92px -26px rgba(0, 0, 0, .74),
+        0 0 0 3px rgba(244, 121, 32, .5),
+        0 0 24px rgba(244, 121, 32, .42) !important;
     }
 
     /* ── Section-title reveal (rise from below + fade). Reuses the site's reveal
@@ -23407,26 +23421,42 @@
         // else: already centred → let the click reach the card and navigate.
       }, true);
 
-      // Arrows + keyboard. The Arrow-key handler is bound to the WHOLE
-      // .svc-carousel (not just the stage), so it fires whenever focus is
-      // anywhere inside the carousel — including after Tabbing to the prev/next
-      // buttons or dots — WITHOUT needing a mouse click on the stage first.
+      // Prev/next buttons + keyboard.
       if (prevBtn) prevBtn.addEventListener('click', function () { goDelta(-1); });
       if (nextBtn) nextBtn.addEventListener('click', function () { goDelta(1); });
       stage.setAttribute('tabindex', '0');
       stage.setAttribute('role', 'group');
       stage.setAttribute('aria-label', 'Service cards — press Left/Right arrow keys to browse, Enter to open the centred service');
-      carousel.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') { e.preventDefault(); goDelta(-1); }
-        else if (e.key === 'ArrowRight') { e.preventDefault(); goDelta(1); }
-        else if ((e.key === 'Enter' || e.key === ' ') && e.target === stage) {
-          // Open the centred card when the stage itself holds keyboard focus
-          // (navigate directly so the drag/tap click-guard can't swallow it).
-          e.preventDefault();
-          var c = slides.filter(function (s) { return s.classList.contains('svcc-center'); })[0];
-          var card = c && c.querySelector('.service-card[data-service]');
-          if (card) location.href = 'services.html?service=' + card.getAttribute('data-service');
-        }
+
+      // Left/Right arrow navigation is bound to the WINDOW and gated by the
+      // carousel's in-view state (the same `inView` used for autoplay), so the
+      // arrows browse the cards as soon as the carousel is on screen — no click
+      // or tab-in required. It NEVER fires while the carousel is off-screen, nor
+      // while the user is typing in a field (contact form, chatbot input, …), and
+      // only Left/Right are intercepted so Up/Down page-scrolling is untouched.
+      function isTyping(t) {
+        if (!t) return false;
+        if (t.isContentEditable) return true;
+        var tag = t.tagName;
+        return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+      }
+      window.addEventListener('keydown', function (e) {
+        if (!inView) return;
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        if (isTyping(e.target)) return;
+        e.preventDefault();
+        if (e.key === 'ArrowLeft') goDelta(-1); else goDelta(1);
+      });
+
+      // Enter/Space opens the centred card, but ONLY when the stage itself holds
+      // keyboard focus (so it can't fire globally). Navigate directly so the
+      // drag/tap click-guard can't swallow it.
+      stage.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        var c = slides.filter(function (s) { return s.classList.contains('svcc-center'); })[0];
+        var card = c && c.querySelector('.service-card[data-service]');
+        if (card) location.href = 'services.html?service=' + card.getAttribute('data-service');
       });
       // Pause autoplay while a keyboard user is interacting (focus inside the
       // carousel), resume when focus leaves — mirrors the existing hover pause.
