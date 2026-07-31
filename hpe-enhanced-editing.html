@@ -25,6 +25,44 @@
   <meta name="description"
     content="More than 10 years in IT Support and Managed Services • 18 Support Centers Nationwide • 70 Experienced Professional Support Staff" />
 
+  <!-- Favicon — exact WordPress site-icon set from hpe.com.my -->
+
+  <link rel="icon" href="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-32x32-1.png" sizes="32x32">
+
+  <link rel="shortcut icon" href="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-32x32-1.png">
+
+  <link rel="apple-touch-icon" href="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-57x57-1.png" sizes="57x57">
+
+  <link rel="apple-touch-icon" href="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-76x76-1.png" sizes="76x76">
+
+  <link rel="apple-touch-icon" href="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-120x120-1.png" sizes="120x120">
+
+  <link rel="apple-touch-icon" href="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-152x152-1.png" sizes="114x114">
+
+  <!-- Open Graph / social link previews -->
+
+  <meta property="og:type" content="website" />
+
+  <meta property="og:site_name" content="HPE Solutions Sdn Bhd" />
+
+  <meta property="og:title" content="HPE Solutions Sdn Bhd – Malaysia's IT Support & Managed Services" />
+
+  <meta property="og:description"
+    content="More than 10 years in IT Support and Managed Services • 18 Support Centers Nationwide • 70 Experienced Professional Support Staff" />
+
+  <meta property="og:image" content="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" />
+
+  <meta property="og:url" content="https://hpe.com.my/" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <meta name="twitter:title" content="HPE Solutions Sdn Bhd – Malaysia's IT Support & Managed Services" />
+
+  <meta name="twitter:description"
+    content="More than 10 years in IT Support and Managed Services • 18 Support Centers Nationwide • 70 Experienced Professional Support Staff" />
+
+  <meta name="twitter:image" content="https://hpe.com.my/wp-content/uploads/2021/02/lg-HPE-390x120-1.png" />
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
     crossorigin="anonymous" />
 
@@ -20968,7 +21006,21 @@
 
         kfItems.forEach(el => el.classList.add('kf-in'));
 
-        kfNums.forEach(el => { if (!el.dataset.counted) countUp(el); });
+        // Only burn the count-up here if the strip is actually on-screen at
+
+        // the 4s mark. If it is still below the fold, leave the numbers at 0
+
+        // and let the (still-observing) IntersectionObserver run them when the
+
+        // user scrolls the strip into view — otherwise the animation plays
+
+        // off-screen and the visitor only ever sees the final static values.
+
+        const kfRect = kfSection ? kfSection.getBoundingClientRect() : null;
+
+        const kfOnScreen = kfRect && kfRect.top < window.innerHeight && kfRect.bottom > 0;
+
+        if (kfOnScreen) kfNums.forEach(el => { if (!el.dataset.counted) countUp(el); });
 
       }, 4000);
 
@@ -23591,15 +23643,21 @@
       });
 
       // ── Autoplay: only while in view, paused on hover / interaction ──
-      var autoT = null, inView = false;
+      var autoT = null, inView = false, pointerInside = false;
       function scheduleAuto() {
         stopAuto();
-        if (!inView || reduce) return;   // no idle auto-motion under reduced motion
+        // Never idle-advance while the pointer is resting on the carousel: the
+        // other callers (goTo / goDelta / endDrag / tap-to-select) all re-arm
+        // autoplay, and without this guard the centred card would slide out from
+        // under a stationary cursor a few seconds after a click — which reads as
+        // the middle card's hover effect "randomly" dropping. pointerleave clears
+        // the flag and resumes autoplay.
+        if (!inView || reduce || pointerInside) return;
         autoT = setTimeout(function () { target = Math.round(progress) + 1; kick(); scheduleAuto(); }, 4200);
       }
       function stopAuto() { if (autoT) { clearTimeout(autoT); autoT = null; } }
-      stage.addEventListener('pointerenter', stopAuto);
-      stage.addEventListener('pointerleave', function () { if (!dragging) scheduleAuto(); });
+      stage.addEventListener('pointerenter', function () { pointerInside = true; stopAuto(); });
+      stage.addEventListener('pointerleave', function () { pointerInside = false; if (!dragging) scheduleAuto(); });
 
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(function (entries) {
