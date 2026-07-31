@@ -312,6 +312,26 @@
     .i-stats .st .v { font-size: 28px; font-weight: 800; color: #fff; }
     .i-stats .st .l { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: rgba(255, 255, 255, .55); }
 
+    /* ── Index-title accents (ported from #services on the main page): a glowing
+       orange line that "draws" right→left via --dash (stroke-dashoffset, 100
+       hidden → 0 drawn) + a twinkling tsParticles sparkle strip. Left-aligned so
+       they sit under the left-aligned hero heading, between .i-title and .i-sub. */
+    .svc-glowline { width: min(340px, 62%); height: 26px; margin: 14px 0 2px; --dash: 100; }
+    .gl-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .gl-s0 { stop-color: var(--orange); stop-opacity: 0; }
+    .gl-s1 { stop-color: var(--orange); stop-opacity: 1; }
+    /* bright orange lit peak — the glow/bloom layers below supply the luminosity,
+       so this stays "via-orange", not a white-hot core */
+    .gl-s2 { stop-color: #ffa64d; stop-opacity: 1; }
+    .gl-line { stroke: url(#glGrad); fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 100; stroke-dashoffset: var(--dash, 100); }
+    .gl-core { stroke-width: 1.6; }
+    .gl-glow { stroke-width: 4; opacity: .95; }
+    .gl-bloom { stroke-width: 9; opacity: .55; }
+    .svc-sparkles { position: relative; width: min(560px, 82%); height: 88px; margin: 0; pointer-events: none; -webkit-mask-image: radial-gradient(ellipse 62% 100% at 50% 50%, #000 0%, #000 38%, transparent 74%); mask-image: radial-gradient(ellipse 62% 100% at 50% 50%, #000 0%, #000 38%, transparent 74%); }
+    #svcSparkles { position: absolute; inset: 0; }
+    .svc-sparkles canvas { width: 100% !important; height: 100% !important; }
+    @media (max-width: 639px) { .svc-sparkles { height: 72px; } }
+
     .i-body { padding: clamp(72px, 9vw, 120px) 0 50px; background: var(--light); }
     .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
     .svc-card {
@@ -4332,6 +4352,21 @@
           '<div class="wrap" data-parallax="0.05">' +
             '<div class="i-eyebrow">What we do</div>' +
             '<h1 class="i-title">' + titleHTML + '</h1>' +
+            '<div class="svc-glowline" id="svcGlowline" aria-hidden="true">' +
+              '<svg class="gl-svg" viewBox="0 0 340 26" preserveAspectRatio="none">' +
+                '<defs>' +
+                  '<linearGradient id="glGrad" gradientUnits="userSpaceOnUse" x1="0" y1="13" x2="340" y2="13">' +
+                    '<stop offset="0" class="gl-s0" /><stop offset="0.28" class="gl-s1" /><stop offset="0.5" class="gl-s2" /><stop offset="0.72" class="gl-s1" /><stop offset="1" class="gl-s0" />' +
+                  '</linearGradient>' +
+                  '<filter id="glBlur" x="-5%" y="-500%" width="110%" height="1100%"><feGaussianBlur stdDeviation="2.4" /></filter>' +
+                  '<filter id="glBloom" x="-10%" y="-800%" width="120%" height="1700%"><feGaussianBlur stdDeviation="5.6" /></filter>' +
+                '</defs>' +
+                '<line class="gl-line gl-bloom" x1="340" y1="13" x2="0" y2="13" pathLength="100" filter="url(#glBloom)" />' +
+                '<line class="gl-line gl-glow" x1="340" y1="13" x2="0" y2="13" pathLength="100" filter="url(#glBlur)" />' +
+                '<line class="gl-line gl-core" x1="340" y1="13" x2="0" y2="13" pathLength="100" />' +
+              '</svg>' +
+            '</div>' +
+            '<div class="svc-sparkles" aria-hidden="true"><div id="svcSparkles"></div></div>' +
             '<p class="i-sub">From SLA-backed managed support to large-scale deployments, helpdesk, staffing, warranty and total IT sourcing — one accountable partner across Malaysia.</p>' +
             '<div class="i-stats">' +
               '<div class="st"><div class="v">7</div><div class="l">Service lines</div></div>' +
@@ -4354,6 +4389,7 @@
       }
 
       setupFilter();
+      initTitleFX();
     }
 
     /* Lightweight category filter for the service cards. Plain JS: toggles a
@@ -4445,6 +4481,79 @@
           }, 560);
         }
       }
+    }
+
+    /* ── Index-title accents (ported from #services on the main page) ──
+       Drives the glow line's right→left draw and the twinkling sparkle field.
+       The hero title sits above the fold, so a scroll-linked draw would never
+       be visible here; instead the line draws once on mount using the SAME
+       --dash / stroke-dashoffset mechanism as the main page. The sparkles use
+       the slim tsParticles bundle, lazy-loaded when the hero enters view.
+       Reduced motion → static full line + non-animated field. */
+    function initTitleFX() {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // 1) Glow line — animate --dash 100 (hidden) → 0 (fully drawn) right→left.
+      var line = document.getElementById('svcGlowline');
+      if (line) {
+        if (reduce) {
+          line.style.setProperty('--dash', '0');            // static: full line, no draw
+        } else {
+          var t0 = 0, DUR = 1050;
+          var draw = function (ts) {
+            if (!t0) t0 = ts;
+            var p = Math.min((ts - t0) / DUR, 1);
+            var e = 1 - Math.pow(1 - p, 3);                  // easeOutCubic
+            line.style.setProperty('--dash', (100 * (1 - e)).toFixed(1));
+            if (p < 1) requestAnimationFrame(draw);
+          };
+          requestAnimationFrame(draw);
+        }
+      }
+
+      // 2) Sparkles — slim tsParticles bundle (loadSlim must register its
+      //    shape/updater plugins before load() or nothing draws), lazy-loaded
+      //    when the hero is in view (fires on load, since it's above the fold).
+      var host = document.getElementById('svcSparkles');
+      var hero = document.querySelector('.i-hero');
+      if (!host || !hero) return;
+      var started = false;
+      var options = function () {
+        return {
+          fullScreen: { enable: false }, fpsLimit: 60, detectRetina: true,
+          background: { color: 'transparent' },
+          particles: {
+            number: { value: 70 }, color: { value: '#ffffff' }, shape: { type: 'circle' },
+            opacity: { value: { min: 0.05, max: 0.95 }, animation: { enable: !reduce, speed: 2.4, sync: false, startValue: 'random' } },
+            size: { value: { min: 0.4, max: 1.4 } },
+            move: { enable: !reduce, speed: 0.25, direction: 'none', random: true, straight: false, outModes: { default: 'out' } },
+            links: { enable: false }
+          },
+          interactivity: { events: { onHover: { enable: false }, onClick: { enable: false } } }
+        };
+      };
+      var initParticles = function () {
+        var eng = window.tsParticles;
+        if (!eng || !eng.load) return;
+        var run = function () { eng.load({ id: 'svcSparkles', options: options() }); };
+        if (typeof window.loadSlim === 'function') { Promise.resolve(window.loadSlim(eng)).then(run).catch(run); }
+        else { run(); }
+      };
+      var startFX = function () {
+        if (started) return; started = true;
+        if (window.tsParticles) { initParticles(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@tsparticles/slim@3/tsparticles.slim.bundle.min.js';
+        s.async = true; s.onload = initParticles;
+        s.onerror = function () { /* CDN unavailable → the accent just doesn't appear */ };
+        document.head.appendChild(s);
+      };
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) { startFX(); io.unobserve(e.target); } });
+        }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+        io.observe(hero);
+      } else { startFX(); }
     }
 
     (function () {
