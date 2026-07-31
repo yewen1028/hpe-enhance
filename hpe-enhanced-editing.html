@@ -3333,6 +3333,38 @@
       will-change: left;
     }
 
+    /* The services title's accent is the glowing line BELOW it (see .svc-glowline),
+       so hide the site's default above-title hairline bar for this one title. */
+    #services .section-title::before { display: none; }
+
+    /* ── Glowing orange line under the services title. Gradient-stroked SVG line
+       (transparent→orange→transparent) with a blurred glow copy; --dash is the
+       stroke-dashoffset (100 = hidden, 0 = fully drawn), driven by scroll in JS
+       so the line draws right→left as the section enters view. ── */
+    .svc-glowline {
+      width: min(340px, 62%);
+      height: 26px;
+      margin: 6px auto 0;
+      --dash: 100;
+    }
+    .gl-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .gl-s0 { stop-color: var(--orange); stop-opacity: 0; }
+    .gl-s1 { stop-color: var(--orange); stop-opacity: 1; }
+    /* bright orange core (stays "via-orange", just a lit peak — the glow/bloom
+       layers below provide the luminosity, not a white-hot centre) */
+    .gl-s2 { stop-color: #ffa64d; stop-opacity: 1; }
+    .gl-line {
+      stroke: url(#glGrad);
+      fill: none;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+      stroke-dasharray: 100;
+      stroke-dashoffset: var(--dash, 100);
+    }
+    .gl-core  { stroke-width: 1.6; }
+    .gl-glow  { stroke-width: 4;   opacity: .95; }
+    .gl-bloom { stroke-width: 9;   opacity: .55; }
+
     /* ── Sparkle accent strip under the services title. A slim horizontal band
        hosting the tsParticles canvas, radial-masked so the field fades out at the
        edges (no hard rectangle). Height kept small so it reads as an accent. ── */
@@ -15497,8 +15529,37 @@
 
       <h2 class="section-title svcc-rise" data-no-tw>What We Do</h2>
 
-      <!-- Sparkle accent under the title: a slim tsParticles field, radial-masked
-           to soft edges, lazy-loaded only when #services scrolls into view. -->
+      <!-- Glowing orange line directly under the title. An SVG line with a
+           gradient stroke (transparent→orange→transparent) + a blurred glow copy;
+           it "draws" right→left via stroke-dashoffset, linked to scroll by JS. -->
+      <div class="svc-glowline" id="svcGlowline" aria-hidden="true">
+        <svg class="gl-svg" viewBox="0 0 340 26" preserveAspectRatio="none">
+          <defs>
+            <!-- userSpaceOnUse: an objectBoundingBox gradient is degenerate on a
+                 horizontal line (zero-height bbox), so span it in user coords. -->
+            <linearGradient id="glGrad" gradientUnits="userSpaceOnUse" x1="0" y1="13" x2="340" y2="13">
+              <stop offset="0" class="gl-s0" />
+              <stop offset="0.28" class="gl-s1" />
+              <stop offset="0.5" class="gl-s2" />
+              <stop offset="0.72" class="gl-s1" />
+              <stop offset="1" class="gl-s0" />
+            </linearGradient>
+            <filter id="glBlur" x="-5%" y="-500%" width="110%" height="1100%">
+              <feGaussianBlur stdDeviation="2.4" />
+            </filter>
+            <!-- wide soft bloom for the luminous halo -->
+            <filter id="glBloom" x="-10%" y="-800%" width="120%" height="1700%">
+              <feGaussianBlur stdDeviation="5.6" />
+            </filter>
+          </defs>
+          <line class="gl-line gl-bloom" x1="340" y1="13" x2="0" y2="13" pathLength="100" filter="url(#glBloom)" />
+          <line class="gl-line gl-glow" x1="340" y1="13" x2="0" y2="13" pathLength="100" filter="url(#glBlur)" />
+          <line class="gl-line gl-core" x1="340" y1="13" x2="0" y2="13" pathLength="100" />
+        </svg>
+      </div>
+
+      <!-- Sparkle accent directly beneath the glow line: a slim tsParticles field,
+           radial-masked to soft edges, lazy-loaded only when #services is in view. -->
       <div class="svc-sparkles" aria-hidden="true"><div id="svcSparkles"></div></div>
 
       <p class="section-sub" style="margin: 0 auto;">IT support and services for corporate and SME clients.</p>
@@ -23595,9 +23656,10 @@
             color: { value: '#ffffff' },
             shape: { type: 'circle' },
             // Twinkle via opacity animation (disabled under reduced motion → static).
+            // Higher speed + wider range so the twinkle is clearly visible.
             opacity: {
-              value: { min: 0.12, max: 0.85 },
-              animation: { enable: !reduce, speed: 1.4, sync: false, startValue: 'random' }
+              value: { min: 0.05, max: 0.95 },
+              animation: { enable: !reduce, speed: 2.4, sync: false, startValue: 'random' }
             },
             size: { value: { min: 0.4, max: 1.4 } },
             move: {
@@ -23644,6 +23706,36 @@
       } else {
         start();
       }
+    })();
+  </script>
+
+  <!-- Orange glow line under the services title — draws right→left, its
+       stroke-dashoffset linked to scroll position (parallax) as the title enters
+       view. Reduced motion → a static, fully-drawn line. -->
+  <script>
+    (function () {
+      var line = document.getElementById('svcGlowline');
+      var title = document.querySelector('#services .section-title');
+      if (!line || !title) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { line.style.setProperty('--dash', '0'); return; }  // static minimal: full line, no draw
+
+      var ticking = false;
+      function apply() {
+        ticking = false;
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        var top = title.getBoundingClientRect().top;
+        // Draw progress p (0→1) as the title crosses the band from 92%→42% of vh.
+        var start = vh * 0.92, end = vh * 0.42;
+        var p = (start - top) / (start - end);
+        p = p < 0 ? 0 : (p > 1 ? 1 : p);
+        line.style.setProperty('--dash', (100 * (1 - p)).toFixed(1));  // 100 hidden → 0 drawn
+      }
+      // rAF-throttled + passive, per the file's scroll-handler conventions.
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+      apply();
     })();
   </script>
 
