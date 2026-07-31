@@ -332,6 +332,29 @@
     .svc-sparkles canvas { width: 100% !important; height: 100% !important; }
     @media (max-width: 639px) { .svc-sparkles { height: 72px; } }
 
+    /* ── Client-proof cards ─────────────────────────────────────────────
+       Anonymized, industry-labelled engagements taken from the real published
+       case studies (hpe.com.my/case-study/) — factual scope, NEVER named
+       clients, people, job titles or invented quotes. Presented as testimonial-
+       style cards but the copy stays factual. Uses the site's .reveal scroll-in
+       treatment and theme tokens, so it reads in both light and dark. */
+    .tm-section { padding: clamp(66px, 8vw, 112px) 0; background: var(--light); border-top: 1px solid var(--border); }
+    .tm-head-center { max-width: 720px; margin: 0 auto clamp(38px, 5vw, 54px); text-align: center; }
+    .tm-kicker { color: var(--orange); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; margin-bottom: 14px; }
+    .tm-title { font-size: clamp(27px, 4.2vw, 42px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; color: var(--heading); }
+    .tm-sub { margin-top: 16px; font-size: clamp(14.5px, 1.5vw, 16.5px); line-height: 1.7; color: var(--muted); }
+    .tm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+    .tm-card { position: relative; display: flex; flex-direction: column; gap: 13px; padding: 26px 24px 22px 28px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform .4s cubic-bezier(.22, 1, .36, 1), box-shadow .4s ease, border-color .3s ease; }
+    .tm-card::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--orange), var(--orange-d)); }
+    .tm-card:hover { transform: translateY(-6px); border-color: rgba(244, 121, 32, .45); box-shadow: 0 34px 66px -30px rgba(0, 0, 0, .5); }
+    .tm-head { display: flex; align-items: center; gap: 12px; }
+    .tm-ico { width: 42px; height: 42px; flex-shrink: 0; display: grid; place-items: center; border-radius: 11px; background: var(--orange-l); border: 1px solid rgba(244, 121, 32, .3); color: var(--orange); font-size: 16px; }
+    .tm-industry { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--orange); }
+    .tm-body { margin: 0; font-size: 14.5px; line-height: 1.68; color: var(--text); }
+    .tm-metrics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 4px; }
+    .tm-metrics span { font-size: 11.5px; font-weight: 700; letter-spacing: .02em; color: var(--heading); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px; }
+    @media (max-width: 560px) { .tm-card { padding: 22px 20px 20px 24px; } }
+
     .i-body { padding: clamp(72px, 9vw, 120px) 0 50px; background: var(--light); }
     .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
     .svc-card {
@@ -4345,6 +4368,36 @@
         return out.join('');
       })();
 
+      /* Client proof — anonymized, industry-labelled engagements drawn straight
+         from the real published case studies (hpe.com.my/case-study/). Factual
+         scope only: NO named clients, people, titles or invented quotes — the
+         real business never publishes those. */
+      var PROOF = [
+        { ico: 'fa-building-columns', ind: 'Banking', body: 'We fulfil principal contract maintenance under an 8×5×2-hour SLA for a major Malaysian bank’s daily support and maintenance — an overall total of about 25,000 nodes nationwide.', tags: ['~25,000 nodes', '8×5×2hr SLA'] },
+        { ico: 'fa-cart-shopping', ind: 'Retail', body: 'We provide 24×7×4-hour support to a nationwide retail chain of more than 2,500 outlets, keeping POS terminals, outlet servers, networking and WiFi running every day of the year.', tags: ['2,500 outlets', '24×7×4hr SLA'] },
+        { ico: 'fa-tower-broadcast', ind: 'Telecommunications', body: 'We maintain multi-vendor network equipment — Cisco routers and switches, Peplink load balancers and Riverbed WAN optimizers — for a telecommunications provider under nationwide 24×7×4-hour coverage.', tags: ['Multi-vendor', '24×7×4hr SLA'] },
+        { ico: 'fa-oil-well', ind: 'Oil & Gas', body: 'As sole vendor we ran three concurrent transformation projects for an oil & gas company — Active Directory migration, Windows OS upgrades and nationwide BitLocker encryption for 30,000 end-users — delivered within six months.', tags: ['30,000 endpoints', '6 months'] },
+        { ico: 'fa-landmark', ind: 'Government', body: 'As an Authorised Support Partner (ASP) we deliver warranty and out-of-warranty hardware support for a government PC-leasing programme, with on-site field support plus walk-in service across 18 nationwide centres.', tags: ['ASP', '18 centres'] },
+        { ico: 'fa-photo-film', ind: 'Media & Broadcasting', body: 'We maintain mission-critical video and voice encoder/decoder infrastructure for a Malaysian media provider under a 24×7×4-hour SLA, keeping broadcast operations live nationwide.', tags: ['Video / Voice', '24×7×4hr SLA'] }
+      ];
+      var proofCards = PROOF.map(function (p) {
+        var tags = p.tags.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
+        return '<article class="tm-card reveal">' +
+          '<div class="tm-head"><span class="tm-ico" aria-hidden="true"><i class="fa-solid ' + p.ico + '"></i></span>' +
+          '<span class="tm-industry">' + esc(p.ind) + '</span></div>' +
+          '<p class="tm-body">' + esc(p.body) + '</p>' +
+          '<div class="tm-metrics">' + tags + '</div></article>';
+      }).join('');
+      var proofHTML =
+        '<section class="tm-section" data-nav-accent="services" aria-labelledby="proofTitle"><div class="wrap">' +
+          '<div class="tm-head-center reveal">' +
+            '<div class="tm-kicker">Proven delivery</div>' +
+            '<h2 class="tm-title" id="proofTitle">Real engagements across industries</h2>' +
+            '<p class="tm-sub">A sample of the work we deliver for clients across Malaysia — anonymized by industry and taken straight from our published case studies. Factual scope, not marketing quotes.</p>' +
+          '</div>' +
+          '<div class="tm-grid">' + proofCards + '</div>' +
+        '</div></section>';
+
       document.getElementById('app').innerHTML =
         '<section class="hero i-hero" data-nav-accent="services">' +
           '<div class="hero-bg" data-parallax="0.10" style="background-image:url(https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=1600)"></div>' +
@@ -4375,7 +4428,8 @@
             '</div>' +
           '</div>' +
         '</section>' +
-        '<section class="i-body" data-nav-accent="services"><div class="wrap">' + filterHTML + '<div class="svc-grid svc-snap">' + cards + '</div></div></section>';
+        '<section class="i-body" data-nav-accent="services"><div class="wrap">' + filterHTML + '<div class="svc-grid svc-snap">' + cards + '</div></div></section>' +
+        proofHTML;
 
       document.title = 'Services — HPE Solutions Sdn Bhd';
 
@@ -4556,12 +4610,81 @@
       } else { startFX(); }
     }
 
+    /* ── Count-up on scroll (mirrors the key-facts strip on the main page) ──
+       Numeric metrics animate 0 → value with an easeOutCubic ramp when their
+       group scrolls into view, using the same IntersectionObserver pattern the
+       reveals use. Only SINGLE-number values animate — SLA notations like
+       "24×7" / "8×5×2" and word badges like "Multi-vendor" stay static — and
+       any thousands separators / decimals in the original are preserved.
+       Reduced motion → the final value is shown immediately (no tween). */
+    var COUNT_SEL = '.i-stats .st .v, .glance .g-v, .sla-card .val';
+    function setupCountUp() {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function parse(raw) {
+        var nums = raw.match(/\d[\d,]*(?:\.\d+)?/g);
+        if (!nums || nums.length !== 1) return null;                 // single number only
+        var token = nums[0], at = raw.indexOf(token);
+        return {
+          target: parseFloat(token.replace(/,/g, '')),
+          comma: token.indexOf(',') !== -1,
+          dec: (token.split('.')[1] || '').length,
+          prefix: raw.slice(0, at), suffix: raw.slice(at + token.length), raw: raw
+        };
+      }
+      function paint(m, v) {
+        var s = m.dec ? v.toFixed(m.dec) : String(Math.round(v));
+        if (m.comma) { var p = s.split('.'); p[0] = Number(p[0]).toLocaleString('en-US'); s = p.join('.'); }
+        return m.prefix + s + m.suffix;
+      }
+      function run(el, m) {
+        if (el.dataset.counted) return;
+        el.dataset.counted = '1';
+        var t0 = performance.now(), DUR = 1300;
+        (function frame(now) {
+          var p = Math.min(Math.max((now - t0) / DUR, 0), 1);   // clamp: first rAF ts can predate t0
+          var e = 1 - Math.pow(1 - p, 3);
+          el.textContent = paint(m, e * m.target);
+          if (p < 1) requestAnimationFrame(frame);
+          else el.textContent = m.raw;                               // exact original at the end
+        })(t0);
+      }
+
+      var items = [];
+      [].slice.call(document.querySelectorAll(COUNT_SEL)).forEach(function (el) {
+        var m = parse(el.textContent);
+        if (!m) return;                                              // non-numeric / multi-number → static
+        el.textContent = paint(m, 0);                                // zero-state
+        var box = el.closest('.st, .g-cell, .sla-card') || el;
+        var sib = box.parentNode ? [].indexOf.call(box.parentNode.children, box) : 0;
+        items.push({ el: el, m: m, delay: (sib > 0 ? sib : 0) * 120 });
+      });
+      if (!items.length) return;
+      if (reduce) { items.forEach(function (it) { it.el.textContent = it.m.raw; }); return; }
+
+      function fire(it) { setTimeout(function () { run(it.el, it.m); }, it.delay); }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            io.unobserve(e.target);
+            var it = items.filter(function (x) { return x.el === e.target; })[0];
+            if (it) fire(it);
+          });
+        }, { threshold: 0.4 });
+        items.forEach(function (it) { io.observe(it.el); });
+      } else { items.forEach(fire); }
+      // Safety net: force any uncounted target after 4s (mirrors the main page).
+      setTimeout(function () { items.forEach(function (it) { if (!it.el.dataset.counted) run(it.el, it.m); }); }, 4000);
+    }
+
     (function () {
       var key = qp('service');
       if (key && SERVICES[key]) renderDetail(key); else renderIndex();
 
       var yrEl = document.getElementById('yr'); if (yrEl) yrEl.textContent = new Date().getFullYear();
       window.scrollTo(0, 0);
+      setupCountUp();
 
       var els = document.querySelectorAll('.reveal');
       if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('in'); }); return; }

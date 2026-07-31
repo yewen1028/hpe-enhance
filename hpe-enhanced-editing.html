@@ -3165,20 +3165,22 @@
       z-index: 6;
     }
 
-    /* Badge = the service's own icon, moved to the reference's top-right pill. */
+    /* Badge = the service's own icon, in the reference's top-right corner. Styled
+       to match the frosted-glass .ic-icon chips on the "Industries We Support"
+       cards: a translucent rounded-square with a white glyph + backdrop blur
+       (blur inherited from the base .svc-ico), not a solid white pill. */
     .svcc-slide .service-card-img .svc-ico {
       left: auto;
       right: 14px;
       top: 14px;
       bottom: auto;
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .92);
-      border-color: rgba(255, 255, 255, .7);
-      color: var(--navy);
-      font-size: 16px;
-      box-shadow: 0 6px 18px rgba(13, 27, 42, .28);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .16);
+      border-color: rgba(255, 255, 255, .24);
+      color: #fff;
+      font-size: 17px;
     }
     /* SELECTED (centred) card: it lifts + floats to mark it as the current
        selection, with a NEUTRAL shadow — NO orange at rest. JS tags the centred
@@ -3219,10 +3221,10 @@
     .svcc-slide:not(.svcc-center):hover .svcc-dim { opacity: 0 !important; }
     .svcc-slide:not(.svcc-center):hover .service-card-body { opacity: 1 !important; }
 
-    /* Keep the icon chip neutral (white glass) on hover — orange stays reserved
+    /* Keep the icon chip neutral (frosted glass) on hover — orange stays reserved
        for the selected-card click above; this overrides the site's global orange. */
     .svcc-slide .service-card:hover .svc-ico {
-      background: rgba(255, 255, 255, .92); color: var(--navy); transform: none;
+      background: rgba(255, 255, 255, .16); color: #fff; transform: none;
     }
 
     /* Arrows — liquid glass (reuses the site's #glass-distortion system + the
