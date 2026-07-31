@@ -4681,7 +4681,7 @@
        "24×7×4hr" / "8×5×2hr" and word badges like "Nationwide" stay static —
        and any thousands separators / decimals in the original are preserved.
        Reduced motion → the final value is shown immediately (no tween). */
-    var COUNT_SEL = '.i-stats .st .v, .d-metric .v';
+    var COUNT_SEL = '.i-stats .st .v, .d-metric .v, .tm-metrics span';
     function setupCountUp() {
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -4719,7 +4719,7 @@
         var m = parse(el.textContent);
         if (!m) return;                                              // non-numeric / multi-number → static
         el.textContent = paint(m, 0);                                // zero-state
-        var box = el.closest('.st, .d-metric') || el;
+        var box = el.closest('.st, .d-metric, .tm-card') || el;
         var sib = box.parentNode ? [].indexOf.call(box.parentNode.children, box) : 0;
         items.push({ el: el, m: m, delay: (sib > 0 ? sib : 0) * 120 });
       });
