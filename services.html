@@ -241,8 +241,9 @@
       box-shadow: 0 10px 26px -10px rgba(244, 121, 32, .8);
       transition: transform .16s, box-shadow .2s, background .2s;
     }
-    .btn-quote:hover { background: var(--orange-d); transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(244, 121, 32, .9); }
-    .btn-quote:active { transform: translateY(0); }
+    /* Primary CTA: confident, weighted lift + glow, and a tactile press. */
+    .btn-quote:hover { background: var(--orange-d); transform: translateY(-3px) scale(1.015); box-shadow: 0 18px 36px -12px rgba(244, 121, 32, .9); }
+    .btn-quote:active { transform: translateY(-1px) scale(.97); transition-duration: .07s; }
 
     /* Shiny hover sweep on orange-filled buttons (matches the main page).
        Uses ::before because .nav-cta's ::after is already taken (underline). */
@@ -277,7 +278,10 @@
     .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
     .feat-card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px 26px; transition: transform .2s, border-color .2s, box-shadow .2s; }
     .feat-card:hover { transform: translateY(-4px); border-color: rgba(255, 125, 26, .4); box-shadow: var(--shadow); }
-    .feat-card .fc-ico { width: 46px; height: 46px; border-radius: var(--r-data); background: var(--orange-l); color: var(--orange); display: grid; place-items: center; font-size: 18px; margin-bottom: 18px; }
+    .feat-card .fc-ico { width: 46px; height: 46px; border-radius: var(--r-data); background: var(--orange-l); color: var(--orange); display: grid; place-items: center; font-size: 18px; margin-bottom: 18px; transition: transform .3s cubic-bezier(.22, 1, .36, 1), background .25s ease, color .25s ease; }
+    /* Content-reveal rather than pure lift: the icon fills with brand orange
+       and kicks up as the card is hovered. */
+    .feat-card:hover .fc-ico { transform: translateY(-3px) scale(1.08) rotate(-4deg); background: var(--orange); color: #fff; }
     .feat-card h4 { color: var(--heading); font-size: 16.5px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
     .feat-card p { color: var(--muted); font-size: 14px; line-height: 1.62; }
 
@@ -381,6 +385,10 @@
     .tm-card { position: relative; display: flex; flex-direction: column; gap: 13px; padding: 26px 24px 22px 28px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform .4s cubic-bezier(.22, 1, .36, 1), box-shadow .4s ease, border-color .3s ease; }
     .tm-card::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--orange), var(--orange-d)); }
     .tm-card:hover { transform: translateY(-6px); border-color: rgba(244, 121, 32, .45); box-shadow: 0 34px 66px -30px rgba(0, 0, 0, .5); }
+    /* Content-reveal on hover (not a scale): a big quotation mark emerges from
+       the corner, giving the quote card editorial character. */
+    .tm-card::after { content: '\201C'; position: absolute; top: 4px; right: 18px; font-family: 'Space Grotesk', Georgia, serif; font-size: 92px; line-height: 1; font-weight: 700; color: var(--orange); opacity: 0; transform: translateY(12px) scale(.9); transition: opacity .35s ease, transform .5s cubic-bezier(.22, 1, .36, 1); pointer-events: none; }
+    .tm-card:hover::after { opacity: .15; transform: translateY(0) scale(1); }
     .tm-head { display: flex; align-items: center; gap: 12px; }
     .tm-ico { width: 42px; height: 42px; flex-shrink: 0; display: grid; place-items: center; border-radius: 11px; background: var(--orange-l); border: 1px solid rgba(244, 121, 32, .3); color: var(--orange); font-size: 16px; }
     .tm-industry { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--orange); }
@@ -540,6 +548,10 @@
     .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .footer-links a { text-decoration: none; color: rgba(255, 255, 255, .6); font-size: 13.5px; transition: color .2s; display: flex; align-items: center; gap: 6px; }
     .footer-links a:hover { color: var(--orange); }
+    /* Secondary links: hairline underline wipes in from the left with the
+       colour shift — quieter than a CTA, so the two never read alike. */
+    .footer-links a, .footer-bottom a, .footer-contact-item a { background-image: linear-gradient(currentColor, currentColor); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1px; transition: background-size .3s cubic-bezier(.22, 1, .36, 1), color .2s ease; }
+    .footer-links a:hover, .footer-bottom a:hover, .footer-contact-item a:hover { background-size: 100% 1px; }
     .footer-links a i { font-size: 10px; color: var(--orange); }
     .footer-social { display: flex; gap: 10px; margin-top: 20px; }
     .social-btn { width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, .65); font-size: 15px; text-decoration: none; transition: background .2s, color .2s, border-color .2s; }
@@ -1273,7 +1285,7 @@
       box-shadow: 0 8px 24px -8px rgba(255,125,26,.55);
       letter-spacing: .1px;
     }
-    .btn-orange:active, .form-submit:active, .nav-cta:active { transform: translateY(0) scale(.985); }
+    .btn-orange:active, .form-submit:active, .nav-cta:active { transform: translateY(-1px) scale(.97); transition-duration: .07s; }
 
     /* --- dropdown / mega refinements (from lines 9451-9625) --- */
     /* ═══ SERVICES NAV DROPDOWN — parallax reveal + richer item states ═══ */
@@ -3521,7 +3533,11 @@
     <style>#introCurtain { display: none !important; }</style>
   </noscript>
 
-  <div id="introCurtain">
+  <!-- Intro splash disabled on this page — it only runs on the main page
+       (hpe-enhanced-editing.html). The id is renamed so the init script below
+       bails at `if (!curtain) return;` (before it can lock body scroll), and
+       the markup is hidden so nothing renders. -->
+  <div id="introCurtain-disabled" hidden style="display:none">
 
     <div class="intro-aurora" aria-hidden="true"></div>
 
@@ -6186,6 +6202,107 @@
         if (raf) { cancelAnimationFrame(raf); raf = 0; lastT = 0; }
         currentY = targetY = y;
       }, { passive: true });
+    })();
+  </script>
+
+
+  <!-- ============================================================
+       SIGNATURE CURSOR — a brand cursor, not the default arrow.
+       A small solid orange dot tracks the pointer 1:1, trailed by an
+       eased ring that swells and warms to orange over interactive
+       elements and tightens on press. Enabled only for fine pointers
+       with motion allowed; the native cursor is the graceful fallback
+       (touch, reduced-motion, and over form fields, where the native
+       caret returns). Performant: passive tracking, GPU transforms,
+       and a rAF loop that idles the moment the ring catches up.
+       ============================================================ -->
+  <script>
+    (function () {
+      var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+      if (!fine.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var root = document.documentElement;
+
+      var css =
+        'html.has-cursor, html.has-cursor * { cursor: none; }' +
+        'html.has-cursor input, html.has-cursor textarea, html.has-cursor select,' +
+        ' html.has-cursor [contenteditable="true"] { cursor: auto; }' +
+        '.hc-cur { position: fixed; top: 0; left: 0; z-index: 2147483000; pointer-events: none;' +
+        ' opacity: 0; transition: opacity .28s ease; will-change: transform; }' +
+        'html.hc-ready .hc-cur { opacity: 1; }' +
+        '.hc-ring-i { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;' +
+        ' box-sizing: border-box; border-radius: 50%; border: 1.5px solid rgba(140,150,165,.6);' +
+        ' transition: width .22s ease, height .22s ease, margin .22s ease, transform .16s ease,' +
+        ' background-color .22s ease, border-color .22s ease, box-shadow .22s ease; }' +
+        '.hc-dot-i { position: absolute; width: 6px; height: 6px; margin: -3px 0 0 -3px;' +
+        ' border-radius: 50%; background: var(--orange, #ff7d1a); transition: opacity .2s ease; }' +
+        'html.hc-hover .hc-ring-i { width: 52px; height: 52px; margin: -26px 0 0 -26px;' +
+        ' border-color: var(--orange, #ff7d1a); background: rgba(255,125,26,.12);' +
+        ' box-shadow: 0 0 22px -6px rgba(255,125,26,.55); }' +
+        'html.hc-hover .hc-dot-i { opacity: 0; }' +
+        'html.hc-down .hc-ring-i { transform: scale(.8); }' +
+        'html.hc-text .hc-cur { opacity: 0 !important; }';
+
+      var style = document.createElement('style');
+      style.textContent = css;
+      document.head.appendChild(style);
+
+      function make(cls, innerCls) {
+        var el = document.createElement('div');
+        el.className = 'hc-cur ' + cls;
+        el.setAttribute('aria-hidden', 'true');
+        var i = document.createElement('span');
+        i.className = innerCls;
+        el.appendChild(i);
+        document.body.appendChild(el);
+        return el;
+      }
+      var ring = make('hc-ring', 'hc-ring-i');
+      var dot = make('hc-dot', 'hc-dot-i');
+
+      var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      var rx = mx, ry = my, raf = 0;
+
+      function loop() {
+        raf = 0;
+        rx += (mx - rx) * 0.2;
+        ry += (my - ry) * 0.2;
+        ring.style.transform = 'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0)';
+        if (Math.abs(mx - rx) > 0.12 || Math.abs(my - ry) > 0.12) raf = requestAnimationFrame(loop);
+      }
+      function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+
+      var INT = 'a, button, [role="button"], [onclick], summary, label, .btn, .btn-orange,' +
+        ' .btn-ghost, .btn-ghost-white, .btn-quote, .nav-cta, .nav-theme-toggle, .nav-search-toggle,' +
+        ' .cs-chip, .svc-fbtn, .service-card, .svc-card, .cs-card, .feat-card, .sla-card,' +
+        ' .cs-home-card, .industry-card, .fab, .map-switch button, .mega-item, .pager a, .svcc-arrow';
+      var lastT = null;
+
+      // Dot tracks 1:1 (crisp); the ring eases in rAF. Hover/text state is read
+      // from the element under the pointer, recomputed only when it changes.
+      window.addEventListener('mousemove', function (e) {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
+        root.classList.add('hc-ready');
+        var t = e.target;
+        if (t !== lastT) {
+          lastT = t;
+          if (t && t.nodeType === 1) {
+            var text = t.closest('input, textarea, select, [contenteditable="true"]');
+            root.classList.toggle('hc-text', !!text);
+            root.classList.toggle('hc-hover', !text && !!t.closest(INT));
+          }
+        }
+        kick();
+      }, { passive: true });
+
+      window.addEventListener('mousedown', function () { root.classList.add('hc-down'); }, { passive: true });
+      window.addEventListener('mouseup', function () { root.classList.remove('hc-down'); }, { passive: true });
+      // Hide when the pointer leaves the window; reappears on the next move.
+      document.addEventListener('mouseout', function (e) { if (!e.relatedTarget) root.classList.remove('hc-ready'); }, { passive: true });
+
+      root.classList.add('has-cursor');
+      kick();
     })();
   </script>
 

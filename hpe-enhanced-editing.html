@@ -1089,8 +1089,23 @@
 
       background: var(--orange-d);
 
-      transform: translateY(-2px);
+      /* Primary CTA: a confident, weighted lift + orange glow — more physical
+         presence than any secondary element gets. */
+      transform: translateY(-3px) scale(1.015);
 
+      box-shadow: 0 16px 32px -12px rgba(255, 125, 26, .6);
+
+    }
+
+    /* Tactile click, reserved for primary CTAs: press down + shrink briefly,
+       then spring back on release. Reads as a physical, deliberate button. */
+    .btn-orange:active,
+    .form-submit:active,
+    .nav-cta:active,
+    .svc-modal-cta a:active,
+    .mobile-menu .m-cta:active {
+      transform: translateY(-1px) scale(.97) !important;
+      transition-duration: .07s !important;
     }
 
 
@@ -7563,7 +7578,49 @@
 
       padding: 28px;
 
-      transition: box-shadow .2s;
+      position: relative;
+
+      transition: box-shadow .25s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
+
+    }
+
+    /* Content-reveal (not a scale): a big quotation mark emerges from the
+       corner on hover, giving the quote card editorial character. */
+    .testimonial-card::before {
+
+      content: '\201C';
+
+      position: absolute;
+
+      top: 2px;
+
+      right: 18px;
+
+      font-family: 'Space Grotesk', Georgia, serif;
+
+      font-size: 96px;
+
+      line-height: 1;
+
+      font-weight: 700;
+
+      color: var(--orange);
+
+      opacity: 0;
+
+      transform: translateY(12px) scale(.9);
+
+      transition: opacity .35s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
+
+      pointer-events: none;
+
+    }
+
+    .testimonial-card:hover::before {
+
+      opacity: .16;
+
+      transform: translateY(0) scale(1);
 
     }
 
@@ -8272,7 +8329,9 @@
 
       background: var(--orange-d);
 
-      transform: translateY(-1px);
+      transform: translateY(-3px) scale(1.01);
+
+      box-shadow: 0 18px 34px -12px rgba(255, 125, 26, .55);
 
     }
 
@@ -8516,6 +8575,27 @@
 
       color: var(--orange);
 
+    }
+
+    /* Secondary links get their own quiet personality: a hairline underline
+       that wipes in from the left alongside the colour shift — deliberately
+       gentler than a CTA's lift, so the two never read as the same control. */
+    .footer-links a,
+    .footer-bottom a,
+    .topbar a,
+    .ci-value a {
+      background-image: linear-gradient(currentColor, currentColor);
+      background-repeat: no-repeat;
+      background-position: 0 100%;
+      background-size: 0% 1px;
+      transition: background-size .3s cubic-bezier(.22, 1, .36, 1), color .2s ease;
+    }
+
+    .footer-links a:hover,
+    .footer-bottom a:hover,
+    .topbar a:hover,
+    .ci-value a:hover {
+      background-size: 100% 1px;
     }
 
 
@@ -12858,6 +12938,8 @@
 
     .testimonial-card:hover {
       box-shadow: 0 22px 55px -20px rgba(0, 0, 0, .8);
+      transform: translateY(-4px);
+      border-color: var(--border-2);
     }
 
     /* ── SECTIONS: opaque dark surfaces (theme lock) ── */
@@ -23968,6 +24050,107 @@
         if (raf) { cancelAnimationFrame(raf); raf = 0; lastT = 0; }
         currentY = targetY = y;
       }, { passive: true });
+    })();
+  </script>
+
+
+  <!-- ============================================================
+       SIGNATURE CURSOR — a brand cursor, not the default arrow.
+       A small solid orange dot tracks the pointer 1:1, trailed by an
+       eased ring that swells and warms to orange over interactive
+       elements and tightens on press. Enabled only for fine pointers
+       with motion allowed; the native cursor is the graceful fallback
+       (touch, reduced-motion, and over form fields, where the native
+       caret returns). Performant: passive tracking, GPU transforms,
+       and a rAF loop that idles the moment the ring catches up.
+       ============================================================ -->
+  <script>
+    (function () {
+      var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+      if (!fine.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var root = document.documentElement;
+
+      var css =
+        'html.has-cursor, html.has-cursor * { cursor: none; }' +
+        'html.has-cursor input, html.has-cursor textarea, html.has-cursor select,' +
+        ' html.has-cursor [contenteditable="true"] { cursor: auto; }' +
+        '.hc-cur { position: fixed; top: 0; left: 0; z-index: 2147483000; pointer-events: none;' +
+        ' opacity: 0; transition: opacity .28s ease; will-change: transform; }' +
+        'html.hc-ready .hc-cur { opacity: 1; }' +
+        '.hc-ring-i { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;' +
+        ' box-sizing: border-box; border-radius: 50%; border: 1.5px solid rgba(140,150,165,.6);' +
+        ' transition: width .22s ease, height .22s ease, margin .22s ease, transform .16s ease,' +
+        ' background-color .22s ease, border-color .22s ease, box-shadow .22s ease; }' +
+        '.hc-dot-i { position: absolute; width: 6px; height: 6px; margin: -3px 0 0 -3px;' +
+        ' border-radius: 50%; background: var(--orange, #ff7d1a); transition: opacity .2s ease; }' +
+        'html.hc-hover .hc-ring-i { width: 52px; height: 52px; margin: -26px 0 0 -26px;' +
+        ' border-color: var(--orange, #ff7d1a); background: rgba(255,125,26,.12);' +
+        ' box-shadow: 0 0 22px -6px rgba(255,125,26,.55); }' +
+        'html.hc-hover .hc-dot-i { opacity: 0; }' +
+        'html.hc-down .hc-ring-i { transform: scale(.8); }' +
+        'html.hc-text .hc-cur { opacity: 0 !important; }';
+
+      var style = document.createElement('style');
+      style.textContent = css;
+      document.head.appendChild(style);
+
+      function make(cls, innerCls) {
+        var el = document.createElement('div');
+        el.className = 'hc-cur ' + cls;
+        el.setAttribute('aria-hidden', 'true');
+        var i = document.createElement('span');
+        i.className = innerCls;
+        el.appendChild(i);
+        document.body.appendChild(el);
+        return el;
+      }
+      var ring = make('hc-ring', 'hc-ring-i');
+      var dot = make('hc-dot', 'hc-dot-i');
+
+      var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      var rx = mx, ry = my, raf = 0;
+
+      function loop() {
+        raf = 0;
+        rx += (mx - rx) * 0.2;
+        ry += (my - ry) * 0.2;
+        ring.style.transform = 'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0)';
+        if (Math.abs(mx - rx) > 0.12 || Math.abs(my - ry) > 0.12) raf = requestAnimationFrame(loop);
+      }
+      function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+
+      var INT = 'a, button, [role="button"], [onclick], summary, label, .btn, .btn-orange,' +
+        ' .btn-ghost, .btn-ghost-white, .btn-quote, .nav-cta, .nav-theme-toggle, .nav-search-toggle,' +
+        ' .cs-chip, .svc-fbtn, .service-card, .svc-card, .cs-card, .feat-card, .sla-card,' +
+        ' .cs-home-card, .industry-card, .fab, .map-switch button, .mega-item, .pager a, .svcc-arrow';
+      var lastT = null;
+
+      // Dot tracks 1:1 (crisp); the ring eases in rAF. Hover/text state is read
+      // from the element under the pointer, recomputed only when it changes.
+      window.addEventListener('mousemove', function (e) {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
+        root.classList.add('hc-ready');
+        var t = e.target;
+        if (t !== lastT) {
+          lastT = t;
+          if (t && t.nodeType === 1) {
+            var text = t.closest('input, textarea, select, [contenteditable="true"]');
+            root.classList.toggle('hc-text', !!text);
+            root.classList.toggle('hc-hover', !text && !!t.closest(INT));
+          }
+        }
+        kick();
+      }, { passive: true });
+
+      window.addEventListener('mousedown', function () { root.classList.add('hc-down'); }, { passive: true });
+      window.addEventListener('mouseup', function () { root.classList.remove('hc-down'); }, { passive: true });
+      // Hide when the pointer leaves the window; reappears on the next move.
+      document.addEventListener('mouseout', function (e) { if (!e.relatedTarget) root.classList.remove('hc-ready'); }, { passive: true });
+
+      root.classList.add('has-cursor');
+      kick();
     })();
   </script>
 

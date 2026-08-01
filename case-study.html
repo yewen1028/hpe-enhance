@@ -516,8 +516,9 @@
       box-shadow: 0 10px 26px -10px rgba(244, 121, 32, .8);
       transition: transform .16s, box-shadow .2s, background .2s;
     }
-    .btn-quote:hover { background: var(--orange-d); transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(244, 121, 32, .9); }
-    .btn-quote:active { transform: translateY(0); }
+    /* Primary CTA: confident, weighted lift + glow, and a tactile press. */
+    .btn-quote:hover { background: var(--orange-d); transform: translateY(-3px) scale(1.015); box-shadow: 0 18px 36px -12px rgba(244, 121, 32, .9); }
+    .btn-quote:active { transform: translateY(-1px) scale(.97); transition-duration: .07s; }
 
     /* Shiny hover sweep on orange-filled buttons (matches the main page).
        Uses ::before because .nav-cta's ::after is already taken (underline). */
@@ -603,6 +604,10 @@
     .tm-card { position: relative; display: flex; flex-direction: column; gap: 13px; padding: 26px 24px 22px 28px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform .4s cubic-bezier(.22, 1, .36, 1), box-shadow .4s ease, border-color .3s ease; }
     .tm-card::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--orange), var(--orange-d)); }
     .tm-card:hover { transform: translateY(-6px); border-color: rgba(244, 121, 32, .45); box-shadow: 0 34px 66px -30px rgba(0, 0, 0, .5); }
+    /* Content-reveal on hover (not a scale): a big quotation mark emerges from
+       the corner, giving the quote card editorial character. */
+    .tm-card::after { content: '\201C'; position: absolute; top: 4px; right: 18px; font-family: 'Space Grotesk', Georgia, serif; font-size: 92px; line-height: 1; font-weight: 700; color: var(--orange); opacity: 0; transform: translateY(12px) scale(.9); transition: opacity .35s ease, transform .5s cubic-bezier(.22, 1, .36, 1); pointer-events: none; }
+    .tm-card:hover::after { opacity: .15; transform: translateY(0) scale(1); }
     .tm-head { display: flex; align-items: center; gap: 12px; }
     .tm-ico { width: 42px; height: 42px; flex-shrink: 0; display: grid; place-items: center; border-radius: 11px; background: var(--orange-l); border: 1px solid rgba(244, 121, 32, .3); color: var(--orange); font-size: 16px; }
     .tm-industry { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--orange); }
@@ -688,6 +693,28 @@
       .card-grid .cs-feature .cs-mets span { font-size: 12px; padding: 6px 12px; }
     }
     @media (max-width: 779px) { .cs-excerpt { -webkit-line-clamp: 4; } }
+
+    /* Editorial pull-stat overlaid on the featured photo — a big figure that
+       makes the hero image a statement, not just a backdrop (mirrors the
+       services proof feature's stat-over-photo). */
+    .card-grid .cs-feature .cs-thumb::after { background: linear-gradient(175deg, rgba(9, 15, 25, .12) 0%, rgba(9, 15, 25, .34) 46%, rgba(9, 15, 25, .9) 100%); }
+    .cs-feat-stat { position: absolute; left: clamp(18px, 2vw, 30px); bottom: clamp(18px, 2vw, 28px); z-index: 2; color: #fff; display: flex; flex-direction: column; line-height: 1; pointer-events: none; }
+    .cs-feat-stat .v { font-family: 'Space Grotesk', Georgia, serif; font-size: clamp(38px, 5vw, 66px); font-weight: 700; letter-spacing: -.03em; text-shadow: 0 6px 26px rgba(0, 0, 0, .55); }
+    .cs-feat-stat .l { margin-top: 9px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .13em; color: rgba(255, 255, 255, .82); }
+
+    /* Full-bleed overlay card — the image fills the whole card with the caption
+       set over a bottom gradient. Mixed into the supporting grid so it reads as
+       a curated spread, not a wall of identical 16/9 thumbnails. Keeps the same
+       grid footprint as standard cards, so rows stay gap-free. */
+    .card-grid .cs-overlay { min-height: clamp(300px, 26vw, 360px); }
+    .card-grid .cs-overlay .cs-thumb { position: absolute; inset: 0; aspect-ratio: auto; height: 100%; }
+    .card-grid .cs-overlay .cs-thumb::after { background: linear-gradient(178deg, rgba(9, 15, 25, .05) 0%, rgba(9, 15, 25, .5) 52%, rgba(9, 15, 25, .93) 100%); }
+    .card-grid .cs-overlay .cs-info { position: relative; z-index: 2; flex: 0 0 auto; margin-top: auto; padding: 22px; }
+    .card-grid .cs-overlay h3 { color: #fff; }
+    .card-grid .cs-overlay .cs-mets { margin-top: 12px; }
+    .card-grid .cs-overlay .cs-mets span { background: rgba(255, 255, 255, .13); color: #fff; border-color: rgba(255, 255, 255, .26); }
+    .card-grid .cs-overlay .cs-more { color: #fff; }
+
     .cs-card {
       position: relative; display: flex; flex-direction: column; overflow: hidden;
       border-radius: var(--radius); background: #fff; border: 1px solid var(--border);
@@ -793,6 +820,10 @@
     .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .footer-links a { text-decoration: none; color: rgba(255, 255, 255, .6); font-size: 13.5px; transition: color .2s; display: flex; align-items: center; gap: 6px; }
     .footer-links a:hover { color: var(--orange); }
+    /* Secondary links: hairline underline wipes in from the left with the
+       colour shift — quieter than a CTA, so the two never read alike. */
+    .footer-links a, .footer-bottom a, .footer-contact-item a { background-image: linear-gradient(currentColor, currentColor); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1px; transition: background-size .3s cubic-bezier(.22, 1, .36, 1), color .2s ease; }
+    .footer-links a:hover, .footer-bottom a:hover, .footer-contact-item a:hover { background-size: 100% 1px; }
     .footer-links a i { font-size: 10px; color: var(--orange); }
     .footer-social { display: flex; gap: 10px; margin-top: 20px; }
     .social-btn { width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, .65); font-size: 15px; text-decoration: none; transition: background .2s, color .2s, border-color .2s; }
@@ -1675,7 +1706,7 @@
       box-shadow: 0 8px 24px -8px rgba(255,125,26,.55);
       letter-spacing: .1px;
     }
-    .btn-orange:active, .form-submit:active, .nav-cta:active { transform: translateY(0) scale(.985); }
+    .btn-orange:active, .form-submit:active, .nav-cta:active { transform: translateY(-1px) scale(.97); transition-duration: .07s; }
 
     /* --- dropdown / mega refinements (from lines 9451-9625) --- */
     /* ═══ SERVICES NAV DROPDOWN — parallax reveal + richer item states ═══ */
@@ -3891,7 +3922,11 @@
     <style>#introCurtain { display: none !important; }</style>
   </noscript>
 
-  <div id="introCurtain">
+  <!-- Intro splash disabled on this page — it only runs on the main page
+       (hpe-enhanced-editing.html). The id is renamed so the init script below
+       bails at `if (!curtain) return;` (before it can lock body scroll), and
+       the markup is hidden so nothing renders. -->
+  <div id="introCurtain-disabled" hidden style="display:none">
 
     <div class="intro-aurora" aria-hidden="true"></div>
 
@@ -4541,18 +4576,24 @@
         catNum++;
         /* isFeat → the first case in each group is rendered as a wide editorial
            card (image + excerpt + more metrics); the rest stay compact. */
-        function buildCard(id, isFeat) {
+        function buildCard(id, isFeat, overlay) {
           var d = CS[id];
           var inds = csIndustries(d);
           var indAttr = inds.map(slugify).join(' ');
           var MAX = 3; // cap visible industry pills so multi-sector cards stay tidy
           var indPills = inds.slice(0, MAX).map(function (n) { return '<span class="cs-tag cs-tag-ind">' + esc(n) + '</span>'; }).join('');
           if (inds.length > MAX) indPills += '<span class="cs-tag cs-tag-more">+' + (inds.length - MAX) + '</span>';
-          var mets = d.metrics.slice(0, isFeat ? 4 : 2).map(function (m) { return '<span>' + esc(m.v) + ' ' + esc(m.l) + '</span>'; }).join('');
-          var thumbInner = isFeat ? '<span class="cs-feat-badge">Featured case</span>'
-            : '<span class="ico"><i class="fa-solid ' + d.icon + '"></i></span>';
+          // Featured cards pull their lead metric out as a big figure overlaid on
+          // the photo (an editorial pull-stat), so the remaining metrics fill the
+          // tag row — no duplication.
+          var lead = (isFeat && d.metrics && d.metrics.length) ? d.metrics[0] : null;
+          var metList = isFeat ? d.metrics.slice(1, 4) : d.metrics.slice(0, 2);
+          var mets = metList.map(function (m) { return '<span>' + esc(m.v) + ' ' + esc(m.l) + '</span>'; }).join('');
+          var thumbInner = isFeat
+            ? '<span class="cs-feat-badge">Featured case</span>' + (lead ? '<div class="cs-feat-stat"><span class="v">' + esc(lead.v) + '</span><span class="l">' + esc(lead.l) + '</span></div>' : '')
+            : (overlay ? '' : '<span class="ico"><i class="fa-solid ' + d.icon + '"></i></span>');
           var excerpt = isFeat ? '<p class="cs-excerpt">' + esc(d.overview) + '</p>' : '';
-          return '<a class="cs-card' + (isFeat ? ' cs-feature' : '') + ' reveal" data-inds="' + indAttr + '" data-svc="' + slugify(d.service) + '" href="case-study.html?case=' + id + '">' +
+          return '<a class="cs-card' + (isFeat ? ' cs-feature' : '') + (overlay ? ' cs-overlay' : '') + ' reveal" data-inds="' + indAttr + '" data-svc="' + slugify(d.service) + '" href="case-study.html?case=' + id + '">' +
             '<div class="cs-thumb" style="background-image:url(' + img(d.img, isFeat ? 1200 : 800) + ')">' + thumbInner + '</div>' +
             '<div class="cs-info">' +
               '<div class="cs-tags">' +
@@ -4565,7 +4606,9 @@
             '</div>' +
           '</a>';
         }
-        var cards = ids.map(function (id, i) { return buildCard(id, i === 0); }).join('');
+        // Mix full-bleed overlay cards into the supporting grid (1st + 4th) so a
+        // category isn't a wall of identical 16/9 thumbnails.
+        var cards = ids.map(function (id, i) { return buildCard(id, i === 0, (i === 1 || i === 4)); }).join('');
         var pad = ('0' + catNum).slice(-2);
         return '<div class="cat" data-svc="' + slugify(g.svc) + '">' +
           '<div class="cat-head">' +
@@ -6253,6 +6296,107 @@
         if (raf) { cancelAnimationFrame(raf); raf = 0; lastT = 0; }
         currentY = targetY = y;
       }, { passive: true });
+    })();
+  </script>
+
+
+  <!-- ============================================================
+       SIGNATURE CURSOR — a brand cursor, not the default arrow.
+       A small solid orange dot tracks the pointer 1:1, trailed by an
+       eased ring that swells and warms to orange over interactive
+       elements and tightens on press. Enabled only for fine pointers
+       with motion allowed; the native cursor is the graceful fallback
+       (touch, reduced-motion, and over form fields, where the native
+       caret returns). Performant: passive tracking, GPU transforms,
+       and a rAF loop that idles the moment the ring catches up.
+       ============================================================ -->
+  <script>
+    (function () {
+      var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+      if (!fine.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var root = document.documentElement;
+
+      var css =
+        'html.has-cursor, html.has-cursor * { cursor: none; }' +
+        'html.has-cursor input, html.has-cursor textarea, html.has-cursor select,' +
+        ' html.has-cursor [contenteditable="true"] { cursor: auto; }' +
+        '.hc-cur { position: fixed; top: 0; left: 0; z-index: 2147483000; pointer-events: none;' +
+        ' opacity: 0; transition: opacity .28s ease; will-change: transform; }' +
+        'html.hc-ready .hc-cur { opacity: 1; }' +
+        '.hc-ring-i { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;' +
+        ' box-sizing: border-box; border-radius: 50%; border: 1.5px solid rgba(140,150,165,.6);' +
+        ' transition: width .22s ease, height .22s ease, margin .22s ease, transform .16s ease,' +
+        ' background-color .22s ease, border-color .22s ease, box-shadow .22s ease; }' +
+        '.hc-dot-i { position: absolute; width: 6px; height: 6px; margin: -3px 0 0 -3px;' +
+        ' border-radius: 50%; background: var(--orange, #ff7d1a); transition: opacity .2s ease; }' +
+        'html.hc-hover .hc-ring-i { width: 52px; height: 52px; margin: -26px 0 0 -26px;' +
+        ' border-color: var(--orange, #ff7d1a); background: rgba(255,125,26,.12);' +
+        ' box-shadow: 0 0 22px -6px rgba(255,125,26,.55); }' +
+        'html.hc-hover .hc-dot-i { opacity: 0; }' +
+        'html.hc-down .hc-ring-i { transform: scale(.8); }' +
+        'html.hc-text .hc-cur { opacity: 0 !important; }';
+
+      var style = document.createElement('style');
+      style.textContent = css;
+      document.head.appendChild(style);
+
+      function make(cls, innerCls) {
+        var el = document.createElement('div');
+        el.className = 'hc-cur ' + cls;
+        el.setAttribute('aria-hidden', 'true');
+        var i = document.createElement('span');
+        i.className = innerCls;
+        el.appendChild(i);
+        document.body.appendChild(el);
+        return el;
+      }
+      var ring = make('hc-ring', 'hc-ring-i');
+      var dot = make('hc-dot', 'hc-dot-i');
+
+      var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      var rx = mx, ry = my, raf = 0;
+
+      function loop() {
+        raf = 0;
+        rx += (mx - rx) * 0.2;
+        ry += (my - ry) * 0.2;
+        ring.style.transform = 'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0)';
+        if (Math.abs(mx - rx) > 0.12 || Math.abs(my - ry) > 0.12) raf = requestAnimationFrame(loop);
+      }
+      function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+
+      var INT = 'a, button, [role="button"], [onclick], summary, label, .btn, .btn-orange,' +
+        ' .btn-ghost, .btn-ghost-white, .btn-quote, .nav-cta, .nav-theme-toggle, .nav-search-toggle,' +
+        ' .cs-chip, .svc-fbtn, .service-card, .svc-card, .cs-card, .feat-card, .sla-card,' +
+        ' .cs-home-card, .industry-card, .fab, .map-switch button, .mega-item, .pager a, .svcc-arrow';
+      var lastT = null;
+
+      // Dot tracks 1:1 (crisp); the ring eases in rAF. Hover/text state is read
+      // from the element under the pointer, recomputed only when it changes.
+      window.addEventListener('mousemove', function (e) {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
+        root.classList.add('hc-ready');
+        var t = e.target;
+        if (t !== lastT) {
+          lastT = t;
+          if (t && t.nodeType === 1) {
+            var text = t.closest('input, textarea, select, [contenteditable="true"]');
+            root.classList.toggle('hc-text', !!text);
+            root.classList.toggle('hc-hover', !text && !!t.closest(INT));
+          }
+        }
+        kick();
+      }, { passive: true });
+
+      window.addEventListener('mousedown', function () { root.classList.add('hc-down'); }, { passive: true });
+      window.addEventListener('mouseup', function () { root.classList.remove('hc-down'); }, { passive: true });
+      // Hide when the pointer leaves the window; reappears on the next move.
+      document.addEventListener('mouseout', function (e) { if (!e.relatedTarget) root.classList.remove('hc-ready'); }, { passive: true });
+
+      root.classList.add('has-cursor');
+      kick();
     })();
   </script>
 

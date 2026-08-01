@@ -3515,7 +3515,11 @@
     <style>#introCurtain { display: none !important; }</style>
   </noscript>
 
-  <div id="introCurtain">
+  <!-- Intro splash disabled on this page — it only runs on the main page
+       (hpe-enhanced-editing.html). The id is renamed so the init script below
+       bails at `if (!curtain) return;` (before it can lock body scroll), and
+       the markup is hidden so nothing renders. -->
+  <div id="introCurtain-disabled" hidden style="display:none">
 
     <div class="intro-aurora" aria-hidden="true"></div>
 
