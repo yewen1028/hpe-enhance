@@ -601,17 +601,83 @@
     .tm-metrics span { font-size: 11.5px; font-weight: 700; letter-spacing: .02em; color: var(--heading); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px; }
     @media (max-width: 560px) { .tm-card { padding: 22px 20px 20px 24px; } }
 
+    /* ═══════════════════════════════════════════════════════════════════
+       REDESIGN PASS — break the templated rhythm (mirrors services.html):
+         • .sec-intro  — left-aligned, index-numbered section intro.
+         • .px-band    — full-bleed parallax statement handoff band.
+         • .proof2     — asymmetric editorial proof (featured metric + ledger).
+       Category grids below also gain a numbered head + a featured wide case
+       per group, so the list reads editorial instead of a uniform grid.
+       ═══════════════════════════════════════════════════════════════════ */
+    .sec-intro { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .92fr); gap: clamp(18px, 4vw, 64px); align-items: end; margin-bottom: clamp(30px, 4vw, 48px); }
+    .sec-intro .si-index { font-size: 12.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--orange); display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+    .sec-intro .si-index::before { content: ''; width: 32px; height: 1px; background: linear-gradient(90deg, var(--orange), transparent); }
+    .sec-intro h2 { font-size: clamp(27px, 4vw, 46px); font-weight: 800; letter-spacing: -.028em; line-height: 1.04; color: var(--heading); }
+    .sec-intro .si-lede { font-size: clamp(14.5px, 1.5vw, 16.5px); line-height: 1.72; color: var(--muted); padding-bottom: 6px; }
+    @media (max-width: 780px) { .sec-intro { grid-template-columns: 1fr; align-items: start; gap: 14px; } }
+
+    .px-band { position: relative; overflow: hidden; padding: clamp(96px, 15vw, 196px) 0; isolation: isolate; border-block: 1px solid var(--border); }
+    .px-band::before { content: ''; position: absolute; inset: -16% 0; z-index: 0; background-image: var(--px-img); background-size: cover; background-position: center; transform: translate3d(0, var(--py, 0px), 0) scale(1.22); will-change: transform; }
+    .px-band::after { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--px-tint, linear-gradient(115deg, rgba(8, 14, 23, .9) 0%, rgba(8, 14, 23, .74) 55%, rgba(8, 14, 23, .88) 100%)); }
+    .px-band > .wrap { position: relative; z-index: 2; }
+    .px-band .pb-kicker { font-size: 12.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--orange); margin-bottom: 22px; display: flex; align-items: center; gap: 13px; }
+    .px-band .pb-kicker::before { content: ''; width: 34px; height: 1px; background: linear-gradient(90deg, var(--orange), transparent); }
+    .px-band .pb-statement { font-size: clamp(27px, 4.8vw, 58px); font-weight: 800; letter-spacing: -.032em; line-height: 1.06; color: #fff; max-width: 18ch; }
+    .px-band .pb-statement em { font-style: normal; color: var(--orange); }
+    .px-band .pb-sub { margin-top: 24px; max-width: 54ch; font-size: clamp(14.5px, 1.5vw, 16.5px); line-height: 1.72; color: rgba(255, 255, 255, .74); }
+    @media (prefers-reduced-motion: reduce) { .px-band::before, .pf-feature::before { transform: none !important; } }
+
+    .proof2-section { padding: clamp(74px, 9vw, 124px) 0; background: var(--light); border-top: 1px solid var(--border); }
+    .proof2-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(16px, 2vw, 26px); align-items: stretch; }
+    @media (max-width: 920px) { .proof2-grid { grid-template-columns: 1fr; } }
+    .pf-feature { position: relative; overflow: hidden; border-radius: 22px; border: 1px solid var(--border); min-height: clamp(320px, 40vw, 440px); display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(26px, 3vw, 42px); isolation: isolate; }
+    .pf-feature::before { content: ''; position: absolute; inset: -16% 0; z-index: 0; background-image: var(--px-img); background-size: cover; background-position: center; transform: translate3d(0, var(--py, 0px), 0) scale(1.2); will-change: transform; }
+    .pf-feature::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(158deg, rgba(9, 15, 25, .38) 0%, rgba(9, 15, 25, .72) 54%, rgba(9, 15, 25, .95) 100%); }
+    .pf-feature > * { position: relative; z-index: 2; }
+    .pf-eyebrow { align-self: flex-start; margin-bottom: auto; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #ffd9b8; padding: 7px 14px; border: 1px solid rgba(255, 125, 26, .4); border-radius: 999px; background: rgba(255, 125, 26, .14); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .pf-metric { font-size: clamp(54px, 8vw, 96px); font-weight: 800; letter-spacing: -.045em; line-height: .9; color: #fff; margin-top: 28px; }
+    .pf-metric span { color: var(--orange); }
+    .pf-unit { font-size: clamp(14px, 1.5vw, 17px); font-weight: 600; color: rgba(255, 255, 255, .85); margin-top: 12px; }
+    .pf-body { margin-top: 16px; max-width: 46ch; font-size: 14px; line-height: 1.66; color: rgba(255, 255, 255, .68); }
+    .pf-ledger { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); overflow: hidden; }
+    .pf-row { position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: clamp(16px, 1.6vw, 22px); row-gap: 4px; padding: clamp(17px, 1.9vw, 23px) clamp(20px, 2.2vw, 28px); align-items: center; flex: 1; transition: background .25s ease; }
+    .pf-row + .pf-row { border-top: 1px solid var(--border); }
+    .pf-row::before { content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 2px; background: var(--orange); border-radius: 0 2px 2px 0; opacity: 0; transform: scaleY(.4); transform-origin: center; transition: opacity .25s ease, transform .35s cubic-bezier(.22, 1, .36, 1); }
+    .pf-row:hover { background: var(--surface-2); }
+    .pf-row:hover::before { opacity: 1; transform: scaleY(1); }
+    .pf-num { grid-row: span 2; align-self: center; font-size: clamp(25px, 3vw, 36px); font-weight: 800; letter-spacing: -.035em; color: var(--heading); line-height: 1; min-width: 3.6ch; }
+    .pf-num .u { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; color: var(--orange); margin-top: 5px; }
+    .pf-ind { font-size: 11.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--orange); align-self: end; }
+    .pf-line { font-size: 13px; line-height: 1.5; color: var(--muted); align-self: start; }
+
     .i-body { padding: clamp(72px, 9vw, 120px) 0 50px; background: var(--light); }
     .cat { margin-bottom: clamp(60px, 8vw, 100px); }
-    .cat-head { display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
-    .cat-head .ci {
-      width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center;
-      background: var(--orange-l); color: var(--orange); font-size: 16px; flex-shrink: 0;
-    }
-    .cat-head h2 { font-size: clamp(19px, 2.4vw, 24px); font-weight: 800; color: var(--navy); letter-spacing: -.01em; }
-    .cat-head .ccount { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--muted); }
+    /* Numbered category head (replaces the icon-in-circle chip). */
+    .cat-head { display: flex; align-items: baseline; gap: clamp(14px, 1.6vw, 22px); margin-bottom: clamp(26px, 3vw, 38px); padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .cat-idx { font-size: clamp(30px, 4.4vw, 54px); font-weight: 800; letter-spacing: -.045em; line-height: .85; color: var(--orange); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+    .cat-headings { display: flex; flex-direction: column; gap: 6px; }
+    .cat-head h2 { font-size: clamp(20px, 2.6vw, 30px); font-weight: 800; color: var(--heading); letter-spacing: -.02em; line-height: 1.05; }
+    .cat-meta { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+    .cat-meta i { color: var(--orange); }
 
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
+    /* Featured wide case per category — image + editorial excerpt, spanning the
+       full grid row, so each group opens with a clear "hero" case before the
+       smaller supporting cards. Kills the uniform-grid monotony. */
+    /* Selectors are qualified with .card-grid so they out-specify the base
+       .cs-card { display:flex } rule that follows this block in source order. */
+    .card-grid .cs-feature { grid-column: 1 / -1; }
+    .cs-feat-badge { position: absolute; left: 16px; top: 16px; z-index: 2; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #fff; padding: 7px 13px; border-radius: 999px; background: linear-gradient(135deg, var(--orange), var(--orange-d)); box-shadow: 0 8px 20px -8px rgba(255, 125, 26, .7); }
+    .cs-excerpt { font-size: 14px; line-height: 1.66; color: var(--muted); margin: 0 0 18px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    @media (min-width: 780px) {
+      .card-grid .cs-feature { display: grid; grid-template-columns: 1.08fr 1fr; align-items: stretch; }
+      .card-grid .cs-feature .cs-thumb { aspect-ratio: auto; height: 100%; min-height: 320px; }
+      .card-grid .cs-feature .cs-info { padding: clamp(28px, 3vw, 44px); justify-content: center; }
+      .card-grid .cs-feature h3 { font-size: clamp(21px, 2.3vw, 30px); font-weight: 800; letter-spacing: -.02em; margin: 12px 0 14px; }
+      .card-grid .cs-feature .cs-mets span { font-size: 12px; padding: 6px 12px; }
+    }
+    @media (max-width: 779px) { .cs-excerpt { -webkit-line-clamp: 4; } }
     .cs-card {
       position: relative; display: flex; flex-direction: column; overflow: hidden;
       border-radius: var(--radius); background: #fff; border: 1px solid var(--border);
@@ -4458,32 +4524,47 @@
 
     /* ── Index view ── */
     function renderIndex() {
+      var catNum = 0;
       var cats = GROUPS.map(function (g) {
         var ids = ORDER.filter(function (id) { return CS[id].service === g.svc; });
         if (!ids.length) return '';
-        var cards = ids.map(function (id) {
+        catNum++;
+        /* isFeat → the first case in each group is rendered as a wide editorial
+           card (image + excerpt + more metrics); the rest stay compact. */
+        function buildCard(id, isFeat) {
           var d = CS[id];
-          var mets = d.metrics.slice(0, 2).map(function (m) { return '<span>' + esc(m.v) + ' ' + esc(m.l) + '</span>'; }).join('');
           var inds = csIndustries(d);
           var indAttr = inds.map(slugify).join(' ');
           var MAX = 3; // cap visible industry pills so multi-sector cards stay tidy
           var indPills = inds.slice(0, MAX).map(function (n) { return '<span class="cs-tag cs-tag-ind">' + esc(n) + '</span>'; }).join('');
           if (inds.length > MAX) indPills += '<span class="cs-tag cs-tag-more">+' + (inds.length - MAX) + '</span>';
-          return '<a class="cs-card reveal" data-inds="' + indAttr + '" data-svc="' + slugify(d.service) + '" href="case-study.html?case=' + id + '">' +
-            '<div class="cs-thumb" style="background-image:url(' + img(d.img, 800) + ')"><span class="ico"><i class="fa-solid ' + d.icon + '"></i></span></div>' +
+          var mets = d.metrics.slice(0, isFeat ? 4 : 2).map(function (m) { return '<span>' + esc(m.v) + ' ' + esc(m.l) + '</span>'; }).join('');
+          var thumbInner = isFeat ? '<span class="cs-feat-badge">Featured case</span>'
+            : '<span class="ico"><i class="fa-solid ' + d.icon + '"></i></span>';
+          var excerpt = isFeat ? '<p class="cs-excerpt">' + esc(d.overview) + '</p>' : '';
+          return '<a class="cs-card' + (isFeat ? ' cs-feature' : '') + ' reveal" data-inds="' + indAttr + '" data-svc="' + slugify(d.service) + '" href="case-study.html?case=' + id + '">' +
+            '<div class="cs-thumb" style="background-image:url(' + img(d.img, isFeat ? 1200 : 800) + ')">' + thumbInner + '</div>' +
             '<div class="cs-info">' +
               '<div class="cs-tags">' +
                 '<span class="cs-tag cs-tag-svc"><i class="fa-solid ' + g.icon + '"></i>' + esc(d.service) + '</span>' +
                 indPills +
               '</div>' +
-              '<h3>' + esc(d.title) + '</h3>' +
+              '<h3>' + esc(d.title) + '</h3>' + excerpt +
               '<div class="cs-mets">' + mets + '</div>' +
               '<span class="cs-more">Read case study <i class="fa-solid fa-arrow-right"></i></span>' +
             '</div>' +
           '</a>';
-        }).join('');
-        return '<div class="cat" data-svc="' + slugify(g.svc) + '"><div class="cat-head"><span class="ci"><i class="fa-solid ' + g.icon + '"></i></span>' +
-          '<h2>' + esc(g.svc) + '</h2><span class="ccount">' + ids.length + ' ' + (ids.length === 1 ? 'case' : 'cases') + '</span></div>' +
+        }
+        var cards = ids.map(function (id, i) { return buildCard(id, i === 0); }).join('');
+        var pad = ('0' + catNum).slice(-2);
+        return '<div class="cat" data-svc="' + slugify(g.svc) + '">' +
+          '<div class="cat-head">' +
+            '<span class="cat-idx">' + pad + '</span>' +
+            '<div class="cat-headings">' +
+              '<h2>' + esc(g.svc) + '</h2>' +
+              '<span class="cat-meta"><i class="fa-solid ' + g.icon + '"></i>' + ids.length + ' ' + (ids.length === 1 ? 'case study' : 'case studies') + '</span>' +
+            '</div>' +
+          '</div>' +
           '<div class="card-grid">' + cards + '</div></div>';
       }).join('');
 
@@ -4499,30 +4580,44 @@
          from the real published case studies (hpe.com.my/case-study/). Factual
          scope only: NO named clients, people, titles or invented quotes — the
          real business never publishes those. */
-      var PROOF = [
-        { ico: 'fa-building-columns', ind: 'Banking', body: 'We fulfil principal contract maintenance under an 8×5×2-hour SLA for a major Malaysian bank’s daily support and maintenance — an overall total of about 25,000 nodes nationwide.', tags: ['~25,000 nodes', '8×5×2hr SLA'] },
-        { ico: 'fa-cart-shopping', ind: 'Retail', body: 'We provide 24×7×4-hour support to a nationwide retail chain of more than 2,500 outlets, keeping POS terminals, outlet servers, networking and WiFi running every day of the year.', tags: ['2,500 outlets', '24×7×4hr SLA'] },
-        { ico: 'fa-tower-broadcast', ind: 'Telecommunications', body: 'We maintain multi-vendor network equipment — Cisco routers and switches, Peplink load balancers and Riverbed WAN optimizers — for a telecommunications provider under nationwide 24×7×4-hour coverage.', tags: ['Multi-vendor', '24×7×4hr SLA'] },
-        { ico: 'fa-oil-well', ind: 'Oil & Gas', body: 'As sole vendor we ran three concurrent transformation projects for an oil & gas company — Active Directory migration, Windows OS upgrades and nationwide BitLocker encryption for 30,000 end-users — delivered within six months.', tags: ['30,000 endpoints', '6 months'] },
-        { ico: 'fa-landmark', ind: 'Government', body: 'As an Authorised Support Partner (ASP) we deliver warranty and out-of-warranty hardware support for a government PC-leasing programme, with on-site field support plus walk-in service across 18 nationwide centres.', tags: ['ASP', '18 centres'] },
-        { ico: 'fa-photo-film', ind: 'Media & Broadcasting', body: 'We maintain mission-critical video and voice encoder/decoder infrastructure for a Malaysian media provider under a 24×7×4-hour SLA, keeping broadcast operations live nationwide.', tags: ['Video / Voice', '24×7×4hr SLA'] }
+      var PF_FEATURE = {
+        ind: 'Banking',
+        metric: '25,000', plus: '+', unit: 'nodes maintained nationwide',
+        body: 'Principal contract maintenance under an 8×5×2-hour SLA for a major Malaysian bank’s daily support and maintenance — an overall total of about 25,000 nodes across the country.',
+        img: img('5203849', 1400)
+      };
+      var PF_ROWS = [
+        { ind: 'Retail', n: '2,500', u: 'outlets', line: '24×7×4-hour support keeping POS, outlet servers, networking and WiFi live every day of the year.' },
+        { ind: 'Oil & Gas', n: '30,000', u: 'endpoints', line: 'AD migration, Windows upgrades and nationwide BitLocker encryption delivered as sole vendor in six months.' },
+        { ind: 'Telecommunications', n: 'Multi', u: 'vendor', line: 'Cisco routers and switches, Peplink load balancers and Riverbed WAN optimizers under 24×7×4 coverage.' },
+        { ind: 'Government', n: '18', u: 'centres', line: 'Authorised Support Partner warranty and out-of-warranty hardware support — walk-in plus on-site field service.' },
+        { ind: 'Media & Broadcasting', n: '24×7×4', u: 'SLA', line: 'Mission-critical video and voice encoder / decoder infrastructure kept live for a national broadcaster.' }
       ];
-      var proofCards = PROOF.map(function (p) {
-        var tags = p.tags.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
-        return '<article class="tm-card reveal">' +
-          '<div class="tm-head"><span class="tm-ico" aria-hidden="true"><i class="fa-solid ' + p.ico + '"></i></span>' +
-          '<span class="tm-industry">' + esc(p.ind) + '</span></div>' +
-          '<p class="tm-body">' + esc(p.body) + '</p>' +
-          '<div class="tm-metrics">' + tags + '</div></article>';
+      var pfRows = PF_ROWS.map(function (r) {
+        return '<div class="pf-row reveal">' +
+          '<div class="pf-num">' + esc(r.n) + '<span class="u">' + esc(r.u) + '</span></div>' +
+          '<div class="pf-ind">' + esc(r.ind) + '</div>' +
+          '<div class="pf-line">' + esc(r.line) + '</div>' +
+        '</div>';
       }).join('');
       var proofHTML =
-        '<section class="tm-section" data-nav-accent="casestudy" aria-labelledby="proofTitle"><div class="wrap">' +
-          '<div class="tm-head-center reveal">' +
-            '<div class="tm-kicker">Client proof</div>' +
-            '<h2 class="tm-title" id="proofTitle">Proven across industries</h2>' +
-            '<p class="tm-sub">Anonymized, industry-labelled engagements drawn straight from our published case studies — factual scope delivered for clients across Malaysia, not marketing quotes.</p>' +
+        '<section class="proof2-section" data-nav-accent="casestudy" aria-labelledby="proofTitle"><div class="wrap">' +
+          '<div class="sec-intro reveal">' +
+            '<div>' +
+              '<div class="si-index">Client proof · 6 engagements</div>' +
+              '<h2 id="proofTitle">Proven across<br>Malaysian industry.</h2>' +
+            '</div>' +
+            '<p class="si-lede">Anonymized, industry-labelled engagements drawn straight from our published case studies — factual scope delivered for clients nationwide, not marketing quotes.</p>' +
           '</div>' +
-          '<div class="tm-grid">' + proofCards + '</div>' +
+          '<div class="proof2-grid">' +
+            '<article class="pf-feature reveal" data-px="0.13" style="--px-img:url(' + PF_FEATURE.img + ')">' +
+              '<span class="pf-eyebrow">' + esc(PF_FEATURE.ind) + ' · flagship account</span>' +
+              '<div class="pf-metric">' + esc(PF_FEATURE.metric) + '<span>' + esc(PF_FEATURE.plus) + '</span></div>' +
+              '<div class="pf-unit">' + esc(PF_FEATURE.unit) + '</div>' +
+              '<p class="pf-body">' + esc(PF_FEATURE.body) + '</p>' +
+            '</article>' +
+            '<div class="pf-ledger">' + pfRows + '</div>' +
+          '</div>' +
         '</div></section>';
 
       document.getElementById('app').innerHTML =
@@ -4555,7 +4650,22 @@
             '</div>' +
           '</div>' +
         '</section>' +
-        '<section class="i-body" data-nav-accent="casestudy"><div class="wrap">' + filterBar + cats + '</div></section>' +
+        '<section class="i-body" data-nav-accent="casestudy"><div class="wrap">' +
+          '<div class="sec-intro reveal">' +
+            '<div>' +
+              '<div class="si-index">01 · The case library</div>' +
+              '<h2>Fourteen engagements,<br>grouped by service line.</h2>' +
+            '</div>' +
+            '<p class="si-lede">Each group opens with a featured account, then the supporting work beneath it. Filter by industry to jump straight to the sector you care about.</p>' +
+          '</div>' +
+          filterBar + cats + '</div></section>' +
+        '<section class="px-band" data-nav-accent="casestudy" data-px="0.16" style="--px-img:url(' + img('3182812', 1600) + '); --px-tint:linear-gradient(112deg, rgba(8,14,23,.93) 0%, rgba(8,14,23,.68) 52%, rgba(10,17,29,.9) 100%)">' +
+          '<div class="wrap">' +
+            '<div class="pb-kicker">Outcomes, not adjectives</div>' +
+            '<div class="pb-statement">Fourteen engagements. <em>One standard.</em> Measurable results.</div>' +
+            '<p class="pb-sub">From nationwide banking infrastructure to disaster-recovery call centres — every engagement below is documented by the numbers it moved, not the words around them.</p>' +
+          '</div>' +
+        '</section>' +
         proofHTML;
 
       document.title = 'Case Studies — HPE Solutions Sdn Bhd';
@@ -4988,6 +5098,37 @@
           });
         });
       }
+    })();
+  </script>
+
+  <!-- Viewport-relative section parallax. Unlike the hero engine (absolute
+       scrollY, top-of-page only), this measures each [data-px] layer against
+       the viewport centre, so mid-page bands and the featured proof card
+       parallax correctly as they pass through. Bounded, rAF-throttled, passive,
+       reduced-motion aware. -->
+  <script>
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+      var layers = [], vh = window.innerHeight, ticking = false;
+      function collect() { layers = [].slice.call(document.querySelectorAll('[data-px]')); }
+      function apply() {
+        ticking = false;
+        for (var i = 0; i < layers.length; i++) {
+          var el = layers[i], r = el.getBoundingClientRect();
+          if (r.bottom < -200 || r.top > vh + 200) continue;
+          var mid = r.top + r.height / 2;
+          var frac = (mid - vh / 2) / (vh + r.height);
+          var k = parseFloat(el.getAttribute('data-px')) || 0.12;
+          var range = parseFloat(el.getAttribute('data-px-range')) || k * 300;
+          el.style.setProperty('--py', (-frac * range).toFixed(1) + 'px');
+        }
+      }
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () { vh = window.innerHeight; collect(); apply(); }, { passive: true });
+      window.__pxCollect = function () { collect(); apply(); };
+      collect(); apply();
     })();
   </script>
 
