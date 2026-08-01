@@ -20,7 +20,7 @@
     })();
   </script>
 
-  <title>HPE Solutions Sdn Bhd – Malaysia's IT Support & Managed Services</title>
+  <title>HPE Solutions Sdn Bhd - Malaysia's IT Support & Managed Services</title>
 
   <meta name="description"
     content="More than 10 years in IT Support and Managed Services • 18 Support Centers Nationwide • 70 Experienced Professional Support Staff" />
@@ -45,7 +45,7 @@
 
   <meta property="og:site_name" content="HPE Solutions Sdn Bhd" />
 
-  <meta property="og:title" content="HPE Solutions Sdn Bhd – Malaysia's IT Support & Managed Services" />
+  <meta property="og:title" content="HPE Solutions Sdn Bhd - Malaysia's IT Support & Managed Services" />
 
   <meta property="og:description"
     content="More than 10 years in IT Support and Managed Services • 18 Support Centers Nationwide • 70 Experienced Professional Support Staff" />
@@ -56,7 +56,7 @@
 
   <meta name="twitter:card" content="summary_large_image" />
 
-  <meta name="twitter:title" content="HPE Solutions Sdn Bhd – Malaysia's IT Support & Managed Services" />
+  <meta name="twitter:title" content="HPE Solutions Sdn Bhd - Malaysia's IT Support & Managed Services" />
 
   <meta name="twitter:description"
     content="More than 10 years in IT Support and Managed Services • 18 Support Centers Nationwide • 70 Experienced Professional Support Staff" />
@@ -13766,6 +13766,65 @@
       background: linear-gradient(to top, rgba(232, 103, 14, .9) 0%, rgba(6, 10, 18, .62) 52%, rgba(6, 10, 18, .12) 100%);
     }
 
+    /* ── The "View More" index CTA ──────────────────────────────────────────
+       Same footprint, radius, shadow and inner skeleton as a real case card so
+       the row stays even, but it carries no --ct photo. ::before therefore
+       renders brand gradient instead of a stock shot, which is what separates
+       an action cell from a content cell without breaking the shape system.
+       Like the photo cards, it keeps one treatment in both themes. */
+    .cs-home-more {
+      text-decoration: none;
+      color: inherit;
+      box-shadow: inset 0 0 0 1px rgba(255, 125, 26, .34), var(--shadow);
+    }
+
+    .cs-home-more::before {
+      background-image: none;
+      background-color: #10192a;
+      /* faint diagonal sheen so the flat cell still has some material to it */
+      background-image:
+        radial-gradient(120% 90% at 18% 8%, rgba(244, 121, 32, .34) 0%, rgba(244, 121, 32, 0) 62%),
+        linear-gradient(145deg, rgba(255, 255, 255, .06) 0%, rgba(255, 255, 255, 0) 44%);
+      filter: none;
+      transform: none;
+    }
+
+    .cs-home-more::after {
+      background: linear-gradient(to top, rgba(8, 13, 23, .9) 0%, rgba(8, 13, 23, .58) 46%, rgba(8, 13, 23, .3) 100%);
+    }
+
+    .cs-home-more:hover {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 125, 26, .78),
+        0 34px 64px -20px rgba(0, 0, 0, .88);
+    }
+
+    /* the CTA warms up rather than "developing" like a photograph */
+    .cs-home-more:hover::before {
+      filter: none;
+      transform: none;
+      background-image:
+        radial-gradient(120% 95% at 18% 6%, rgba(244, 121, 32, .5) 0%, rgba(244, 121, 32, 0) 66%),
+        linear-gradient(145deg, rgba(255, 255, 255, .09) 0%, rgba(255, 255, 255, 0) 46%);
+    }
+
+    .cs-home-more:hover::after {
+      background: linear-gradient(to top, rgba(244, 121, 32, .5) 0%, rgba(8, 13, 23, .5) 58%, rgba(8, 13, 23, .2) 100%);
+    }
+
+    .cs-home-more .cs-home-thumb {
+      background: rgba(244, 121, 32, .18);
+      box-shadow: inset 0 0 0 1px rgba(255, 125, 26, .4);
+    }
+
+    .cs-home-more .cs-home-arrow {
+      color: var(--orange);
+    }
+
+    .cs-home-more:hover .cs-home-arrow {
+      transform: translateX(5px);
+    }
+
     /* bigger frosted icon chip with a playful tilt on hover */
     .cs-home-thumb {
       width: 48px;
@@ -15042,7 +15101,7 @@
 
     <div class="topbar-right">
 
-      <span><i class="fa-solid fa-clock"></i> Mon–Fri: 9am–6pm &nbsp;|&nbsp; Emergency: 24/7</span>
+      <span><i class="fa-solid fa-clock"></i> Mon-Fri: 9am-6pm &nbsp;|&nbsp; Emergency: 24/7</span>
 
       <span><i class="fa-solid fa-location-dot"></i> Puchong, Selangor</span>
 
@@ -15263,7 +15322,7 @@
 
       <h1>IT Support Across <span>All of Malaysia</span></h1>
 
-      <p>Managed services, hardware deployment, helpdesk, and on-site engineers — with 24/7 response from 18 service
+      <p>Managed services, hardware deployment, helpdesk, and on-site engineers, with 24/7 response from 18 service
         centres.</p>
 
       <div class="hero-btns">
@@ -15716,8 +15775,6 @@
 
     <div style="text-align:center; margin-bottom:52px;" data-parallax="0.18">
 
-      <div class="section-tag" style="justify-content:center;">What We Offer</div>
-
       <h2 class="section-title svcc-rise" data-no-tw>What We Do</h2>
 
       <!-- Glowing orange line directly under the title. An SVG line with a
@@ -15757,7 +15814,7 @@
 
     </div>
 
-    <div class="svc-carousel" role="group" aria-roledescription="carousel" aria-label="What we do — our services. Use the left and right arrow keys to browse.">
+    <div class="svc-carousel" role="group" aria-roledescription="carousel" aria-label="What we do, our services. Use the left and right arrow keys to browse.">
 
       <!-- Visually-hidden live region: announces the centred service to screen readers. -->
       <p class="svcc-live" aria-live="polite" aria-atomic="true"></p>
@@ -15834,7 +15891,7 @@
 
           <h3><i class="fa-solid fa-headset"></i> IT Helpdesk</h3>
 
-          <p>Managed helpdesk — remote and on-site.</p>
+          <p>Managed helpdesk, remote and on-site.</p>
 
           <span class="service-link">Learn More <i class="fa-solid fa-arrow-right fa-sm"></i></span>
 
@@ -15958,7 +16015,7 @@
 
       <div class="svcc-dots" id="svccDots" role="tablist" aria-label="Choose a service"></div>
 
-      <p class="svcc-hint"><i class="fa-solid fa-hand-pointer"></i> Drag or use the arrows — tap a card to select it, tap again to open</p>
+      <p class="svcc-hint"><i class="fa-solid fa-hand-pointer"></i> Drag or use the arrows. Tap a card to select it, tap again to open</p>
 
     </div><!-- /svc-carousel -->
 
@@ -15974,8 +16031,6 @@
     <div class="why-grid">
 
       <div>
-
-        <div class="section-tag">Why Choose HPE</div>
 
         <h2 class="section-title st-lg" data-em="Stay">Why Companies Stay With Us</h2>
 
@@ -16089,8 +16144,6 @@
 
   <section class="industries">
 
-    <div class="section-tag">Industries Served</div>
-
     <h2 class="section-title" data-em="Industries">Industries We Support</h2>
 
     <p class="section-sub">Clients in banking, retail, telecommunications, government, and manufacturing.</p>
@@ -16173,8 +16226,6 @@
 
     <div class="proc-head" data-parallax="0.16" style="text-align:center; margin-bottom: 56px;">
 
-      <div class="section-tag" style="justify-content:center;">How It Works</div>
-
       <h2 class="section-title">Simple, Transparent Process</h2>
 
       <p class="section-sub" style="margin: 0 auto;">From first contact to ongoing support.</p>
@@ -16255,383 +16306,155 @@
 
       <h2 class="section-title" data-em="Projects">Client Projects</h2>
 
-      <p class="section-sub" style="margin:0 auto;">14 completed engagements across banking, retail, telco, and
-        government. Click any project for details.</p>
+      <p class="section-sub" style="margin:0 auto;">A selection from 14 completed engagements across banking, retail,
+        telco, and government. Click any project for details.</p>
 
     </div>
 
 
 
-    <!-- ── IT MANAGEMENT & SUPPORT ── -->
+    <!-- The homepage shows a curated 5, spanning all four service lines
+         (management, deployment, helpdesk, sourcing) and five industries; the
+         full 14-project index lives on case-study.html. Six cells total (the 5
+         plus the View More CTA) divide evenly into the 6-column desktop track
+         (3+3) and the 2-column tablet track (2+2+2), so no orphan cell is left
+         and .cs-grid-5 is no longer needed here. -->
 
-    <div class="cs-home-category">
+    <div class="cs-home-grid px-drift" data-parallax="0.16">
 
-      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i
-          class="fa-solid fa-server"></i> IT Management &amp; Support<i
-          class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
+      <div class="cs-home-card" onclick="location.href='case-study.html?case=banking-mgmt'"
+        style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
-      <!-- 5 cards: the trailing pair widens to span 3 so the row closes -->
-      <div class="cs-home-grid cs-grid-5 px-drift" data-parallax="0.16">
+        <span class="cs-accent" aria-hidden="true"></span>
 
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=banking-mgmt'"
-          style="--ct:url('https://images.pexels.com/photos/5203849/pexels-photo-5203849.jpeg?auto=compress&cs=tinysrgb&w=600')">
+        <div class="cs-home-thumb"><i class="fa-solid fa-building-columns"></i></div>
 
-          <span class="cs-accent" aria-hidden="true"></span>
+        <div class="cs-home-info">
 
-          <div class="cs-home-thumb"><i class="fa-solid fa-building-columns"></i></div>
+          <div class="cs-home-industry">Banking</div>
 
-          <div class="cs-home-info">
+          <h4>Nationwide IT Infrastructure Maintenance</h4>
 
-            <div class="cs-home-industry">Banking</div>
-
-            <h4>Nationwide IT Infrastructure Maintenance</h4>
-
-            <div class="cs-home-metrics"><span>25,000 Nodes</span><span>8×5×2hr SLA</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
+          <div class="cs-home-metrics"><span>25,000 Nodes</span><span>8×5×2hr SLA</span></div>
 
         </div>
 
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=retail-mgmt'"
-          style="--ct:url('https://images.pexels.com/photos/33690927/pexels-photo-33690927.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-cart-shopping"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Retail</div>
-
-            <h4>Retail Outlet 24/7 IT Support</h4>
-
-            <div class="cs-home-metrics"><span>2,500 Outlets</span><span>24×7×4hr SLA</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=telco-mgmt'"
-          style="--ct:url('https://images.pexels.com/photos/5550905/pexels-photo-5550905.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-tower-broadcast"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Telecommunications
-
-            </div>
-
-            <h4>Telco Network Equipment Maintenance</h4>
-
-            <div class="cs-home-metrics"><span>Multi-Vendor</span><span>24×7×4hr SLA</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=media-mgmt'"
-          style="--ct:url('https://images.pexels.com/photos/7865064/pexels-photo-7865064.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-photo-film"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Media / Broadcasting
-
-            </div>
-
-            <h4>Media &amp; Broadcasting Infrastructure</h4>
-
-            <div class="cs-home-metrics"><span>24×7×4hr SLA</span><span>Video/Voice</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=airline-mgmt'"
-          style="--ct:url('https://images.pexels.com/photos/3140204/pexels-photo-3140204.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-plane"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Airlines /
-
-              Hospitality</div>
-
-            <h4>Airline Wireless &amp; Broadband Support</h4>
-
-            <div class="cs-home-metrics"><span>24×7×4hr SLA</span><span>Always-On</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
+        <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
 
       </div>
 
-    </div>
+      <div class="cs-home-card" onclick="location.href='case-study.html?case=retail-mgmt'"
+        style="--ct:url('https://images.pexels.com/photos/33690927/pexels-photo-33690927.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+        <span class="cs-accent" aria-hidden="true"></span>
 
+        <div class="cs-home-thumb"><i class="fa-solid fa-cart-shopping"></i></div>
 
-    <!-- ── PROJECT DEPLOYMENT ── -->
+        <div class="cs-home-info">
 
-    <div class="cs-home-category">
+          <div class="cs-home-industry">Retail</div>
 
-      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i
-          class="fa-solid fa-diagram-project"></i> Project Deployment<i
-          class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
+          <h4>Retail Outlet 24/7 IT Support</h4>
 
-      <div class="cs-home-grid px-drift" data-parallax="0.16">
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=banking-deploy'"
-          style="--ct:url('https://images.pexels.com/photos/3755700/pexels-photo-3755700.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-building-columns"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Banking</div>
-
-            <h4>Large-Scale OS Migration &amp; Asset Management</h4>
-
-            <div class="cs-home-metrics"><span>25,000+ Devices</span><span>2 Countries</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
+          <div class="cs-home-metrics"><span>2,500 Outlets</span><span>24×7×4hr SLA</span></div>
 
         </div>
 
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=oilgas-deploy'"
-          style="--ct:url('https://images.pexels.com/photos/4883682/pexels-photo-4883682.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-oil-well"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Oil &amp; Gas</div>
-
-            <h4>AD Migration &amp; Security Encryption</h4>
-
-            <div class="cs-home-metrics"><span>30,000 Encrypted</span><span>6 Months</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=govt-deploy'"
-          style="--ct:url('https://images.pexels.com/photos/14608504/pexels-photo-14608504.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-landmark"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Government</div>
-
-            <h4>Asset Management &amp; Preventive Maintenance</h4>
-
-            <div class="cs-home-metrics"><span>Full Inventory</span><span>AV + Patches</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
+        <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
 
       </div>
 
-    </div>
+      <div class="cs-home-card" onclick="location.href='case-study.html?case=oilgas-deploy'"
+        style="--ct:url('https://images.pexels.com/photos/4883682/pexels-photo-4883682.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+        <span class="cs-accent" aria-hidden="true"></span>
 
+        <div class="cs-home-thumb"><i class="fa-solid fa-oil-well"></i></div>
 
-    <!-- ── HELPDESK + WARRANTY ── -->
+        <div class="cs-home-info">
 
-    <div class="cs-home-category">
+          <div class="cs-home-industry">Oil &amp; Gas</div>
 
-      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i
-          class="fa-solid fa-headset"></i> IT Helpdesk &amp; Warranty<i
-          class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
+          <h4>AD Migration &amp; Security Encryption</h4>
 
-      <div class="cs-home-grid px-drift" data-parallax="0.16">
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=tech-helpdesk'"
-          style="--ct:url('https://images.pexels.com/photos/7709297/pexels-photo-7709297.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-oil-well"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Technology / Oil
-
-              &amp; Gas</div>
-
-            <h4>Corporate Helpdesk Operations</h4>
-
-            <div class="cs-home-metrics"><span>Dedicated Team</span><span>IVR + SLA Reports</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
+          <div class="cs-home-metrics"><span>30,000 Encrypted</span><span>6 Months</span></div>
 
         </div>
 
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=telco-helpdesk'"
-          style="--ct:url('https://images.pexels.com/photos/7709091/pexels-photo-7709091.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-tower-broadcast"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Telecommunications
-
-            </div>
-
-            <h4>Disaster Recovery Call Centre</h4>
-
-            <div class="cs-home-metrics"><span>24/7 DR Standby</span><span>Full BCP</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=govt-warranty'"
-          style="--ct:url('https://images.pexels.com/photos/12741843/pexels-photo-12741843.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-shield-halved"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Government</div>
-
-            <h4>Government PC Leasing Warranty Support</h4>
-
-            <div class="cs-home-metrics"><span>18 Walk-In Centres</span><span>Nationwide</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
+        <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
 
       </div>
 
-    </div>
+      <div class="cs-home-card" onclick="location.href='case-study.html?case=telco-helpdesk'"
+        style="--ct:url('https://images.pexels.com/photos/7709091/pexels-photo-7709091.jpeg?auto=compress&cs=tinysrgb&w=600')">
 
+        <span class="cs-accent" aria-hidden="true"></span>
 
+        <div class="cs-home-thumb"><i class="fa-solid fa-tower-broadcast"></i></div>
 
-    <!-- ── IT STAFFING + TOTAL SOLUTION ── -->
+        <div class="cs-home-info">
 
-    <div class="cs-home-category">
+          <div class="cs-home-industry">Telecommunications</div>
 
-      <div class="cs-home-cat-label" role="button" tabindex="0" aria-expanded="false" onclick="toggleCsCat(this)"><i
-          class="fa-solid fa-users"></i> IT Staffing &amp; Total Solutions<i
-          class="fa-solid fa-chevron-down cs-cat-chevron"></i></div>
+          <h4>Disaster Recovery Call Centre</h4>
 
-      <div class="cs-home-grid px-drift" data-parallax="0.16">
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=staffing'"
-          style="--ct:url('https://images.pexels.com/photos/8872441/pexels-photo-8872441.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-briefcase"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Oil &amp; Gas ·
-
-              Logistics · Retail · Automotive</div>
-
-            <h4>Multi-Sector IT Staffing Solutions</h4>
-
-            <div class="cs-home-metrics"><span>4+ Industries</span><span>All Levels</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
+          <div class="cs-home-metrics"><span>24/7 DR Standby</span><span>Full BCP</span></div>
 
         </div>
 
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=healthcare-solution'"
-          style="--ct:url('https://images.pexels.com/photos/13176452/pexels-photo-13176452.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-hospital"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Healthcare</div>
-
-            <h4>Healthcare Digital Transformation</h4>
-
-            <div class="cs-home-metrics"><span>End-to-End Sourcing</span><span>Digital Transformation</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
-
-        <div class="cs-home-card" onclick="location.href='case-study.html?case=multisector-solution'"
-          style="--ct:url('https://images.pexels.com/photos/6466141/pexels-photo-6466141.jpeg?auto=compress&cs=tinysrgb&w=600')">
-
-          <span class="cs-accent" aria-hidden="true"></span>
-
-          <div class="cs-home-thumb"><i class="fa-solid fa-industry"></i></div>
-
-          <div class="cs-home-info">
-
-            <div class="cs-home-industry">Telco · Banking ·
-
-              Healthcare · Manufacturing · Logistics · Education</div>
-
-            <h4>Multi-Sector IT Sourcing &amp; Infrastructure</h4>
-
-            <div class="cs-home-metrics"><span>6+ Industries</span><span>Single Vendor</span></div>
-
-          </div>
-
-          <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
-
-        </div>
+        <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
 
       </div>
 
+      <div class="cs-home-card" onclick="location.href='case-study.html?case=healthcare-solution'"
+        style="--ct:url('https://images.pexels.com/photos/13176452/pexels-photo-13176452.jpeg?auto=compress&cs=tinysrgb&w=600')">
+
+        <span class="cs-accent" aria-hidden="true"></span>
+
+        <div class="cs-home-thumb"><i class="fa-solid fa-hospital"></i></div>
+
+        <div class="cs-home-info">
+
+          <div class="cs-home-industry">Healthcare</div>
+
+          <h4>Healthcare Digital Transformation</h4>
+
+          <div class="cs-home-metrics"><span>End-to-End Sourcing</span><span>Digital Transformation</span></div>
+
+        </div>
+
+        <i class="fa-solid fa-chevron-right cs-home-arrow"></i>
+
+      </div>
+
+      <!-- The index CTA. Carries .cs-home-card so every engine that binds to
+           that selector (fold-up reveal, magnetic hover, liquid-glass sheen,
+           signature cursor) picks it up unchanged; .cs-home-more only restyles
+           it. A real anchor rather than an onclick div: it is keyboard-focusable,
+           and the nav-search indexer reads onclick, so the CTA stays out of the
+           case-study search results. -->
+      <a class="cs-home-card cs-home-more" href="case-study.html">
+
+        <span class="cs-accent" aria-hidden="true"></span>
+
+        <div class="cs-home-thumb"><i class="fa-solid fa-layer-group"></i></div>
+
+        <div class="cs-home-info">
+
+          <div class="cs-home-industry">All Industries</div>
+
+          <h4>View More Case Studies</h4>
+
+          <div class="cs-home-metrics"><span>14 Engagements</span><span>Full Index</span></div>
+
+        </div>
+
+        <i class="fa-solid fa-arrow-right cs-home-arrow"></i>
+
+      </a>
+
     </div>
+
 
   </section>
 
@@ -16763,10 +16586,21 @@
         var t = a.querySelector('.mi-tx strong');
         if (t) add(t.textContent, a.getAttribute('href'), 'Service', 'fa-screwdriver-wrench');
       });
-      document.querySelectorAll('.cs-home-card').forEach(function (c) {
-        var h4 = c.querySelector('.cs-home-info h4'), oc = c.getAttribute('onclick') || '', m = oc.match(/'([^']+)'/);
-        if (h4 && m) add(h4.textContent, m[1], 'Case study', 'fa-file-lines');
-      });
+      // Case studies come from CS_DATA, not the DOM: the homepage grid only
+      // shows a curated 5, but all 14 must stay findable in search. Falls back
+      // to the rendered cards if CS_DATA has not parsed for any reason. The
+      // View More CTA is an anchor with no onclick, so it never self-indexes.
+      if (window.CS_DATA) {
+        Object.keys(window.CS_DATA).forEach(function (id) {
+          var d = window.CS_DATA[id];
+          if (d && d.title) add(d.title, 'case-study.html?case=' + id, 'Case study', d.icon || 'fa-file-lines');
+        });
+      } else {
+        document.querySelectorAll('.cs-home-card').forEach(function (c) {
+          var h4 = c.querySelector('.cs-home-info h4'), oc = c.getAttribute('onclick') || '', m = oc.match(/'([^']+)'/);
+          if (h4 && m) add(h4.textContent, m[1], 'Case study', 'fa-file-lines');
+        });
+      }
 
       var activeIdx = -1;
 
@@ -16959,8 +16793,6 @@
     <canvas class="centers-fx" aria-hidden="true"></canvas>
 
     <div style="text-align:center; margin-bottom:40px;">
-
-      <div class="section-tag" style="justify-content:center;">Service Centers</div>
 
       <h2 class="section-title">Countrywide Service &amp; Support Coverage</h2>
 
@@ -17492,8 +17324,6 @@
 
     <div style="text-align:center; margin-bottom:44px;">
 
-      <div class="section-tag" style="justify-content:center;">Business Partners</div>
-
       <h2 class="section-title" data-em="Partners">Our Business Partners</h2>
 
       <p class="section-sub" style="margin:0 auto;">Authorised partner for leading global tech brands.</p>
@@ -17760,11 +17590,11 @@
 
               <div class="ci-value">
 
-                <a href="mailto:sales@hpe.com.my">sales@hpe.com.my</a> — Sales &amp; Marketing<br>
+                <a href="mailto:sales@hpe.com.my">sales@hpe.com.my</a> - Sales &amp; Marketing<br>
 
-                <a href="mailto:support@hpe.com.my">support@hpe.com.my</a> — Technical Support<br>
+                <a href="mailto:support@hpe.com.my">support@hpe.com.my</a> - Technical Support<br>
 
-                <a href="mailto:hr@hpe.com.my">hr@hpe.com.my</a> — HR / Vacancy
+                <a href="mailto:hr@hpe.com.my">hr@hpe.com.my</a> - HR / Vacancy
 
               </div>
 
@@ -17778,9 +17608,9 @@
 
           <h4><i class="fa-solid fa-clock" style="color:var(--orange);margin-right:6px;"></i>Support Hours</h4>
 
-          <div class="hours-row"><strong>Monday – Friday</strong><span>9:00 AM – 6:00 PM</span></div>
+          <div class="hours-row"><strong>Monday - Friday</strong><span>9:00 AM - 6:00 PM</span></div>
 
-          <div class="hours-row"><strong>Saturday</strong><span>9:00 AM – 1:00 PM</span></div>
+          <div class="hours-row"><strong>Saturday</strong><span>9:00 AM - 1:00 PM</span></div>
 
           <div class="hours-row"><strong>Sunday &amp; Public Holidays</strong><span>Closed</span></div>
 
@@ -17856,7 +17686,7 @@
 
             <select id="fservice">
 
-              <option value="">— Select a service —</option>
+              <option value="">Select a service</option>
 
               <option>IT Support &amp; Managed Services</option>
 
@@ -18020,9 +17850,9 @@
 
           <p style="font-size:13px;line-height:2;color:rgba(255,255,255,.6);">
 
-            <i class="fa-regular fa-clock" style="color:var(--orange);margin-right:4px;"></i>Mon–Fri: 9am – 6pm<br>
+            <i class="fa-regular fa-clock" style="color:var(--orange);margin-right:4px;"></i>Mon-Fri: 9am - 6pm<br>
 
-            <i class="fa-regular fa-clock" style="color:var(--orange);margin-right:4px;"></i>Sat: 9am – 1pm<br>
+            <i class="fa-regular fa-clock" style="color:var(--orange);margin-right:4px;"></i>Sat: 9am - 1pm<br>
 
             <i class="fa-solid fa-circle-exclamation" style="color:var(--orange);margin-right:4px;"></i>Emergency: 24/7
 
@@ -18036,7 +17866,7 @@
 
     <div class="footer-bottom">
 
-      <span>© 2011–2026 HPE Solutions (M) Sdn Bhd — All Rights Reserved</span>
+      <span>© 2011-2026 HPE Solutions (M) Sdn Bhd. All Rights Reserved</span>
 
       <div style="display:flex;gap:20px;">
 
@@ -18154,7 +17984,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-lightbulb"></i> Solution</div>
 
-                <p>Contractual Maintenance (8×5×2Hrs) providing daily support for live systems — servers, desktops,
+                <p>Contractual Maintenance (8×5×2Hrs) providing daily support for live systems: servers, desktops,
 
                   laptops, printers, network devices, and application support.</p>
 
@@ -18332,7 +18162,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-lightbulb"></i> Solution</div>
 
-                <p>24×7×4-hour maintenance support for video and voice encoder/decoder equipment — ensuring broadcast
+                <p>24×7×4-hour maintenance support for video and voice encoder/decoder equipment, ensuring broadcast
 
                   continuity with minimal downtime.</p>
 
@@ -18497,7 +18327,7 @@
 
               <div>
 
-                <h3>Oil &amp; Gas — AD Migration &amp; Security Encryption</h3>
+                <h3>Oil &amp; Gas: AD Migration &amp; Security Encryption</h3>
 
                 <span class="cs-industry-badge">Oil &amp;
 
@@ -18738,7 +18568,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-lightbulb"></i> Solution</div>
 
-                <p>Dedicated manpower deployed to operate corporate helpdesk facilities — covering agent staffing, team
+                <p>Dedicated manpower deployed to operate corporate helpdesk facilities, covering agent staffing, team
 
                   leadership, telephony IVR, and regular SLA reporting.</p>
 
@@ -18800,7 +18630,7 @@
 
                 <p>HPE Solutions managed and staffed a disaster recovery call centre, ready to take over complete call
 
-                  centre functionality at any point — including staffing, IVR routing, and performance monitoring.</p>
+                  centre functionality at any point, including staffing, IVR routing, and performance monitoring.</p>
 
               </div>
 
@@ -18859,7 +18689,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-user-tie"></i> Long-Term Staffing</div>
 
-                <p>Oil &amp; gas, logistics, conglomerate, and technology providers — ongoing senior/junior IT engineers
+                <p>Oil &amp; gas, logistics, conglomerate, and technology providers, with ongoing senior/junior IT engineers
 
                   for in-house daily operations support.</p>
 
@@ -18869,7 +18699,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-clock-rotate-left"></i> Short-Term &amp; Backfill</div>
 
-                <p>Oil &amp; gas clients — temporary IT staff covering daily BAU operations, emergency MC coverage, and
+                <p>Oil &amp; gas clients, with temporary IT staff covering daily BAU operations, emergency MC coverage, and
 
                   unexpected staff absences.</p>
 
@@ -18879,7 +18709,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-diagram-project"></i> Project-Based Resources</div>
 
-                <p>Automotive and home appliance sectors — IT engineers deployed for nationwide rollout and deployment
+                <p>Automotive and home appliance sectors, with IT engineers deployed for nationwide rollout and deployment
 
                   projects on a project-contract basis.</p>
 
@@ -18943,7 +18773,7 @@
 
                 <div class="cs-row-label"><i class="fa-solid fa-triangle-exclamation"></i> Challenge</div>
 
-                <p>A healthcare provider required a comprehensive IT partner to enable digital business transformation —
+                <p>A healthcare provider required a comprehensive IT partner to enable digital business transformation,
 
                   covering solutions, services, support, and procurement under one contract.</p>
 
@@ -18955,7 +18785,7 @@
 
                 <p>Complete IT sourcing engagement: hardware procurement, software licensing, network infrastructure,
 
-                  on-site support, and managed services — delivered as a unified solution.</p>
+                  on-site support, and managed services, delivered as a unified solution.</p>
 
               </div>
 
@@ -19043,7 +18873,7 @@
 
         <h3>Want Similar Results for Your Business?</h3>
 
-        <p>Talk to our team — we'll map the right solution to your IT challenges.</p>
+        <p>Talk to our team. We'll map the right solution to your IT challenges.</p>
 
         <a href="#contact" class="btn-orange"
           onclick="closeCasePage();setTimeout(function(){var ct=document.getElementById('contact');if(ct)window.scrollTo({top:ct.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});},430);return false;">
@@ -19187,7 +19017,7 @@
 
         <div class="cb-title">HPE Assistant</div>
 
-        <div class="cb-status" id="cbStatus"><span class="cb-status-txt">Online — typically replies instantly</span></div>
+        <div class="cb-status" id="cbStatus"><span class="cb-status-txt">Online, typically replies instantly</span></div>
 
       </div>
 
@@ -19237,7 +19067,7 @@
 
     <!-- SR-only description for #chatInput: explains the ghost-suggestion Tab affordance -->
 
-    <span id="chatGhostHint" class="cb-sr">A suggested question is shown as faint hint text in the box. Press Tab, or activate the Tab button, to fill it in for editing — it is not sent automatically.</span>
+    <span id="chatGhostHint" class="cb-sr">A suggested question is shown as faint hint text in the box. Press Tab, or activate the Tab button, to fill it in for editing. It is not sent automatically.</span>
 
   </div>
 
@@ -19282,7 +19112,7 @@
 
     <h3 class="exit-title">Get a free 15-minute IT consultation</h3>
 
-    <p class="exit-text">Talk to our team about your setup — or get practical monthly IT tips in your inbox.</p>
+    <p class="exit-text">Talk to our team about your setup, or get practical monthly IT tips in your inbox.</p>
 
     <form class="exit-form" id="exitForm" autocomplete="off">
 
@@ -19294,7 +19124,7 @@
 
     <a class="exit-cta" href="#contact">Book a consultation <i class="fa-solid fa-arrow-right"></i></a>
 
-    <div class="exit-done" id="exitDone" hidden>You're on the list — we'll be in touch shortly. 🎉</div>
+    <div class="exit-done" id="exitDone" hidden>You're on the list. We'll be in touch shortly. 🎉</div>
 
   </aside>
 
@@ -19424,27 +19254,27 @@
       var KB = [
         {
           k: ['service', 'services', 'offer', 'offering', 'what do you do', 'what can you do', 'solutions', 'provide'],
-          a: "We offer four core services:<br>• <strong>IT Support &amp; Managed Services</strong> — SLA-backed maintenance, on-site engineers<br>• <strong>Project Deployment</strong> — OS migration, rollouts, asset management<br>• <strong>IT Helpdesk</strong> — managed call-centre &amp; DR operations<br>• <strong>Authorised Warranty Provider (ASP)</strong> — on-site &amp; walk-in warranty<br>Which one would you like to know more about?"
+          a: "We offer four core services:<br>• <strong>IT Support &amp; Managed Services</strong>: SLA-backed maintenance, on-site engineers<br>• <strong>Project Deployment</strong>: OS migration, rollouts, asset management<br>• <strong>IT Helpdesk</strong>: managed call-centre &amp; DR operations<br>• <strong>Authorised Warranty Provider (ASP)</strong>: on-site &amp; walk-in warranty<br>Which one would you like to know more about?"
         },
         {
           k: ['managed', 'maintenance', 'sla', 'on-site', 'onsite', 'support contract', 'it support'],
-          a: "Our <strong>IT Support &amp; Managed Services</strong> run under strict SLAs — from <strong>8×5×2-hour</strong> to <strong>24×7×4-hour</strong> response — with fault ticketing, remote troubleshooting, on-site engineers and preventive maintenance, backed by 18 service centres nationwide."
+          a: "Our <strong>IT Support &amp; Managed Services</strong> run under strict SLAs, from <strong>8×5×2-hour</strong> to <strong>24×7×4-hour</strong> response, with fault ticketing, remote troubleshooting, on-site engineers and preventive maintenance, backed by 18 service centres nationwide."
         },
         {
           k: ['deploy', 'deployment', 'migration', 'rollout', 'os upgrade', 'project'],
-          a: "Our <strong>Project Deployment</strong> team handles large-scale rollouts — Windows OS migrations, Active Directory, SCCM, BitLocker encryption and asset management. We've deployed across 25,000+ and 30,000+ endpoint projects nationwide and cross-border."
+          a: "Our <strong>Project Deployment</strong> team handles large-scale rollouts: Windows OS migrations, Active Directory, SCCM, BitLocker encryption and asset management. We've deployed across 25,000+ and 30,000+ endpoint projects nationwide and cross-border."
         },
         {
           k: ['helpdesk', 'help desk', 'call center', 'call centre', 'ivr', 'disaster recovery', 'agent'],
-          a: "Our <strong>IT Helpdesk</strong> service gives you a fully staffed, SLA-governed call centre — team leads, trained agents, IVR routing and weekly performance reporting — including standby <strong>disaster-recovery</strong> call centres."
+          a: "Our <strong>IT Helpdesk</strong> service gives you a fully staffed, SLA-governed call centre with team leads, trained agents, IVR routing and weekly performance reporting, including standby <strong>disaster-recovery</strong> call centres."
         },
         {
           k: ['warranty', 'asp', 'walk-in', 'walk in', 'repair', 'out of warranty'],
-          a: "We're an <strong>Authorised Support Partner (ASP)</strong> for hardware &amp; software warranty — both on-site field support and <strong>walk-in service at all 18 centres</strong>, plus cost-effective out-of-warranty repairs."
+          a: "We're an <strong>Authorised Support Partner (ASP)</strong> for hardware &amp; software warranty, covering both on-site field support and <strong>walk-in service at all 18 centres</strong>, plus cost-effective out-of-warranty repairs."
         },
         {
           k: ['staffing', 'headcount', 'contract staff', 'technician', 'hire', 'resource'],
-          a: "Our <strong>IT Hardware Support Staffing</strong> provides IT headcount on long- or short-term contracts — matched to your required skillset, from junior technicians to senior engineers."
+          a: "Our <strong>IT Hardware Support Staffing</strong> provides IT headcount on long- or short-term contracts, matched to your required skillset, from junior technicians to senior engineers."
         },
         {
           k: ['location', 'where', 'address', 'office', 'centre', 'center', 'branch', 'hq', 'puchong', 'nationwide', 'map'],
@@ -19464,11 +19294,11 @@
         },
         {
           k: ['about', 'who are you', 'company', 'history', 'experience', 'years', 'since', 'established'],
-          a: "<strong>HPE Solutions Sdn Bhd</strong> is a Malaysian IT support &amp; managed-services company operating <strong>since 2011</strong> — 10+ years' experience, 18 service centres nationwide and ~70 professional support staff."
+          a: "<strong>HPE Solutions Sdn Bhd</strong> is a Malaysian IT support &amp; managed-services company operating <strong>since 2011</strong>, with 10+ years' experience, 18 service centres nationwide and ~70 professional support staff."
         },
         {
           k: ['industry', 'industries', 'sector', 'clients', 'client', 'customer', 'who do you work'],
-          a: "We serve <strong>banking, retail, telecommunications, media/broadcasting, oil &amp; gas, government and airlines/hospitality</strong> — from nationwide bank infrastructure to 2,500-outlet retail chains. Check the Industries and Case Studies sections for details."
+          a: "We serve <strong>banking, retail, telecommunications, media/broadcasting, oil &amp; gas, government and airlines/hospitality</strong>, from nationwide bank infrastructure to 2,500-outlet retail chains. Check the Industries and Case Studies sections for details."
         },
         {
           k: ['case study', 'case studies', 'example', 'portfolio', 'work', 'projects done', 'reference'],
@@ -19480,7 +19310,7 @@
         },
         {
           k: ['price', 'pricing', 'cost', 'how much', 'fee', 'budget', 'rate'],
-          a: "Pricing is tailored to your scope, SLA and site count. The quickest way to a quote is to email <a href='mailto:sales@hpe.com.my'>sales@hpe.com.my</a> or call <strong>+603 5888 9817</strong> — we'll put together a proposal for you."
+          a: "Pricing is tailored to your scope, SLA and site count. The quickest way to a quote is to email <a href='mailto:sales@hpe.com.my'>sales@hpe.com.my</a> or call <strong>+603 5888 9817</strong>. We'll put together a proposal for you."
         },
         {
           k: ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'greetings', 'yo'],
@@ -19578,7 +19408,7 @@
 
       /* Reflect real chat state in the header status line: "Typing…" while the
          bot composes, otherwise the resting "Online" string. */
-      var ONLINE_STATUS = 'Online — typically replies instantly';
+      var ONLINE_STATUS = 'Online, typically replies instantly';
       function setStatus(state) {
         if (!statusEl) return;
         var txt = statusEl.querySelector('.cb-status-txt') || statusEl;
@@ -20544,7 +20374,7 @@
 
         <p>Interested in ${s.title}?</p>
 
-        <span>Speak to our team — no commitment required.</span>
+        <span>Speak to our team. No commitment required.</span>
 
       </div>
 
