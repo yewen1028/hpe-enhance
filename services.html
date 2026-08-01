@@ -79,6 +79,13 @@
       --light: #0d1626; --surface: #111c2e; --surface-2: #16233a;
       --border: rgba(255, 255, 255, .09);
       --radius: 14px;
+      /* Radius hierarchy — intentional variety by element weight (not one soft
+         rounding everywhere): showcase generous, dense data crisp, sharp=square. */
+      --r-showcase: 22px;
+      --r-card: 14px;
+      --r-compact: 8px;
+      --r-data: 4px;
+      --r-sharp: 0px;
       --shadow: 0 26px 60px -24px rgba(0, 0, 0, .65);
       --nav-h: 68px;
     }
@@ -270,13 +277,15 @@
     .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
     .feat-card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px 26px; transition: transform .2s, border-color .2s, box-shadow .2s; }
     .feat-card:hover { transform: translateY(-4px); border-color: rgba(255, 125, 26, .4); box-shadow: var(--shadow); }
-    .feat-card .fc-ico { width: 46px; height: 46px; border-radius: 12px; background: var(--orange-l); color: var(--orange); display: grid; place-items: center; font-size: 18px; margin-bottom: 18px; }
+    .feat-card .fc-ico { width: 46px; height: 46px; border-radius: var(--r-data); background: var(--orange-l); color: var(--orange); display: grid; place-items: center; font-size: 18px; margin-bottom: 18px; }
     .feat-card h4 { color: var(--heading); font-size: 16.5px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
     .feat-card p { color: var(--muted); font-size: 14px; line-height: 1.62; }
 
     /* SLA grid */
     .sla-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; }
-    .sla-card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 26px 24px; }
+    /* SLA cards read like a spec sheet — deliberately square for a crisp,
+       technical data look that contrasts with the softer feature cards. */
+    .sla-card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sharp); padding: 26px 24px; }
     .sla-card.highlight { border-color: rgba(255, 125, 26, .5); background: linear-gradient(180deg, rgba(255, 125, 26, .13), var(--surface)); }
     .sla-card .tier { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--orange); font-weight: 800; }
     .sla-card .val { font-size: 24px; font-weight: 800; color: var(--heading); margin: 7px 0 8px; letter-spacing: -.01em; }
@@ -316,7 +325,10 @@
     /* INDEX */
     .i-hero .wrap { padding: 66px 0 clamp(80px, 10vw, 132px); }
     .i-eyebrow { color: var(--orange); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; margin-bottom: 18px; }
-    .i-title { font-size: clamp(34px, 6vw, 60px); font-weight: 800; letter-spacing: -.025em; line-height: 1.03; }
+    /* Hero headline is a weight-mix: supporting words sit light, the one key
+       word (.i-em) carries heavy weight — art-directed, not a flat bold line. */
+    .i-title { font-size: clamp(34px, 6vw, 60px); font-weight: 400; letter-spacing: -.025em; line-height: 1.03; }
+    .i-title .i-em { font-weight: 700; letter-spacing: -.04em; }
     /* Staggered headline load-in: each word starts hidden + nudged down and
        eases up on page load. JS wraps the words in .i-word spans and sets a
        per-word transition-delay, then adds .in on the next frame to play it.
@@ -4438,11 +4450,13 @@
          transition-delay so they stagger in on load. \n marks the line break. */
       var titleHTML = (function () {
         var lines = ['IT services,', 'delivered nationwide.'], out = [], i = 0;
+        var EM = { 'nationwide': 1 };   // the differentiator carries the weight
         lines.forEach(function (line, li) {
           if (li > 0) out.push('<br>');
           var words = line.split(' ');
           words.forEach(function (w, wi) {
-            out.push('<span class="i-word" style="transition-delay:' + (i * 70) + 'ms">' + esc(w) + '</span>');
+            var em = EM[w.toLowerCase().replace(/[^0-9a-z]+/g, '')] ? ' i-em' : '';
+            out.push('<span class="i-word' + em + '" style="transition-delay:' + (i * 70) + 'ms">' + esc(w) + '</span>');
             if (wi < words.length - 1) out.push(' ');
             i++;
           });
@@ -6081,6 +6095,97 @@
           if (e.key === 'Escape' && panelEl.classList.contains('open')) window.toggleChat();
         });
       });
+    })();
+  </script>
+
+
+  <!-- ============================================================
+       SMOOTH SCROLL (inertia) — lightweight, dependency-free.
+       Eases the *real* window scroll toward a wheel-driven target
+       (the approach Lenis uses) so scrollY stays truthful: the
+       parallax engine [data-parallax], IntersectionObserver reveals,
+       sticky/fixed layers, the scroll-progress bar and section dots
+       all keep working off ordinary native scroll events.
+
+         - Wheel only. Touch keeps its native momentum; keyboard and
+           scrollbar stay native, and the engine resyncs to them.
+         - Bails to native when the wheel is over any nested scroll
+           container (mega-menu, nav-search, chatbot, modals, the
+           off-canvas case pages, the horizontal .svc-snap carousel) —
+           detected generically via overflow, plus defaultPrevented for
+           the containers that run their own wheel handlers.
+         - Disabled under prefers-reduced-motion (falls back to native).
+       ============================================================ -->
+  <script>
+    (function () {
+      // Respect reduced motion — no smoothing, plain native scroll.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var root = document.scrollingElement || document.documentElement;
+      var LERP = 0.12;          // approach speed per ~16ms frame (0–1)
+      var targetY = window.scrollY || 0;   // where the wheel wants us
+      var currentY = targetY;              // the eased position we render
+      var raf = 0;
+      var expectedY = -1;       // last value we wrote — tells our writes from external scrolls
+      var lastT = 0;
+
+      function maxScroll() { return Math.max(0, root.scrollHeight - window.innerHeight); }
+
+      // True if a scroll container between `el` and the page root can take
+      // a vertical wheel itself (nested lists, modals, carousels, off-canvas
+      // pages). Those keep native scrolling; we never hijack them.
+      function nestedScroller(el) {
+        while (el && el.nodeType === 1 && el !== document.body && el !== document.documentElement) {
+          if (el.scrollHeight > el.clientHeight + 1) {
+            var oy = getComputedStyle(el).overflowY;
+            if (oy === 'auto' || oy === 'scroll' || oy === 'overlay') return true;
+          }
+          el = el.parentNode;
+        }
+        return false;
+      }
+
+      function frame(t) {
+        raf = 0;
+        if (!lastT) lastT = t;
+        var dt = Math.min(48, t - lastT);          // clamp long gaps (tab switches)
+        lastT = t;
+        var k = 1 - Math.pow(1 - LERP, dt / 16.6667);   // frame-rate-independent easing
+        currentY += (targetY - currentY) * k;
+        if (Math.abs(targetY - currentY) < 0.5) currentY = targetY;
+        expectedY = Math.round(currentY);
+        window.scrollTo({ top: expectedY, behavior: 'instant' });   // 'instant' overrides CSS scroll-behavior:smooth
+        if (currentY !== targetY) { raf = requestAnimationFrame(frame); }
+        else { lastT = 0; }
+      }
+
+      function start() { if (!raf) { lastT = 0; raf = requestAnimationFrame(frame); } }
+
+      window.addEventListener('wheel', function (e) {
+        if (e.defaultPrevented) return;                            // a nested handler already consumed it
+        if (e.ctrlKey) return;                                     // pinch-zoom — leave to the browser
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;       // horizontal intent → native (carousels)
+        if (nestedScroller(e.target)) return;                      // inside a nested scroller → native
+
+        var px = e.deltaMode === 1 ? e.deltaY * 16
+               : e.deltaMode === 2 ? e.deltaY * window.innerHeight
+               : e.deltaY;
+        // If we're at rest, re-anchor to the live position so keyboard /
+        // scrollbar / anchor moves since the last wheel aren't undone.
+        if (!raf) currentY = targetY = window.scrollY;
+        targetY = Math.max(0, Math.min(maxScroll(), targetY + px));
+        e.preventDefault();
+        start();
+      }, { passive: false });
+
+      // Yield to anything else that scrolls the page (scrollbar drag,
+      // keyboard, anchor/back-to-top smooth-scroll): resync and stand down.
+      window.addEventListener('scroll', function () {
+        var y = window.scrollY;
+        if (Math.abs(y - expectedY) <= 2) return;   // our own write — ignore
+        if (raf) { cancelAnimationFrame(raf); raf = 0; lastT = 0; }
+        currentY = targetY = y;
+      }, { passive: true });
     })();
   </script>
 

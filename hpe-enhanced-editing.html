@@ -1472,13 +1472,12 @@
 
     .hero-stat-card {
 
-      background: rgba(13, 27, 42, .85);
-
-      backdrop-filter: blur(12px);
+      background: rgba(13, 27, 42, .92);
 
       border: 1px solid rgba(255, 255, 255, .12);
 
-      border-radius: 10px;
+      /* solid data panel over the hero photo — no glass; crisp compact corner */
+      border-radius: var(--r-compact);
 
       padding: 16px;
 
@@ -2418,13 +2417,19 @@
 
     .kf-num {
 
-      font-size: 36px;
+      /* oversized display figures — stats carry their own scale, well above
+         the label, so the numbers read as the hero of the keyfacts band */
+      font-size: clamp(42px, 5.5vw, 64px);
 
       font-weight: 800;
 
       color: var(--orange);
 
-      line-height: 1;
+      line-height: .95;
+
+      letter-spacing: -.02em;
+
+      font-variant-numeric: tabular-nums;
 
       margin-bottom: 6px;
 
@@ -2436,7 +2441,16 @@
 
     .kf-num span {
 
-      font-size: 24px;
+      /* the unit/“+” rides small and dimmed next to the big figure */
+      font-size: .42em;
+
+      font-weight: 700;
+
+      opacity: .7;
+
+      margin-left: 2px;
+
+      vertical-align: baseline;
 
     }
 
@@ -2600,7 +2614,7 @@
 
     .about-img-wrap {
 
-      border-radius: 16px;
+      border-radius: var(--r-showcase);
 
       overflow: hidden;
 
@@ -3592,7 +3606,7 @@
 
       background: var(--navy);
 
-      border-radius: 20px;
+      border-radius: var(--r-showcase);
 
       padding: 40px;
 
@@ -3630,7 +3644,8 @@
 
       border: 1px solid rgba(255, 255, 255, .1);
 
-      border-radius: 12px;
+      /* dense numeric metric — tight, technical corner */
+      border-radius: var(--r-data);
 
       padding: 24px;
 
@@ -6738,7 +6753,7 @@
 
       background: white;
 
-      border-radius: 14px;
+      border-radius: var(--r-compact);
 
       padding: 24px;
 
@@ -8016,7 +8031,8 @@
 
       background: white;
 
-      border-radius: 12px;
+      /* schedule data block — tight corner */
+      border-radius: var(--r-data);
 
       padding: 22px 24px;
 
@@ -9377,7 +9393,7 @@
 
       background: var(--navy);
 
-      border-radius: 16px;
+      border-radius: var(--r-showcase);
 
       padding: 36px 40px;
 
@@ -9487,7 +9503,8 @@
 
       border: 1px solid rgba(255, 255, 255, .15);
 
-      border-radius: 10px;
+      /* dense numeric metric — tight, technical corner */
+      border-radius: var(--r-data);
 
       padding: 14px 20px;
 
@@ -9713,7 +9730,8 @@
 
       border: 1px solid var(--border);
 
-      border-radius: 8px;
+      /* deliberately square — technical scope tag for contrast */
+      border-radius: var(--r-sharp);
 
       padding: 10px 14px;
 
@@ -10233,7 +10251,8 @@
 
       border: 1px solid rgba(244, 121, 32, .25);
 
-      border-radius: 8px;
+      /* deliberately square — technical metric tag for contrast */
+      border-radius: var(--r-sharp);
 
       padding: 8px 14px;
 
@@ -10821,7 +10840,7 @@
 
     .svc-sla-card {
 
-      border-radius: 10px;
+      border-radius: var(--r-data);
 
       padding: 18px;
 
@@ -12480,6 +12499,19 @@
       --orange-l: rgba(255, 125, 26, .13);
 
       --radius: 14px;
+      /* Radius hierarchy — intentional variety by element weight, not one
+         soft rounding everywhere. Showcase reads generous; dense data reads
+         crisp/technical; --r-sharp gives deliberate square contrast. */
+      --r-showcase: 22px;
+      /* hero imagery / showcase visuals */
+      --r-card: 14px;
+      /* standard content cards (alias of --radius) */
+      --r-compact: 8px;
+      /* compact secondary cards / inputs */
+      --r-data: 4px;
+      /* dense data: metrics, chips, SLA, schedule */
+      --r-sharp: 0px;
+      /* deliberate square contrast */
       --shadow: 0 22px 55px -18px rgba(0, 0, 0, .72);
       --ring: 0 0 0 3px rgba(255, 125, 26, .28);
 
@@ -12602,6 +12634,43 @@
       font-weight: 700;
       color: var(--heading);
       letter-spacing: -0.032em;
+    }
+
+    /* ── Art-directed section headings ───────────────────────────────────
+       Break the one-rule-everywhere look. A [data-em] heading drops its
+       supporting words to a light Space Grotesk weight + dimmed ink while
+       the one key word (named in data-em, wrapped .tw-em by the split JS)
+       stays heavy and bright — a weight/tone mix inside a single heading.
+       Size modifiers give a couple of sections their own display scale so
+       the set reads art-directed rather than templated from one rule. */
+    /* Scoped to .title-anim (added by the split JS) so that with scripting off
+       the heading keeps its solid single weight instead of going light with no
+       emphasized word to carry it. */
+    h2.section-title.title-anim[data-em] {
+      font-weight: 400;
+      color: rgba(243, 247, 252, .60);
+    }
+
+    h2.section-title.title-anim[data-em] .tw-em,
+    .ht-em {
+      font-weight: 700;
+      color: var(--heading);
+      letter-spacing: -0.045em;
+    }
+
+    /* flagship section — a more confident display scale */
+    h2.section-title.st-lg {
+      font-size: clamp(34px, 5.2vw, 66px);
+    }
+
+    /* utility heading (Contact) — smaller, tracked-out label energy, so it
+       reads as a quiet closer rather than another full-size display head */
+    h2.section-title.st-sm {
+      font-size: clamp(22px, 2.4vw, 30px);
+      font-weight: 600;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: var(--heading);
     }
 
     /* 'pretty' (not 'balance') for body: keeps the measure even but only
@@ -12759,10 +12828,10 @@
     }
 
     .hero-stat-card {
-      background: rgba(9, 15, 25, .72);
+      /* de-glassed: solid near-opaque fill instead of blur — a crisp data
+         panel that contrasts with the glassy nav/search chrome above it */
+      background: rgba(9, 15, 25, .92);
       border: 1px solid var(--border-2);
-      -webkit-backdrop-filter: blur(14px);
-      backdrop-filter: blur(14px);
       box-shadow: 0 14px 40px -14px rgba(0, 0, 0, .8);
     }
 
@@ -15486,7 +15555,7 @@
 
         <div class="section-tag">About HPE Solutions</div>
 
-        <h2 class="section-title">Who We Are</h2>
+        <h2 class="section-title" data-em="Who">Who We Are</h2>
 
         <p class="section-sub">An IT support and managed-services company operating since 2011, with 18 service centres
           across Malaysia.</p>
@@ -15826,7 +15895,7 @@
 
         <div class="section-tag">Why Choose HPE</div>
 
-        <h2 class="section-title">Why Companies Stay With Us</h2>
+        <h2 class="section-title st-lg" data-em="Stay">Why Companies Stay With Us</h2>
 
         <p class="section-sub">Engineers on the ground in every region, backed by contracted response times.</p>
 
@@ -15940,7 +16009,7 @@
 
     <div class="section-tag">Industries Served</div>
 
-    <h2 class="section-title">Industries We Support</h2>
+    <h2 class="section-title" data-em="Industries">Industries We Support</h2>
 
     <p class="section-sub">Clients in banking, retail, telecommunications, government, and manufacturing.</p>
 
@@ -16102,7 +16171,7 @@
 
       <div class="section-tag" style="justify-content:center;">Case Study</div>
 
-      <h2 class="section-title">Client Projects</h2>
+      <h2 class="section-title" data-em="Projects">Client Projects</h2>
 
       <p class="section-sub" style="margin:0 auto;">14 completed engagements across banking, retail, telco, and
         government. Click any project for details.</p>
@@ -17343,7 +17412,7 @@
 
       <div class="section-tag" style="justify-content:center;">Business Partners</div>
 
-      <h2 class="section-title">Our Business Partners</h2>
+      <h2 class="section-title" data-em="Partners">Our Business Partners</h2>
 
       <p class="section-sub" style="margin:0 auto;">Authorised partner for leading global tech brands.</p>
 
@@ -17557,7 +17626,7 @@
 
       <div class="section-tag">Get In Touch</div>
 
-      <h2 class="section-title">Contact Us</h2>
+      <h2 class="section-title st-sm">Contact Us</h2>
 
       <p class="section-sub">We respond within one business day.</p>
 
@@ -21180,9 +21249,21 @@
 
         t.setAttribute('aria-label', text);
 
+        /* data-em names the word(s) to emphasize (comma-separated, case- and
+           punctuation-insensitive). Matching words get .tw-em so the heading
+           can carry a heavy key word among lighter supporting words. */
+        var emSet = {};
+        (t.getAttribute('data-em') || '').split(',').forEach(function (w) {
+          w = w.trim().toLowerCase(); if (w) emSet[w] = 1;
+        });
+
         t.innerHTML = text.split(' ').map(function (w, i) {
 
-          return '<span class="tw" aria-hidden="true" style="--tw-d:' + Math.min(i * 60, 420) + 'ms">' + esc(w) + '</span>';
+          var key = w.toLowerCase().replace(/[^0-9a-z]+/g, '');
+
+          var em = emSet[key] ? ' tw-em' : '';
+
+          return '<span class="tw' + em + '" aria-hidden="true" style="--tw-d:' + Math.min(i * 60, 420) + 'ms">' + esc(w) + '</span>';
 
         }).join(' ');
 
@@ -23796,6 +23877,97 @@
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll, { passive: true });
       apply();
+    })();
+  </script>
+
+
+  <!-- ============================================================
+       SMOOTH SCROLL (inertia) — lightweight, dependency-free.
+       Eases the *real* window scroll toward a wheel-driven target
+       (the approach Lenis uses) so scrollY stays truthful: the
+       parallax engine [data-parallax], IntersectionObserver reveals,
+       sticky/fixed layers, the scroll-progress bar and section dots
+       all keep working off ordinary native scroll events.
+
+         - Wheel only. Touch keeps its native momentum; keyboard and
+           scrollbar stay native, and the engine resyncs to them.
+         - Bails to native when the wheel is over any nested scroll
+           container (mega-menu, nav-search, chatbot, modals, the
+           off-canvas case pages, the horizontal .svc-snap carousel) —
+           detected generically via overflow, plus defaultPrevented for
+           the containers that run their own wheel handlers.
+         - Disabled under prefers-reduced-motion (falls back to native).
+       ============================================================ -->
+  <script>
+    (function () {
+      // Respect reduced motion — no smoothing, plain native scroll.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var root = document.scrollingElement || document.documentElement;
+      var LERP = 0.12;          // approach speed per ~16ms frame (0–1)
+      var targetY = window.scrollY || 0;   // where the wheel wants us
+      var currentY = targetY;              // the eased position we render
+      var raf = 0;
+      var expectedY = -1;       // last value we wrote — tells our writes from external scrolls
+      var lastT = 0;
+
+      function maxScroll() { return Math.max(0, root.scrollHeight - window.innerHeight); }
+
+      // True if a scroll container between `el` and the page root can take
+      // a vertical wheel itself (nested lists, modals, carousels, off-canvas
+      // pages). Those keep native scrolling; we never hijack them.
+      function nestedScroller(el) {
+        while (el && el.nodeType === 1 && el !== document.body && el !== document.documentElement) {
+          if (el.scrollHeight > el.clientHeight + 1) {
+            var oy = getComputedStyle(el).overflowY;
+            if (oy === 'auto' || oy === 'scroll' || oy === 'overlay') return true;
+          }
+          el = el.parentNode;
+        }
+        return false;
+      }
+
+      function frame(t) {
+        raf = 0;
+        if (!lastT) lastT = t;
+        var dt = Math.min(48, t - lastT);          // clamp long gaps (tab switches)
+        lastT = t;
+        var k = 1 - Math.pow(1 - LERP, dt / 16.6667);   // frame-rate-independent easing
+        currentY += (targetY - currentY) * k;
+        if (Math.abs(targetY - currentY) < 0.5) currentY = targetY;
+        expectedY = Math.round(currentY);
+        window.scrollTo({ top: expectedY, behavior: 'instant' });   // 'instant' overrides CSS scroll-behavior:smooth
+        if (currentY !== targetY) { raf = requestAnimationFrame(frame); }
+        else { lastT = 0; }
+      }
+
+      function start() { if (!raf) { lastT = 0; raf = requestAnimationFrame(frame); } }
+
+      window.addEventListener('wheel', function (e) {
+        if (e.defaultPrevented) return;                            // a nested handler already consumed it
+        if (e.ctrlKey) return;                                     // pinch-zoom — leave to the browser
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;       // horizontal intent → native (carousels)
+        if (nestedScroller(e.target)) return;                      // inside a nested scroller → native
+
+        var px = e.deltaMode === 1 ? e.deltaY * 16
+               : e.deltaMode === 2 ? e.deltaY * window.innerHeight
+               : e.deltaY;
+        // If we're at rest, re-anchor to the live position so keyboard /
+        // scrollbar / anchor moves since the last wheel aren't undone.
+        if (!raf) currentY = targetY = window.scrollY;
+        targetY = Math.max(0, Math.min(maxScroll(), targetY + px));
+        e.preventDefault();
+        start();
+      }, { passive: false });
+
+      // Yield to anything else that scrolls the page (scrollbar drag,
+      // keyboard, anchor/back-to-top smooth-scroll): resync and stand down.
+      window.addEventListener('scroll', function () {
+        var y = window.scrollY;
+        if (Math.abs(y - expectedY) <= 2) return;   // our own write — ignore
+        if (raf) { cancelAnimationFrame(raf); raf = 0; lastT = 0; }
+        currentY = targetY = y;
+      }, { passive: true });
     })();
   </script>
 

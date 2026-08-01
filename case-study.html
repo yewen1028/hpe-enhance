@@ -87,6 +87,13 @@
       --light: #f6f8fb;
       --border: #e6ebf1;
       --radius: 14px;
+      /* Radius hierarchy — intentional variety by element weight (not one soft
+         rounding everywhere): showcase generous, dense data crisp, sharp=square. */
+      --r-showcase: 22px;
+      --r-card: 14px;
+      --r-compact: 8px;
+      --r-data: 4px;
+      --r-sharp: 0px;
       --shadow: 0 24px 60px -22px rgba(13, 27, 42, .28);
       --nav-h: 68px;
     }
@@ -279,9 +286,9 @@
       margin-top: 44px;
     }
     .d-metric {
-      background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .12);
-      border-radius: 13px; padding: 22px 20px 20px;
-      backdrop-filter: blur(4px);
+      /* de-glassed solid data card; tight technical corner (was 13px + blur) */
+      background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: var(--r-data); padding: 22px 20px 20px;
     }
     .d-metric .v {
       display: block; font-size: clamp(22px, 3vw, 30px); font-weight: 800; color: #fff; letter-spacing: -.01em;
@@ -365,7 +372,7 @@
     .sc-media figcaption { position: absolute; left: 14px; bottom: 14px; z-index: 2; }
     .sc-ind {
       display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
-      background: rgba(10, 17, 29, .74); backdrop-filter: blur(8px);
+      background: rgba(10, 17, 29, .88);
       border: 1px solid rgba(255, 255, 255, .16);
       font-size: 12.5px; font-weight: 700; color: #fff;
     }
@@ -552,7 +559,10 @@
     /* ─────────────────────────  INDEX VIEW  ───────────────────────── */
     .i-hero .wrap { padding: 66px 0 clamp(80px, 10vw, 132px); }
     .i-eyebrow { color: var(--orange); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; margin-bottom: 18px; }
-    .i-title { font-size: clamp(34px, 6vw, 60px); font-weight: 800; letter-spacing: -.025em; line-height: 1.03; }
+    /* Hero headline is a weight-mix: supporting words sit light, the one key
+       word (.i-em) carries heavy weight — art-directed, not a flat bold line. */
+    .i-title { font-size: clamp(34px, 6vw, 60px); font-weight: 400; letter-spacing: -.025em; line-height: 1.03; }
+    .i-title .i-em { font-weight: 700; letter-spacing: -.04em; }
     .i-sub { margin-top: 22px; max-width: 56ch; font-size: clamp(15.5px, 1.6vw, 18px); line-height: 1.72; color: rgba(255, 255, 255, .8); }
     .i-stats { display: flex; flex-wrap: wrap; gap: 44px; margin-top: 44px; }
     .i-stats .st .v { font-size: 28px; font-weight: 800; color: #fff; }
@@ -696,7 +706,7 @@
     .cs-card.in .cs-thumb { clip-path: polygon(0 0, 135% 0, 100% 100%, 0 100%); }
     .cs-thumb .ico {
       position: absolute; left: 14px; bottom: 14px; z-index: 1;
-      width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center;
+      width: 40px; height: 40px; border-radius: var(--r-compact); display: grid; place-items: center;
       background: rgba(255, 255, 255, .92); color: var(--orange); font-size: 16px;
       box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .4);
     }
@@ -705,7 +715,7 @@
     .cs-info h3 { font-size: 17.5px; font-weight: 700; color: var(--navy); line-height: 1.35; margin: 9px 0 14px; }
     .cs-mets { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; }
     .cs-mets span {
-      font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 7px;
+      font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: var(--r-data);
       background: var(--light); color: var(--navy); border: 1px solid var(--border);
     }
     .cs-more {
@@ -744,7 +754,7 @@
     .cs-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
     .cs-tag {
       font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
-      padding: 4px 9px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 9px; border-radius: var(--r-sharp); display: inline-flex; align-items: center; gap: 5px;
       border: 1px solid var(--border); white-space: nowrap;
     }
     .cs-tag-svc { background: var(--orange-l); color: var(--orange); border-color: rgba(255, 125, 26, .25); }
@@ -4626,7 +4636,7 @@
           '<div class="hero-glow" data-parallax="0.24"></div>' +
           '<div class="wrap" data-parallax="0.05">' +
             '<div class="i-eyebrow">Case Studies</div>' +
-            '<h1 class="i-title">Real results for<br>real businesses.</h1>' +
+            '<h1 class="i-title">Real <span class="i-em">results</span> for<br>real businesses.</h1>' +
             '<div class="svc-glowline" id="svcGlowline" aria-hidden="true">' +
               '<svg class="gl-svg" viewBox="0 0 340 26" preserveAspectRatio="none">' +
                 '<defs>' +
@@ -6152,6 +6162,97 @@
           if (e.key === 'Escape' && panelEl.classList.contains('open')) window.toggleChat();
         });
       });
+    })();
+  </script>
+
+
+  <!-- ============================================================
+       SMOOTH SCROLL (inertia) — lightweight, dependency-free.
+       Eases the *real* window scroll toward a wheel-driven target
+       (the approach Lenis uses) so scrollY stays truthful: the
+       parallax engine [data-parallax], IntersectionObserver reveals,
+       sticky/fixed layers, the scroll-progress bar and section dots
+       all keep working off ordinary native scroll events.
+
+         - Wheel only. Touch keeps its native momentum; keyboard and
+           scrollbar stay native, and the engine resyncs to them.
+         - Bails to native when the wheel is over any nested scroll
+           container (mega-menu, nav-search, chatbot, modals, the
+           off-canvas case pages, the horizontal .svc-snap carousel) —
+           detected generically via overflow, plus defaultPrevented for
+           the containers that run their own wheel handlers.
+         - Disabled under prefers-reduced-motion (falls back to native).
+       ============================================================ -->
+  <script>
+    (function () {
+      // Respect reduced motion — no smoothing, plain native scroll.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var root = document.scrollingElement || document.documentElement;
+      var LERP = 0.12;          // approach speed per ~16ms frame (0–1)
+      var targetY = window.scrollY || 0;   // where the wheel wants us
+      var currentY = targetY;              // the eased position we render
+      var raf = 0;
+      var expectedY = -1;       // last value we wrote — tells our writes from external scrolls
+      var lastT = 0;
+
+      function maxScroll() { return Math.max(0, root.scrollHeight - window.innerHeight); }
+
+      // True if a scroll container between `el` and the page root can take
+      // a vertical wheel itself (nested lists, modals, carousels, off-canvas
+      // pages). Those keep native scrolling; we never hijack them.
+      function nestedScroller(el) {
+        while (el && el.nodeType === 1 && el !== document.body && el !== document.documentElement) {
+          if (el.scrollHeight > el.clientHeight + 1) {
+            var oy = getComputedStyle(el).overflowY;
+            if (oy === 'auto' || oy === 'scroll' || oy === 'overlay') return true;
+          }
+          el = el.parentNode;
+        }
+        return false;
+      }
+
+      function frame(t) {
+        raf = 0;
+        if (!lastT) lastT = t;
+        var dt = Math.min(48, t - lastT);          // clamp long gaps (tab switches)
+        lastT = t;
+        var k = 1 - Math.pow(1 - LERP, dt / 16.6667);   // frame-rate-independent easing
+        currentY += (targetY - currentY) * k;
+        if (Math.abs(targetY - currentY) < 0.5) currentY = targetY;
+        expectedY = Math.round(currentY);
+        window.scrollTo({ top: expectedY, behavior: 'instant' });   // 'instant' overrides CSS scroll-behavior:smooth
+        if (currentY !== targetY) { raf = requestAnimationFrame(frame); }
+        else { lastT = 0; }
+      }
+
+      function start() { if (!raf) { lastT = 0; raf = requestAnimationFrame(frame); } }
+
+      window.addEventListener('wheel', function (e) {
+        if (e.defaultPrevented) return;                            // a nested handler already consumed it
+        if (e.ctrlKey) return;                                     // pinch-zoom — leave to the browser
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;       // horizontal intent → native (carousels)
+        if (nestedScroller(e.target)) return;                      // inside a nested scroller → native
+
+        var px = e.deltaMode === 1 ? e.deltaY * 16
+               : e.deltaMode === 2 ? e.deltaY * window.innerHeight
+               : e.deltaY;
+        // If we're at rest, re-anchor to the live position so keyboard /
+        // scrollbar / anchor moves since the last wheel aren't undone.
+        if (!raf) currentY = targetY = window.scrollY;
+        targetY = Math.max(0, Math.min(maxScroll(), targetY + px));
+        e.preventDefault();
+        start();
+      }, { passive: false });
+
+      // Yield to anything else that scrolls the page (scrollbar drag,
+      // keyboard, anchor/back-to-top smooth-scroll): resync and stand down.
+      window.addEventListener('scroll', function () {
+        var y = window.scrollY;
+        if (Math.abs(y - expectedY) <= 2) return;   // our own write — ignore
+        if (raf) { cancelAnimationFrame(raf); raf = 0; lastT = 0; }
+        currentY = targetY = y;
+      }, { passive: true });
     })();
   </script>
 
